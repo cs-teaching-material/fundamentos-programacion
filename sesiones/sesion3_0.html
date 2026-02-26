@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sesión 3.0 — PSInt → C# (Consola)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --text:#e9eefc;
+      --muted:#b7c0e3;
+      --accent:#7aa2ff;
+      --ok:#41d39b;
+      --warn:#ffcc66;
+      --danger:#ff6b6b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);}
+    .deck{height:100%; display:flex; flex-direction:column;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .topbar .title{font-weight:650; letter-spacing:.2px;}
+    .topbar .meta{color:var(--muted); font-size:13px;}
+    .stage{flex:1; display:flex; align-items:center; justify-content:center; padding:18px;}
+    .slide{
+      width:min(1100px, 96vw);
+      height:min(640px, 78vh);
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
+      padding:28px 34px;
+      display:none;
+      overflow:hidden;
+    }
+    .slide.active{display:block;}
+    h1,h2,h3{margin:0 0 12px 0;}
+    h1{font-size:44px; line-height:1.08;}
+    h2{font-size:34px;}
+    h3{font-size:22px; color:var(--muted); font-weight:600;}
+    p{margin:10px 0; color:var(--text); font-size:20px; line-height:1.35;}
+    ul{margin:12px 0 0 20px; font-size:20px; line-height:1.35;}
+    li{margin:8px 0;}
+    .kpi{display:flex; gap:14px; flex-wrap:wrap; margin-top:14px;}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .two{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:start;
+      margin-top:12px;
+    }
+    .box{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:14px 14px;
+    }
+    .code{
+      font-family:var(--mono);
+      font-size:15px;
+      line-height:1.35;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      padding:12px 12px;
+      white-space:pre-wrap;
+    }
+    .note{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .footer{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted); font-size:13px;
+    }
+    .keys kbd{
+      font-family:var(--mono);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+      margin:0 2px;
+      color:var(--text);
+    }
+    .badge{
+      color:var(--bg);
+      background:var(--accent);
+      border-radius:8px;
+      padding:2px 8px;
+      font-weight:650;
+      font-size:13px;
+    }
+    .hl{color:var(--accent); font-weight:650;}
+    .ok{color:var(--ok); font-weight:650;}
+    .warn{color:var(--warn); font-weight:650;}
+    .danger{color:var(--danger); font-weight:650;}
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:10px;
+    }
+    .small{font-size:16px; color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="topbar">
+      <div>
+        <div class="title">Lógica de Programación — Sesión 3.0</div>
+        <div class="meta">Puente PSInt → C# (Consola) · Variables · Tipos · Entrada/Salida · Condicionales</div>
+      </div>
+      <div class="meta"><span class="badge" id="counter">1/1</span></div>
+    </div>
+
+    <div class="stage">
+      <!-- Slide 1 -->
+      <section class="slide active">
+        <h1>Sesión 3.0</h1>
+        <h3>Todo lo visto en PSInt, ahora “bien escrito” en C#</h3>
+        <div class="kpi">
+          <div class="chip">Meta: traducir conceptos, no memorizar sintaxis</div>
+          <div class="chip">Herramienta: consola + pruebas por casos</div>
+          <div class="chip">Salida: 1 programa corto + 3 casos (incluye bordes)</div>
+        </div>
+        <p class="note">Navegación: ← → · Pantalla completa: F</p>
+      </section>
+
+      <!-- Slide 2 -->
+      <section class="slide">
+        <h2>Objetivos (universitario)</h2>
+        <ul>
+          <li>Escribir la estructura mínima de un programa de consola en C#.</li>
+          <li>Declarar variables con tipos correctos (int, decimal, bool, string).</li>
+          <li>Leer, convertir y validar entrada por consola (Parse/TryParse).</li>
+          <li>Implementar reglas con if/else y switch sin ambigüedad.</li>
+        </ul>
+        <p class="note">C# es estricto con tipos: eso te obliga a pensar mejor el modelo.</p>
+      </section>
+
+      <!-- Slide 3 -->
+      <section class="slide">
+        <h2>Mapa mental: PSInt → C#</h2>
+        <div class="box">
+          <div class="code">PSInt                     C#
+---------------------------------------------------------
+Proceso / FinProceso       static void Main(...) { ... }
+Escribir                  Console.WriteLine(...)
+Leer x                    var s = Console.ReadLine()
+                          x = int.Parse(s) / TryParse
+Entero / Real / Cadena    int / double|decimal / string
+Si / Sino / FinSi         if / else
+Segun / FinSegun          switch
+Y / O / No                && / || / !</div>
+        </div>
+        <p class="note">La lógica es la misma; cambia el “cómo se escribe”.</p>
+      </section>
+
+      <!-- Slide 4 -->
+      <section class="slide">
+        <h2>Cómo inicia un programa (plantilla mínima)</h2>
+        <div class="code">using System;
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    Console.WriteLine("Hola, mundo");
+  }
+}</div>
+        <p class="note">Tu programa vive dentro de Main. Primero lo hacemos simple, luego lo organizamos.</p>
+      </section>
+
+      <!-- Slide 5 -->
+      <section class="slide">
+        <h2>Tipos de datos (lo que debes dominar ya)</h2>
+        <div class="grid2">
+          <div class="box">
+            <h3>Numéricos</h3>
+            <div class="code">int    edad = 20;        // enteros
+decimal precio = 12500m;  // dinero (más seguro)
+double  x = 3.14;         // cálculo científico</div>
+            <p class="small">Tip: dinero → decimal (usa sufijo <span class="hl">m</span>).</p>
+          </div>
+          <div class="box">
+            <h3>Texto y lógico</h3>
+            <div class="code">string ciudad = "Cali";
+bool esValido = true;</div>
+            <p class="small">bool solo puede ser true/false.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 6 -->
+      <section class="slide">
+        <h2>Entrada por consola (sin fallar)</h2>
+        <div class="two">
+          <div class="box">
+            <h3>Versión directa (Parse)</h3>
+            <div class="code">Console.Write("Edad: ");
+int edad = int.Parse(Console.ReadLine()!);</div>
+            <p class="small">Si el usuario escribe texto, esto puede fallar.</p>
+          </div>
+          <div class="box">
+            <h3>Versión robusta (TryParse)</h3>
+            <div class="code">Console.Write("Edad: ");
+string s = Console.ReadLine() ?? "";
+bool ok = int.TryParse(s, out int edad);
+
+if (!ok)
+{
+  Console.WriteLine("Entrada inválida.");
+  return;
+}</div>
+            <p class="small">Universitario: valida entrada o define precondición explícita.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7 -->
+      <section class="slide">
+        <h2>Operadores (repaso rápido)</h2>
+        <div class="two">
+          <div class="box">
+            <h3>Aritméticos</h3>
+            <div class="code">+  -  *  /</div>
+            <h3>Comparación</h3>
+            <div class="code">==  !=  >  >=  <  <=</div>
+          </div>
+          <div class="box">
+            <h3>Lógicos</h3>
+            <div class="code">&&  (AND)
+||  (OR)
+!   (NOT)</div>
+            <p class="note">Si mezclas AND/OR, usa paréntesis.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 8 -->
+      <section class="slide">
+        <h2>Condicionales (if / else)</h2>
+        <div class="code">if (edad >= 18)
+{
+  Console.WriteLine("Mayor de edad");
+}
+else
+{
+  Console.WriteLine("Menor de edad");
+}</div>
+        <p class="note">No hay “FinSi”: en C# mandan las llaves { }.</p>
+      </section>
+
+      <!-- Slide 9 -->
+      <section class="slide">
+        <h2>Selección por categorías (switch)</h2>
+        <div class="code">Console.Write("Tipo (1=Moto, 2=Carro, 3=Camión): ");
+int tipo = int.Parse(Console.ReadLine()!);
+
+decimal baseTarifa = tipo switch
+{
+  1 => 6000m,
+  2 => 12000m,
+  3 => 20000m,
+  _ => throw new Exception("Tipo inválido")
+};</div>
+        <p class="note">switch ayuda cuando la regla es “según categoría”.</p>
+      </section>
+
+      <!-- Slide 10 -->
+      <section class="slide">
+        <h2>Ejemplo completo (IVA + descuento)</h2>
+        <p>El mismo ejemplo de PSInt, ahora en C# con decimal.</p>
+        <div class="code">Console.Write("Precio base: ");
+decimal precioBase = decimal.Parse(Console.ReadLine()!);
+
+Console.Write("IVA (%): ");
+decimal ivaPct = decimal.Parse(Console.ReadLine()!);
+
+Console.Write("Descuento (%): ");
+decimal descPct = decimal.Parse(Console.ReadLine()!);
+
+decimal ivaVal = precioBase * (ivaPct / 100m);
+decimal subtotal = precioBase + ivaVal;
+decimal descVal = subtotal * (descPct / 100m);
+decimal total = subtotal - descVal;
+
+Console.WriteLine($"Total: {total}");</div>
+        <p class="note">Prueba mínima: descPct=0 debe dejar total=subtotal.</p>
+      </section>
+
+      <!-- Slide 11 -->
+      <section class="slide">
+        <h2>Prueba por casos (lo que exijo)</h2>
+        <div class="box">
+          <ul>
+            <li>1 caso normal (valores típicos).</li>
+            <li>1 caso borde (0, umbral exacto, etc.).</li>
+            <li>1 caso “sanity” (¿el resultado tiene sentido?).</li>
+          </ul>
+        </div>
+        <p class="note">Sin pruebas por casos, no hay evidencia de corrección.</p>
+      </section>
+
+      <!-- Slide 12 -->
+      <section class="slide">
+        <h2>Actividad (obligatoria)</h2>
+        <p><span class="hl">Taller en clase:</span> reescribe tu solución de “compra con envío” en C#.</p>
+        <div class="box">
+          <ul>
+            <li>Entradas: subtotal (decimal), ciudad (string), tieneCupon (S/N).</li>
+            <li>Reglas: cupón y envío gratis por umbral (prioridad).</li>
+            <li>Salida: total.</li>
+          </ul>
+        </div>
+        <ul>
+          <li>Entrega: .cs o captura del código + 3 casos de prueba documentados.</li>
+          <li>Enfócate en: tipos + if/else + claridad de reglas.</li>
+        </ul>
+      </section>
+
+      <!-- Slide 13 -->
+      <section class="slide">
+        <h2>Reto (opcional, sin nota)</h2>
+        <div class="box">
+          <p><b>Modo robusto:</b> reemplaza Parse por TryParse y maneja entrada inválida sin romper el programa.</p>
+          <p class="small">Si lo haces, obtienes retroalimentación extra (no calificación).</p>
+        </div>
+        <p class="note">Esto prepara tu proyecto: entrada real casi siempre trae errores.</p>
+      </section>
+
+      <!-- Slide 14 -->
+      <section class="slide">
+        <h2>Ticket de salida (5 min)</h2>
+        <ul>
+          <li>¿Qué tipo usaste para dinero y por qué?</li>
+          <li>Escribe 1 borde que probaste (con valores).</li>
+          <li>¿Qué regla de prioridad implementaste en tu if/else?</li>
+        </ul>
+        <p class="note">Objetivo: pasar de pseudocódigo a C# sin perder el modelo.</p>
+      </section>
+    </div>
+
+    <div class="footer">
+      <div class="keys">
+        Teclas: <kbd>←</kbd><kbd>→</kbd> · <kbd>Home</kbd> inicio · <kbd>End</kbd> final · <kbd>F</kbd> pantalla completa
+      </div>
+      <div id="status">Lista</div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let idx = 0;
+
+    function render(){
+      slides.forEach((s,i)=>s.classList.toggle('active', i===idx));
+      document.getElementById('counter').textContent = (idx+1) + '/' + slides.length;
+      document.getElementById('status').textContent = 'Sesión 3.0 · Diapositiva ' + (idx+1);
+      location.hash = '#slide-' + (idx+1);
+    }
+    function go(n){
+      idx = Math.max(0, Math.min(slides.length-1, n));
+      render();
+    }
+    function next(){ go(idx+1); }
+    function prev(){ go(idx-1); }
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight' || e.key === 'PageDown') next();
+      if(e.key === 'ArrowLeft'  || e.key === 'PageUp') prev();
+      if(e.key === 'Home') go(0);
+      if(e.key === 'End') go(slides.length-1);
+      if(e.key.toLowerCase() === 'f'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    if(location.hash.startsWith('#slide-')){
+      const n = parseInt(location.hash.replace('#slide-',''),10);
+      if(!Number.isNaN(n)) idx = Math.max(0, Math.min(slides.length-1, n-1));
+    }
+    render();
+  </script>
+</body>
+</html>

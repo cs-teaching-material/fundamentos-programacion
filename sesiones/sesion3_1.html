@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sesión 3 — Lógica de Programación</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121a33; --text:#e9eefc; --muted:#b7c0e3;
+      --accent:#7aa2ff; --ok:#41d39b; --warn:#ffcc66; --danger:#ff6b6b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);}
+    .deck{height:100%; display:flex; flex-direction:column;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .topbar .title{font-weight:650; letter-spacing:.2px;}
+    .topbar .meta{color:var(--muted); font-size:13px;}
+    .stage{flex:1; display:flex; align-items:center; justify-content:center; padding:18px;}
+    .slide{
+      width:min(1100px, 96vw);
+      height:min(640px, 78vh);
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
+      padding:28px 34px;
+      display:none;
+      overflow:hidden;
+    }
+    .slide.active{display:block;}
+    h1,h2,h3{margin:0 0 12px 0;}
+    h1{font-size:44px; line-height:1.08;}
+    h2{font-size:34px;}
+    h3{font-size:22px; color:var(--muted); font-weight:600;}
+    p{margin:10px 0; color:var(--text); font-size:20px; line-height:1.35;}
+    ul{margin:12px 0 0 20px; font-size:20px; line-height:1.35;}
+    li{margin:8px 0;}
+    .kpi{display:flex; gap:14px; flex-wrap:wrap; margin-top:14px;}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .two{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px; align-items:start; margin-top:12px;}
+    .box{border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03); border-radius:12px; padding:14px 14px;}
+    .code{
+      font-family:var(--mono);
+      font-size:16px;
+      line-height:1.35;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      padding:12px 12px;
+      white-space:pre-wrap;
+    }
+    .note{margin-top:10px; color:var(--muted); font-size:15px;}
+    .footer{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted); font-size:13px;
+    }
+    .keys kbd{
+      font-family:var(--mono);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+      margin:0 2px;
+      color:var(--text);
+    }
+    .badge{color:var(--bg); background:var(--accent); border-radius:8px; padding:2px 8px; font-weight:650; font-size:13px;}
+    .hl{color:var(--accent); font-weight:650;}
+    .ok{color:var(--ok); font-weight:650;}
+    .warn{color:var(--warn); font-weight:650;}
+    .danger{color:var(--danger); font-weight:650;}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px;}
+    .small{font-size:16px; color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="topbar">
+      <div>
+        <div class="title">Lógica de Programación — Sesión 3</div>
+        <div class="meta">Unidad 1 · 2 horas · Condicionales + tablas de decisión + bordes + primer C# (incremental)</div>
+      </div>
+      <div class="meta"><span class="badge" id="counter">1/1</span></div>
+    </div>
+
+    <div class="stage">
+      <!-- Slide 1 -->
+      <section class="slide active">
+        <h1>Sesión 3</h1>
+        <h3>Diseñar decisiones: correcto, verificable y mantenible</h3>
+        <div class="kpi">
+          <div class="chip">Meta: controlar flujo (si / si-no / selección)</div>
+          <div class="chip">Nivel: bordes + prioridad de reglas</div>
+          <div class="chip">Salida: decisión + trazas + C# mínimo</div>
+        </div>
+        <p class="note">Navegación: ← → · Pantalla completa: F</p>
+      </section>
+
+      <!-- Slide 2 -->
+      <section class="slide">
+        <h2>Objetivos</h2>
+        <ul>
+          <li>Traducir reglas en <span class="hl">condiciones</span> sin huecos ni solapes.</li>
+          <li>Aplicar <span class="hl">prioridad</span> cuando varias reglas pueden activarse.</li>
+          <li>Verificar por <span class="hl">casos borde</span> (boundary testing).</li>
+          <li>Implementar la decisión en C# de forma incremental (if/else, switch).</li>
+        </ul>
+        <p class="note">Nivel universitario: no basta con “funciona con un ejemplo”.</p>
+      </section>
+
+      <!-- Slide 3 -->
+      <section class="slide">
+        <h2>Recordatorio: condición y borde</h2>
+        <div class="two">
+          <div class="box">
+            <p>Una condición debe ser <span class="ok">verdadera</span> o <span class="danger">falsa</span>.</p>
+            <div class="code">edad >= 18
+consumo > 200
+(hora >= 18) AND (hora <= 23)</div>
+          </div>
+          <div class="box">
+            <h3>Bordes típicos</h3>
+            <ul>
+              <li>Valores exactos del umbral (18, 200, 23).</li>
+              <li>Justo debajo y justo encima (17/18/19).</li>
+              <li>Entradas mínimas (0) y máximas (si existe tope).</li>
+            </ul>
+          </div>
+        </div>
+        <p class="small">Regla: si el enunciado no especifica, tú defines y lo dejas escrito.</p>
+      </section>
+
+      <!-- Slide 4 -->
+      <section class="slide">
+        <h2>Tabla de decisión (herramienta)</h2>
+        <div class="box">
+          <p>Sirve para evitar reglas contradictorias y para asegurar cobertura de casos.</p>
+          <div class="code">Condiciones →    C1         C2           Acción
+---------------------------------------------------------
+Caso 1:         true       true         A1
+Caso 2:         true       false        A2
+Caso 3:         false      true         A3
+Caso 4:         false      false        A4</div>
+        </div>
+        <p class="note">Si no puedes escribir la tabla, probablemente tu regla está incompleta.</p>
+      </section>
+
+      <!-- Slide 5 -->
+      <section class="slide">
+        <h2>Prioridad de reglas (cuando se pisan)</h2>
+        <div class="box">
+          <p><span class="hl">Regla de oro:</span> define el orden de aplicación.</p>
+          <div class="code">Ejemplo (envío):
+1) Si subtotal >= 100000 → envío = 0   (prioridad alta)
+2) Si no, si ciudad == "Cali" → envío = 12000
+3) Si no → envío = 18000</div>
+        </div>
+        <p class="note">Esto no es “estilo”: cambia el resultado.</p>
+      </section>
+
+      <!-- Slide 6 -->
+      <section class="slide">
+        <h2>Ejemplo guiado (reglas)</h2>
+        <p><span class="hl">Problema:</span> calcular total de compra con envío y cupón.</p>
+        <div class="box">
+          <ul>
+            <li>Entrada: subtotal, ciudad, tieneCupon (S/N).</li>
+            <li>Descuento: si tieneCupon y subtotal ≥ 80.000 → 8% sobre subtotal.</li>
+            <li>Envío: si subtotal ≥ 100.000 → 0; si no, Cali 12.000; otras 18.000.</li>
+            <li>Salida: total.</li>
+          </ul>
+        </div>
+        <p class="note">Aquí hay condiciones compuestas + prioridad (envío gratis gana).</p>
+      </section>
+
+      <!-- Slide 7 -->
+      <section class="slide">
+        <h2>Pseudocódigo (limpio y verificable)</h2>
+        <div class="code">Leer subtotal
+Leer ciudad
+Leer tieneCupon
+
+// 1) Descuento (se define primero)
+aplicaCupon = (tieneCupon == "S") AND (subtotal >= 80000)
+
+Si aplicaCupon Entonces
+  descuento = subtotal * 0.08
+Si no
+  descuento = 0
+FinSi
+
+// 2) Envío (prioridad)
+Si subtotal >= 100000 Entonces
+  envio = 0
+Si no
+  Si ciudad == "Cali" Entonces
+    envio = 12000
+  Si no
+    envio = 18000
+  FinSi
+FinSi
+
+total = (subtotal - descuento) + envio
+Escribir total</div>
+        <p class="note">Observa: cada variable crítica queda asignada en todas las ramas.</p>
+      </section>
+
+      <!-- Slide 8 -->
+      <section class="slide">
+        <h2>Primer C# (incremental, sin “frameworks”)</h2>
+        <div class="code">decimal subtotal = ...;
+string ciudad = ...;        // "Cali" u otra
+bool tieneCupon = ...;      // true/false
+
+bool aplicaCupon = tieneCupon && (subtotal >= 80000m);
+
+decimal descuento = aplicaCupon ? subtotal * 0.08m : 0m;
+
+decimal envio;
+if (subtotal >= 100000m) envio = 0m;
+else if (ciudad == "Cali") envio = 12000m;
+else envio = 18000m;
+
+decimal total = (subtotal - descuento) + envio;</div>
+        <p class="note">Esto es suficiente para la Entrega 1 del proyecto: leer, decidir, calcular, probar.</p>
+      </section>
+
+      <!-- Slide 9 -->
+      <section class="slide">
+        <h2>Prueba de escritorio (cobertura)</h2>
+        <div class="code">Caso | subtotal | cupon | ciudad | descuento | envio | total | motivo
+---- | ------- | ----- | ------ | -------- | ----- | ----- | ------
+1    |  120000 |  S    | Cali   | ?        | ?     | ?     | envío gratis
+2    |   90000 |  S    | Cali   | ?        | ?     | ?     | cupón aplica
+3    |   79000 |  S    | Medellín | ?      | ?     | ?     | borde cupón (no aplica)</div>
+        <p class="note">Exigencia: al menos 1 caso por regla + 1 caso borde por umbral.</p>
+      </section>
+
+      <!-- Slide 10 -->
+      <section class="slide">
+        <h2>Actividad central (25–30 min)</h2>
+        <p><span class="hl">Trabajo individual:</span> inicia tu Proyecto (Entrega 1, diseño).</p>
+        <div class="box">
+          <ul>
+            <li>Elige tu contexto (1–5) y define 6–10 parámetros (umbrales/tarifas).</li>
+            <li>Escribe 8 reglas (con prioridad) y conviértelas a pseudocódigo.</li>
+            <li>Diseña 6 casos de prueba (mínimo 2 bordes).</li>
+          </ul>
+        </div>
+        <p class="note">Entregable en clase: reglas + pseudocódigo + matriz de pruebas (borrador).</p>
+      </section>
+
+      <!-- Slide 11 -->
+      <section class="slide">
+        <h2>Reto (opcional, sin nota)</h2>
+        <div class="box">
+          <p><b>Auditoría de reglas:</b> escribe 2 casos “trampa” que rompan soluciones ambiguas.</p>
+          <ul>
+            <li>Ejemplo: dos reglas aplican a la vez, ¿cuál gana?</li>
+            <li>Ejemplo: entrada inválida (hora=27, subtotal negativo), ¿qué haces?</li>
+          </ul>
+        </div>
+        <p class="note">Si lo haces, obtienes retroalimentación extra (no calificación).</p>
+      </section>
+
+      <!-- Slide 12 -->
+      <section class="slide">
+        <h2>Ticket de salida (5 min)</h2>
+        <ul>
+          <li>Escribe 1 borde que hoy aprendiste a probar (con valores).</li>
+          <li>Escribe 1 regla con prioridad y cómo la aplicas.</li>
+          <li>¿Qué variable booleana (aplicaX) usarías para legibilidad en tu proyecto?</li>
+        </ul>
+        <p class="note">Meta: que tu algoritmo sea defendible, no solo “parecido”.</p>
+      </section>
+    </div>
+
+    <div class="footer">
+      <div class="keys">
+        Teclas: <kbd>←</kbd><kbd>→</kbd> · <kbd>Home</kbd> inicio · <kbd>End</kbd> final · <kbd>F</kbd> pantalla completa
+      </div>
+      <div id="status">Lista</div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let idx = 0;
+
+    function render(){
+      slides.forEach((s,i)=>s.classList.toggle('active', i===idx));
+      document.getElementById('counter').textContent = (idx+1) + '/' + slides.length;
+      document.getElementById('status').textContent = 'Sesión 3 · Diapositiva ' + (idx+1);
+      location.hash = '#slide-' + (idx+1);
+    }
+    function go(n){
+      idx = Math.max(0, Math.min(slides.length-1, n));
+      render();
+    }
+    function next(){ go(idx+1); }
+    function prev(){ go(idx-1); }
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight' || e.key === 'PageDown') next();
+      if(e.key === 'ArrowLeft'  || e.key === 'PageUp') prev();
+      if(e.key === 'Home') go(0);
+      if(e.key === 'End') go(slides.length-1);
+      if(e.key.toLowerCase() === 'f'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    if(location.hash.startsWith('#slide-')){
+      const n = parseInt(location.hash.replace('#slide-',''),10);
+      if(!Number.isNaN(n)) idx = Math.max(0, Math.min(slides.length-1, n-1));
+    }
+    render();
+  </script>
+</body>
+</html>

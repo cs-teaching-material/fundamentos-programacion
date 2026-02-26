@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lógica de Programación - Sesión 6: Arreglos/Listas y reportes iterativos (C#)</title>
+
+  <style>
+    :root{
+      /* Tema */
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+
+      --h1: clamp(30px, 3.4vw, 48px);
+      --h2: clamp(22px, 2.3vw, 34px);
+      --p:  clamp(15px, 1.3vw, 19px);
+      --li: clamp(15px, 1.3vw, 19px);
+
+      /* Safe margins (tal cual) */
+      --safe-top-cover: clamp(208px, 9vh, 128px);
+      --safe-left-cover: clamp(585px, 5.5vw, 110px);
+      --safe-right-cover: clamp(28px, 3vw, 72px);
+      --safe-bottom-cover: clamp(54px, 6vh, 92px);
+
+      --safe-top: clamp(100px, 9vh, 132px);
+      --safe-side: clamp(66px, 5.5vw, 108px);
+      --safe-bottom: clamp(52px, 6vh, 90px);
+    }
+
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:#ffffff;
+    }
+
+    .deck{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:clamp(10px, 2vw, 22px);
+      box-sizing:border-box;
+      background:#ffffff;
+    }
+
+    .stage{
+      width:min(96vw, calc(92vh * (16/9)));
+      aspect-ratio:16/9;
+      position:relative;
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      display:none;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .slide.active{ display:block; }
+
+    /* Fondos institucionales */
+    .slide.cover{
+      background:url("./Portada.png") center/cover no-repeat;
+      color:#ffffff;
+    }
+    .slide.content-slide{
+      background:
+        url("./Contenido.png") top left/contain no-repeat,
+        #ffffff;
+      color:var(--texto);
+    }
+
+    /* Safe padding por tipo de slide */
+    .inner{
+      height:100%;
+      box-sizing:border-box;
+      padding: var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+      display:flex;
+      flex-direction:column;
+      gap:clamp(10px, 1.1vw, 18px);
+    }
+    .cover .inner{
+      padding:
+        var(--safe-top-cover)
+        var(--safe-right-cover)
+        var(--safe-bottom-cover)
+        var(--safe-left-cover);
+    }
+
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:clamp(10px, 1.1vw, 16px);
+      min-height:0;
+    }
+
+    .header{
+      color:var(--azul-medio);
+      font-size:clamp(18px, 1.6vw, 22px);
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    h1{
+      margin:0;
+      font-size:var(--h1);
+      line-height:1.08;
+      color:var(--texto);
+    }
+    h2{
+      margin:0;
+      font-size:var(--h2);
+      line-height:1.15;
+      color:var(--azul-medio);
+    }
+
+    p{
+      margin:0;
+      font-size:var(--p);
+      line-height:1.4;
+      color:var(--texto);
+    }
+    li{
+      font-size:var(--li);
+      line-height:1.4;
+      color:var(--texto);
+    }
+    ul,ol{ margin:0; padding-left:1.2em; }
+
+    .subtitle{
+      color:var(--turquesa);
+      font-weight:800;
+      font-size:clamp(18px, 1.8vw, 24px);
+      margin-top:clamp(6px, 1vw, 10px);
+    }
+
+    /* Portada: colores */
+    .cover h1{ color:#ffffff; }
+    .cover p{ color:#e5edf8; }
+    .cover .subtitle{ color:#f7df00; }
+
+    .note{
+      color:var(--muted);
+      font-size:clamp(12px, 1.05vw, 14px);
+      line-height:1.35;
+    }
+
+    .callout{
+      background:rgba(255,255,255,0.94);
+      border-left:6px solid var(--turquesa);
+      padding:clamp(10px, 1.1vw, 14px);
+      border-radius:6px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1.15fr 0.9fr;
+      gap:clamp(12px, 1.6vw, 22px);
+      align-items:flex-start;
+      min-height:0;
+    }
+    @media(max-width:980px){
+      .two-col{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background:rgba(255,255,255,0.96);
+      border:1px solid #dde2f1;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#111827;
+      color:#e5e7eb;
+      padding:2px 8px;
+      border-radius:7px;
+      font-size:clamp(11px, 1vw, 13px);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:clamp(12px, 1.05vw, 14px);
+      line-height:1.35;
+      background:#0b1020;
+      color:#e5e7eb;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+      overflow:auto;
+      max-height: 44vh;
+      border:1px solid rgba(17,24,39,.25);
+      white-space:pre-wrap;
+    }
+
+    .imgbox{
+      background:rgba(255,255,255,0.96);
+      border:1px solid #dde2f1;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+    .imgwrap{
+      width:100%;
+      height: min(34vh, 280px);
+      border-radius:10px;
+      border:1px solid #dde2f1;
+      background:#ffffff;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+      box-sizing:border-box;
+    }
+    .imgwrap img, .imgwrap svg{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:rgba(255,255,255,0.96);
+    }
+    th,td{
+      border:1px solid #dde2f1;
+      padding:clamp(8px, 1vw, 12px);
+      font-size:clamp(14px, 1.2vw, 18px);
+      color:var(--texto);
+      vertical-align:top;
+    }
+    th{
+      background:#f3f6fb;
+      text-transform:uppercase;
+      font-size:clamp(12px, 1.1vw, 14px);
+      letter-spacing:.06em;
+      color:var(--azul-medio);
+    }
+
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+      font-size:clamp(12px, 1.05vw, 14px);
+      gap:14px;
+    }
+
+    .counter{
+      font-weight:800;
+      color:var(--azul-medio);
+    }
+    .cover .counter{ color:#e5edf8; }
+
+    /* Botones pequeños (mouse + touch) */
+    .touch-nav{
+      position:absolute;
+      top:50%;
+      left:0;
+      right:0;
+      transform:translateY(-50%);
+      display:flex;
+      justify-content:space-between;
+      padding: 0 12px;
+      pointer-events:none;
+      z-index: 10;
+    }
+    .touch-nav button{
+      pointer-events:auto;
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      padding:0;
+      border:1px solid rgba(221,226,241,0.95);
+      background:rgba(255,255,255,0.92);
+      color:var(--texto);
+      font-weight:900;
+      box-shadow:0 10px 22px rgba(0,0,0,.12);
+      cursor:pointer;
+    }
+
+    /* En desktop: aparecen al pasar el mouse por el stage */
+    #touchNav{ opacity:0; transform:translateY(-50%) translateY(6px); transition:.15s ease; }
+    .stage:hover #touchNav{ opacity:1; transform:translateY(-50%) translateY(0); }
+
+    /* En touch: visibles siempre */
+    @media (hover: none){
+      #touchNav{ opacity:1; transform:translateY(-50%); }
+    }
+  </style>
+</head>
+
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1) PORTADA -->
+    <section class="slide cover active" data-title="Portada">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesión 6: Arreglos/Listas + reportes iterativos</h1>
+          <div class="subtitle">Guardar datos para analizarlos: ciclos + almacenamiento (C#)</div>
+
+          <p class="note" style="margin-top:18px;">
+            Navegación: <span class="kbd">←</span> <span class="kbd">→</span> |
+            <span class="kbd">Home</span> <span class="kbd">End</span> |
+            <span class="kbd">F</span> pantalla completa · Mouse: botones · Touch: swipe
+          </p>
+        </div>
+
+        <div class="footer">
+          <span style="color:#e5edf8;">I.U. Pascual Bravo · Lógica de Programación</span>
+          <span class="counter">1 / 1</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) AGENDA -->
+    <section class="slide content-slide" data-title="Agenda">
+      <div class="inner">
+        <div class="header">Agenda de la sesión (120 min)</div>
+        <div class="content">
+          <h2>Plan de trabajo</h2>
+          <ul>
+            <li>0–10 · Puente: ciclos, contadores y acumuladores (C#).</li>
+            <li>10–30 · ¿Por qué guardar datos? (cuando el reporte requiere más que “sumar”).</li>
+            <li>30–55 · Arreglos en C#: qué son, cómo se usan y errores típicos.</li>
+            <li>55–70 · Listas (List&lt;T&gt;): cuándo convienen.</li>
+            <li>70–105 · Ejemplo guiado: almacenar N consumos y generar reporte completo.</li>
+            <li>105–115 · Taller: adaptar el ejemplo al escenario del proyecto (Entrega 2).</li>
+            <li>115–120 · Exit ticket.</li>
+          </ul>
+
+          <div class="callout">
+            <p>
+              Esta sesión avanza la Unidad 2 reforzando iteración y sumando “estructuras para almacenamiento de datos”
+              y operaciones sobre ellas para generar reportes.
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Sesión 6 · Agenda</span>
+          <span class="counter">2 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3) PUENTE -->
+    <section class="slide content-slide" data-title="Puente">
+      <div class="inner">
+        <div class="header">Puente con la sesión 5</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Lo que ya dominamos</h2>
+            <ul>
+              <li>for: cuando sabemos N (cantidad de iteraciones).</li>
+              <li>while: cuando repetimos hasta una condición o centinela.</li>
+              <li>Contador: “cuántos cumplen…”.</li>
+              <li>Acumulador: “cuánto llevo…”.</li>
+              <li>Traza: evidencia de que el ciclo hace lo correcto.</li>
+            </ul>
+          </div>
+
+          <div class="callout">
+            <p><b>Pregunta guía:</b></p>
+            <p style="margin-top:8px;">
+              Si ya puedes calcular total y conteos “al vuelo”, ¿por qué guardarías los datos?
+              Porque a veces el reporte necesita revisar valores después: máximos/mínimos, listas filtradas,
+              ordenar, buscar o reimprimir.
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Continuidad Unidad 2</span>
+          <span class="counter">3 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4) PROCESAR VS ALMACENAR -->
+    <section class="slide content-slide" data-title="Procesar vs almacenar">
+      <div class="inner">
+        <div class="header">Idea clave</div>
+        <div class="content two-col">
+          <div class="imgbox">
+            <h2 style="font-size:clamp(18px,1.7vw,24px); margin-bottom:10px;">Dos enfoques</h2>
+            <div class="imgwrap">
+              <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <style>
+                    .b{fill:#ffffff;stroke:#cbd5e1;stroke-width:2;}
+                    .t{fill:#015583;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;}
+                    .m{fill:#201F4B;font-family:Arial,Helvetica,sans-serif;font-size:18px;}
+                    .a{stroke:#05ADBC;stroke-width:3;marker-end:url(#arrow);}
+                  </style>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#05ADBC"/>
+                  </marker>
+                </defs>
+
+                <text class="t" x="40" y="40">A) Procesar al vuelo</text>
+                <rect class="b" x="40" y="60" rx="12" ry="12" width="360" height="80"/>
+                <text class="m" x="70" y="108">Leer dato → actualizar total/contadores</text>
+                <rect class="b" x="40" y="160" rx="12" ry="12" width="360" height="80"/>
+                <text class="m" x="70" y="208">No guardas todos los datos</text>
+
+                <text class="t" x="480" y="40">B) Almacenar y analizar</text>
+                <rect class="b" x="480" y="60" rx="12" ry="12" width="380" height="80"/>
+                <text class="m" x="510" y="100">Leer dato → guardarlo en arreglo/lista</text>
+                <rect class="b" x="480" y="160" rx="12" ry="12" width="380" height="80"/>
+                <text class="m" x="510" y="200">Luego: promedio, max/min, filtros, reporte</text>
+
+                <line class="a" x1="220" y1="250" x2="220" y2="325"/>
+                <rect class="b" x="80" y="325" rx="12" ry="12" width="280" height="70"/>
+                <text class="m" x="105" y="368">Salida final (reporte)</text>
+
+                <line class="a" x1="670" y1="250" x2="670" y2="325"/>
+                <rect class="b" x="530" y="325" rx="12" ry="12" width="280" height="70"/>
+                <text class="m" x="555" y="368">Salida final (reporte)</text>
+              </svg>
+            </div>
+            <p class="note" style="margin-top:10px;">
+              Hoy practicamos el enfoque B porque prepara el camino para operaciones sobre estructuras.
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Cuándo necesitas guardar</h2>
+            <ul>
+              <li>Cuando debes imprimir “los que cumplen condición” (lista filtrada).</li>
+              <li>Cuando el cálculo requiere revisar el conjunto más de una vez.</li>
+              <li>Cuando necesitas máximo/mínimo con su posición (índice).</li>
+              <li>Cuando quieres comparar el valor actual con uno anterior (series).</li>
+            </ul>
+            <div class="callout" style="margin-top:10px;">
+              <p>
+                Lo importante para lógica: tu ciclo sigue existiendo, pero ahora además controlas
+                un <b>índice</b> (posición) y respetas los límites del arreglo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Decisión de diseño</span>
+          <span class="counter">4 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5) ARREGLOS -->
+    <section class="slide content-slide" data-title="Arreglos">
+      <div class="inner">
+        <div class="header">Estructuras de datos (básico)</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Arreglo (array)</h2>
+            <p>
+              Un arreglo es un conjunto de N elementos del mismo tipo, con posiciones numeradas
+              desde 0 hasta N-1.
+            </p>
+            <ul style="margin-top:10px;">
+              <li>Su tamaño se define al crearlo.</li>
+              <li>Accedes por índice: datos[i].</li>
+              <li>Tiene longitud: datos.Length.</li>
+            </ul>
+            <p class="note" style="margin-top:10px;">
+              Error típico: intentar acceder a datos[N] (eso está fuera del arreglo).
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Ejemplo en C#</h2>
+            <div class="code">int N = 5;
+decimal[] consumos = new decimal[N];
+
+consumos[0] = 120m;
+consumos[1] = 250m;
+
+// Recorrer:
+for (int i = 0; i < consumos.Length; i++)
+{
+  Console.WriteLine($"Consumo {i} = {consumos[i]}");
+}</div>
+            <p class="note" style="margin-top:8px;">
+              Observa que el for usa i = 0 y condición i &lt; Length para garantizar límites.
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Arreglos en C#</span>
+          <span class="counter">5 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6) LISTAS -->
+    <section class="slide content-slide" data-title="Listas">
+      <div class="inner">
+        <div class="header">Estructuras de datos (práctico)</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">List&lt;T&gt;</h2>
+            <p>
+              Una lista se parece a un arreglo, pero puede crecer dinámicamente.
+              Es útil cuando no conoces N al inicio o cuando quieres ir agregando datos.
+            </p>
+            <ul style="margin-top:10px;">
+              <li>Agregas con Add(valor).</li>
+              <li>Longitud con Count.</li>
+              <li>Acceso por índice: lista[i].</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Ejemplo con centinela</h2>
+            <div class="code">var datos = new List<decimal>();
+
+while (true)
+{
+  decimal x = LeerDecimal("Consumo (-1 para terminar): ");
+  if (x == -1m) break;
+  datos.Add(x);
+}
+
+Console.WriteLine($"Se guardaron {datos.Count} consumos.");</div>
+            <p class="note" style="margin-top:8px;">
+              Luego puedes recorrer la lista para generar el reporte.
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Listas en C#</span>
+          <span class="counter">6 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7) EJEMPLO COMPLETO -->
+    <section class="slide content-slide" data-title="Ejemplo completo">
+      <div class="inner">
+        <div class="header">Ejemplo guiado (reporte)</div>
+        <div class="content">
+          <h2>Guardar N consumos y generar reporte</h2>
+          <div class="callout">
+            <p>
+              Enunciado: leer N consumos (kWh), guardarlos y calcular:
+              total, promedio (si N&gt;0), máximo, mínimo y cuántos son &gt; 200.
+            </p>
+          </div>
+
+          <div class="two-col" style="margin-top:10px;">
+            <div class="card">
+              <h2 style="font-size:clamp(18px,1.7vw,24px);">Código (C# consola)</h2>
+              <div class="code">using System;
+using System.Collections.Generic;
+
+class Program
+{
+  static void Main()
+  {
+    int N = LeerEntero("N (cantidad de consumos): ");
+
+    // Almacenamiento
+    decimal[] consumos = new decimal[N];
+
+    // 1) Lectura y guardado
+    for (int i = 0; i < N; i++)
+    {
+      consumos[i] = LeerDecimal($"Consumo {i+1} (kWh): ");
+    }
+
+    // 2) Cálculos
+    decimal total = 0m;
+    int mayores200 = 0;
+
+    decimal max = 0m, min = 0m;
+    bool hayDatos = false;
+
+    for (int i = 0; i < N; i++)
+    {
+      decimal c = consumos[i];
+      total += c;
+
+      if (c > 200m) mayores200++;
+
+      if (!hayDatos)
+      {
+        max = c; min = c;
+        hayDatos = true;
+      }
+      else
+      {
+        if (c > max) max = c;
+        if (c < min) min = c;
+      }
+    }
+
+    // 3) Salida
+    Console.WriteLine($"Total: {total}");
+    Console.WriteLine($">200: {mayores200}");
+
+    if (N > 0)
+    {
+      decimal promedio = total / N;
+      Console.WriteLine($"Promedio: {promedio}");
+      Console.WriteLine($"Máximo: {max}");
+      Console.WriteLine($"Mínimo: {min}");
+    }
+    else
+    {
+      Console.WriteLine("N=0: no hay consumos, no se calcula promedio/max/min.");
+    }
+  }
+
+  static int LeerEntero(string mensaje)
+  {
+    while (true)
+    {
+      Console.Write(mensaje);
+      string s = Console.ReadLine() ?? "";
+
+      if (int.TryParse(s, out int n) && n >= 0)
+        return n;
+
+      Console.WriteLine("Entrada inválida. Debe ser entero >= 0.");
+    }
+  }
+
+  static decimal LeerDecimal(string mensaje)
+  {
+    while (true)
+    {
+      Console.Write(mensaje);
+      string s = Console.ReadLine() ?? "";
+
+      if (decimal.TryParse(s, out decimal x))
+        return x;
+
+      Console.WriteLine("Entrada inválida. Debe ser numérica.");
+    }
+  }
+}</div>
+            </div>
+
+            <div class="imgbox">
+              <h2 style="font-size:clamp(18px,1.7vw,24px); margin-bottom:10px;">Diagrama de flujo (resumen)</h2>
+              <div class="imgwrap">
+                <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                  <defs>
+                    <style>
+                      .b{fill:#ffffff;stroke:#cbd5e1;stroke-width:2;}
+                      .t{fill:#015583;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:800;}
+                      .m{fill:#201F4B;font-family:Arial,Helvetica,sans-serif;font-size:16px;}
+                      .a{stroke:#05ADBC;stroke-width:3;marker-end:url(#arrow2);}
+                    </style>
+                    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#05ADBC"/>
+                    </marker>
+                  </defs>
+
+                  <rect class="b" x="40" y="30" rx="12" ry="12" width="360" height="70"/>
+                  <text class="t" x="65" y="60">Leer N</text>
+                  <text class="m" x="65" y="85">Crear arreglo consumos[N]</text>
+
+                  <rect class="b" x="40" y="130" rx="12" ry="12" width="360" height="80"/>
+                  <text class="t" x="65" y="165">Ciclo 1: guardar</text>
+                  <text class="m" x="65" y="190">Leer consumo → consumos[i] = valor</text>
+
+                  <rect class="b" x="480" y="30" rx="12" ry="12" width="380" height="80"/>
+                  <text class="t" x="505" y="65">Ciclo 2: calcular</text>
+                  <text class="m" x="505" y="90">total, conteos, max/min</text>
+
+                  <rect class="b" x="480" y="140" rx="12" ry="12" width="380" height="80"/>
+                  <text class="t" x="505" y="175">Salida</text>
+                  <text class="m" x="505" y="200">Imprimir reporte final</text>
+
+                  <line class="a" x1="220" y1="100" x2="220" y2="130"/>
+                  <line class="a" x1="400" y1="170" x2="480" y2="70"/>
+                  <line class="a" x1="670" y1="110" x2="670" y2="140"/>
+                </svg>
+              </div>
+              <p class="note" style="margin-top:10px;">
+                El punto didáctico: separas “capturar” de “analizar”. Esto ayuda a depurar.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Ejemplo: almacenamiento + reporte</span>
+          <span class="counter">7 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8) PRUEBAS -->
+    <section class="slide content-slide" data-title="Pruebas">
+      <div class="inner">
+        <div class="header">Evidencia de calidad</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Casos de prueba mínimos</h2>
+            <ul>
+              <li><b>Normal:</b> N=4; consumos: 100, 250, 200, 300.</li>
+              <li><b>Borde:</b> N=0 (sin datos).</li>
+              <li><b>Borde de umbral:</b> consumo=200 exacto (no cuenta como &gt;200).</li>
+            </ul>
+            <p class="note" style="margin-top:10px;">
+              Si el estudiante no puede explicar un caso borde, el algoritmo no está completamente justificado.
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Traza (iteración de cálculo)</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>i</th><th>c</th><th>total</th><th>&gt;200</th><th>max</th><th>min</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td>100</td><td>100</td><td>0</td><td>100</td><td>100</td></tr>
+                <tr><td>1</td><td>250</td><td>350</td><td>1</td><td>250</td><td>100</td></tr>
+                <tr><td>2</td><td>200</td><td>550</td><td>1</td><td>250</td><td>100</td></tr>
+                <tr><td>3</td><td>300</td><td>850</td><td>2</td><td>300</td><td>100</td></tr>
+              </tbody>
+            </table>
+            <p class="note" style="margin-top:10px;">
+              Esta es la evidencia esperada para sustentar el cálculo del reporte.
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Pruebas y trazas</span>
+          <span class="counter">8 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9) TALLER PROYECTO -->
+    <section class="slide content-slide" data-title="Taller proyecto">
+      <div class="inner">
+        <div class="header">Taller (en clase)</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Objetivo</h2>
+            <p>
+              Tomar el ejemplo de consumos y adaptarlo al escenario del <b>Proyecto — Entrega 2</b>
+              (Unidad 2). Debe incluir: ciclo(s), almacenamiento (array o List), y reporte verificable.
+            </p>
+            <ul style="margin-top:10px;">
+              <li>Define el dominio (notas, ventas, sensores, tiempos de producción, etc.).</li>
+              <li>Define N o centinela.</li>
+              <li>Define mínimo 4 salidas: total, promedio (si aplica), un conteo por regla y max/min.</li>
+            </ul>
+          </div>
+
+          <div class="callout">
+            <p><b>Entregable en clase (evidencia rápida):</b></p>
+            <ul style="margin-top:8px;">
+              <li>IPO en 5 líneas (entradas, proceso, salidas).</li>
+              <li>Variables: lista de contadores/acumuladores y su significado.</li>
+              <li>2 casos de prueba: normal + borde.</li>
+              <li>1 traza corta (2–3 iteraciones) del ciclo de cálculo.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Taller hacia Proyecto — Entrega 2</span>
+          <span class="counter">9 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10) CHECKLIST -->
+    <section class="slide content-slide" data-title="Checklist">
+      <div class="inner">
+        <div class="header">Evaluación (calidad)</div>
+        <div class="content">
+          <h2>Checklist para revisar tu entrega</h2>
+
+          <div class="two-col" style="margin-top:10px;">
+            <div class="card">
+              <h2 style="font-size:clamp(18px,1.7vw,24px);">Lógica y estructura</h2>
+              <ul>
+                <li>El ciclo termina (progreso claro, sin infinitos).</li>
+                <li>Contadores/acumuladores están inicializados y actualizados en el lugar correcto.</li>
+                <li>Si usas arreglo: índices dentro de 0..N-1.</li>
+                <li>Si N=0: el programa no falla y responde coherente.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2 style="font-size:clamp(18px,1.7vw,24px);">Evidencia</h2>
+              <ul>
+                <li>Incluyes 2 pruebas (normal + borde).</li>
+                <li>Incluyes traza de 2–3 iteraciones (variables clave).</li>
+                <li>Resultados coherentes (sanity check: ¿tiene sentido el total/promedio?).</li>
+                <li>Lectura robusta (TryParse) al menos para N (recomendado).</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="note">
+            Este checklist conecta lo visto hoy con los criterios de calidad esperados en la Unidad 2.
+          </p>
+        </div>
+
+        <div class="footer">
+          <span>Checklist de evaluación</span>
+          <span class="counter">10 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11) ERRORES COMUNES -->
+    <section class="slide content-slide" data-title="Errores comunes">
+      <div class="inner">
+        <div class="header">Errores comunes</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Arreglos</h2>
+            <ul>
+              <li><b>IndexOutOfRange</b>: usar i &lt;= Length o acceder a consumos[N].</li>
+              <li>Confundir “posición” con “número”: consumos[i+1] sin razón.</li>
+              <li>Inicializar max/min sin controlar el caso N=0.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Entrada y números</h2>
+            <ul>
+              <li>Usar Parse sin validar (el programa se cae ante entradas inválidas).</li>
+              <li>Separador decimal (punto/coma) depende del sistema del estudiante.</li>
+              <li>Promedio con división por cero si N=0.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Prevención de fallos</span>
+          <span class="counter">11 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12) EXIT TICKET -->
+    <section class="slide content-slide" data-title="Exit ticket">
+      <div class="inner">
+        <div class="header">Exit ticket (5–10 min)</div>
+        <div class="content">
+          <h2>Responde individualmente</h2>
+          <ol>
+            <li>¿Qué ventaja te da guardar datos en un arreglo/lista en vez de solo acumular “al vuelo”?</li>
+            <li>¿Cuál es el rango válido de índices para un arreglo de tamaño N?</li>
+            <li>Propón 1 caso borde para tu Proyecto — Entrega 2 y explica qué valida.</li>
+          </ol>
+
+          <div class="callout" style="margin-top:12px;">
+            <p>
+              Próximo paso: preparar el terreno para <b>programación modular (Unidad 3)</b>,
+              extrayendo funciones para lectura/validación y para cálculos del reporte.
+            </p>
+          </div>
+
+          <p class="note" style="margin-top:auto;">
+            Navegación: <span class="kbd">←</span> <span class="kbd">→</span> |
+            <span class="kbd">Home</span> <span class="kbd">End</span> |
+            <span class="kbd">F</span> · Botones · Swipe
+          </p>
+        </div>
+
+        <div class="footer">
+          <span>Sesión 6 · Cierre</span>
+          <span class="counter">12 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13) ACTIVIDAD / TAREA (AGREGADA) -->
+    <section class="slide content-slide" data-title="Actividad final">
+      <div class="inner">
+        <div class="header">Actividad / Tarea</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Actividad final: reporte con almacenamiento</h2>
+            <p>
+              Elige un contexto (notas, ventas, sensores, tiempos de producción, etc.) y construye un programa en C#
+              que:
+            </p>
+            <ul style="margin-top:10px;">
+              <li>Lea datos repetidos (con N o con centinela).</li>
+              <li>Guarde todos los valores en un arreglo o en una lista.</li>
+              <li>Genere un reporte con: total, promedio (si hay datos), un conteo por regla y max/min.</li>
+              <li>Incluya 2 casos de prueba (normal + borde) y una traza corta del ciclo de cálculo.</li>
+            </ul>
+            <p class="note" style="margin-top:10px;">
+              En la socialización, tu evidencia principal será la traza y la justificación de variables (qué cuenta y qué acumula).
+            </p>
+          </div>
+
+          <div class="callout">
+            <p><b>Checklist de entrega (mínimo):</b></p>
+            <ul style="margin-top:8px;">
+              <li>IPO (5 líneas).</li>
+              <li>Lista de variables: contadores/acumuladores y significado.</li>
+              <li>Reporte final impreso con resultados.</li>
+              <li>Traza (2–3 iteraciones) + 2 pruebas.</li>
+            </ul>
+            <p class="note" style="margin-top:10px;">
+              Fecha: [Pendiente en la planeación]
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span>Actividad final</span>
+          <span class="counter">13 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Botones pequeños -->
+    <div class="touch-nav" id="touchNav">
+      <button type="button" id="btnPrev" aria-label="Anterior">←</button>
+      <button type="button" id="btnNext" aria-label="Siguiente">→</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function(){
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const counters = Array.from(document.querySelectorAll('.counter'));
+    const stage = document.getElementById('stage');
+
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+
+    let idx = 0;
+
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+    function show(i){
+      idx = clamp(i, 0, slides.length - 1);
+      slides.forEach((s,k) => s.classList.toggle('active', k === idx));
+      const label = (idx+1) + " / " + slides.length;
+      counters.forEach(el => el.textContent = label);
+      history.replaceState(null, "", "#" + (idx+1));
+    }
+
+    function next(){ show(idx+1); }
+    function prev(){ show(idx-1); }
+
+    // Hash inicial
+    const m = (location.hash || "").match(/^#(\d+)$/);
+    if(m){
+      const start = parseInt(m[1], 10);
+      if(!isNaN(start)) idx = clamp(start-1, 0, slides.length-1);
+    }
+    show(idx);
+
+    // Botones (mouse/touch)
+    btnPrev.addEventListener('click', prev);
+    btnNext.addEventListener('click', next);
+
+    // Teclado
+    document.addEventListener('keydown', (e) => {
+      const k = e.key;
+
+      if(k === 'f' || k === 'F'){
+        if(!document.fullscreenElement){
+          document.documentElement.requestFullscreen?.();
+        }else{
+          document.exitFullscreen?.();
+        }
+        return;
+      }
+
+      if(k === 'ArrowRight' || k === 'PageDown' || k === ' '){
+        e.preventDefault(); next();
+      }else if(k === 'ArrowLeft' || k === 'PageUp'){
+        e.preventDefault(); prev();
+      }else if(k === 'Home'){
+        e.preventDefault(); show(0);
+      }else if(k === 'End'){
+        e.preventDefault(); show(slides.length-1);
+      }
+    });
+
+    // Swipe (limitado al stage para evitar conflictos)
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    if(isTouch){
+      let x0=null, y0=null, t0=0;
+      const SWIPE_MIN_X = 50;
+      const SWIPE_MAX_Y = 80;
+      const SWIPE_MAX_MS = 800;
+
+      stage.addEventListener('touchstart', (e)=>{
+        const t = e.changedTouches[0];
+        x0=t.clientX; y0=t.clientY; t0=Date.now();
+      }, {passive:true});
+
+      stage.addEventListener('touchend', (e)=>{
+        if(x0===null || y0===null) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - x0;
+        const dy = t.clientY - y0;
+        const dt = Date.now() - t0;
+        x0=null; y0=null;
+
+        if(dt > SWIPE_MAX_MS) return;
+        if(Math.abs(dy) > SWIPE_MAX_Y) return;
+
+        if(dx <= -SWIPE_MIN_X) next();
+        else if(dx >= SWIPE_MIN_X) prev();
+      }, {passive:true});
+    }
+  })();
+</script>
+</body>
+</html>

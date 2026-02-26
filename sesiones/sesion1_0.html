@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sesión 02 — Lógica de Programación</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --text:#e9eefc;
+      --muted:#b7c0e3;
+      --accent:#7aa2ff;
+      --ok:#41d39b;
+      --warn:#ffcc66;
+      --danger:#ff6b6b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);}
+    .deck{height:100%; display:flex; flex-direction:column;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .topbar .title{font-weight:650; letter-spacing:.2px;}
+    .topbar .meta{color:var(--muted); font-size:13px;}
+    .stage{flex:1; display:flex; align-items:center; justify-content:center; padding:18px;}
+    .slide{
+      width:min(1100px, 96vw);
+      height:min(640px, 78vh);
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
+      padding:28px 34px;
+      display:none;
+      overflow:hidden;
+    }
+    .slide.active{display:block;}
+    h1,h2,h3{margin:0 0 12px 0;}
+    h1{font-size:44px; line-height:1.08;}
+    h2{font-size:34px;}
+    h3{font-size:22px; color:var(--muted); font-weight:600;}
+    p{margin:10px 0; color:var(--text); font-size:20px; line-height:1.35;}
+    ul{margin:12px 0 0 20px; font-size:20px; line-height:1.35;}
+    li{margin:8px 0;}
+    .kpi{display:flex; gap:14px; flex-wrap:wrap; margin-top:14px;}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .two{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:start;
+      margin-top:12px;
+    }
+    .box{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:14px 14px;
+    }
+    .code{
+      font-family:var(--mono);
+      font-size:16px;
+      line-height:1.35;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      padding:12px 12px;
+      white-space:pre-wrap;
+    }
+    .note{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .footer{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted); font-size:13px;
+    }
+    .keys kbd{
+      font-family:var(--mono);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+      margin:0 2px;
+      color:var(--text);
+    }
+    .badge{
+      color:var(--bg);
+      background:var(--accent);
+      border-radius:8px;
+      padding:2px 8px;
+      font-weight:650;
+      font-size:13px;
+    }
+    .hl{color:var(--accent); font-weight:650;}
+    .ok{color:var(--ok); font-weight:650;}
+    .warn{color:var(--warn); font-weight:650;}
+    .danger{color:var(--danger); font-weight:650;}
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:10px;
+    }
+    .small{font-size:16px; color:var(--muted);}
+    .spacer{height:8px;}
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="topbar">
+      <div>
+        <div class="title">Lógica de Programación — Sesión 02</div>
+        <div class="meta">Unidad 1 · 2 horas · Tema: IPO + Variables + Operadores + Prueba de escritorio</div>
+      </div>
+      <div class="meta"><span class="badge" id="counter">1/1</span></div>
+    </div>
+
+    <div class="stage">
+      <!-- Slide 1 -->
+      <section class="slide active">
+        <h1>Sesión 02</h1>
+        <h3>De enunciado → IPO → variables → cálculo → validación</h3>
+        <div class="kpi">
+          <div class="chip">Meta: escribir algoritmos claros</div>
+          <div class="chip">Herramienta: prueba de escritorio</div>
+          <div class="chip">Salida: un ejercicio resuelto + ticket de salida</div>
+        </div>
+        <p class="note">Navegación: ← → · Pantalla completa: F</p>
+      </section>
+
+      <!-- Slide 2 -->
+      <section class="slide">
+        <h2>Objetivos de aprendizaje</h2>
+        <ul>
+          <li>Reconocer la estructura <span class="hl">IPO</span> (Entradas → Proceso → Salidas).</li>
+          <li>Definir <span class="hl">variables</span> y escoger tipos de dato adecuados.</li>
+          <li>Aplicar <span class="hl">operadores</span> (aritméticos y lógicos básicos) sin ambigüedades.</li>
+          <li>Validar un algoritmo con una <span class="hl">prueba de escritorio</span>.</li>
+        </ul>
+        <p class="note">Hoy no codificamos “mucho”: primero razonamos y verificamos.</p>
+      </section>
+
+      <!-- Slide 3 -->
+      <section class="slide">
+        <h2>Recordatorio: ¿qué es un algoritmo?</h2>
+        <div class="two">
+          <div class="box">
+            <p>Un algoritmo es una secuencia finita de pasos, <span class="ok">ordenada</span> y <span class="ok">no ambigua</span>, para transformar entradas en salidas.</p>
+            <ul>
+              <li>Debe terminar.</li>
+              <li>Debe poder “ejecutarse” (por una persona o máquina).</li>
+              <li>Debe producir resultados verificables.</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Señales de buen algoritmo</h3>
+            <ul>
+              <li>Nombres claros de variables.</li>
+              <li>Fórmulas explícitas.</li>
+              <li>Casos de prueba (incluye límite).</li>
+              <li>Prueba de escritorio.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 4 -->
+      <section class="slide">
+        <h2>Plantilla IPO (que vamos a usar)</h2>
+        <div class="code">Problema: ___________________________
+
+Entradas:
+- ___________________________
+- ___________________________
+
+Proceso:
+- Definir variables
+- Calcular __________________
+- Validar ___________________ (si aplica)
+
+Salidas:
+- ___________________________</div>
+        <p class="note">IPO es tu “contrato”: si algo no aparece en Entradas, no puede aparecer en el Proceso.</p>
+      </section>
+
+      <!-- Slide 5 -->
+      <section class="slide">
+        <h2>Variables y tipos (regla práctica)</h2>
+        <div class="grid2">
+          <div class="box">
+            <h3>Variable</h3>
+            <p>Nombre + tipo + propósito.</p>
+            <div class="code">precioBase : decimal
+iva         : decimal
+descuento   : decimal
+total       : decimal</div>
+          </div>
+          <div class="box">
+            <h3>Errores comunes</h3>
+            <ul>
+              <li>Usar “x”, “a1”, “dato” sin significado.</li>
+              <li>Mezclar unidades (porcentaje vs valor absoluto).</li>
+              <li>Guardar textos donde van números (o viceversa).</li>
+              <li>No inicializar contadores/valores.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="small">Tip: si el dominio es dinero, usa decimal; si es conteo, entero.</p>
+      </section>
+
+      <!-- Slide 6 -->
+      <section class="slide">
+        <h2>Operadores: lo mínimo para no fallar</h2>
+        <div class="two">
+          <div class="box">
+            <h3>Aritméticos</h3>
+            <div class="code">+  suma
+-  resta
+*  multiplicación
+/  división</div>
+            <div class="spacer"></div>
+            <h3>Paréntesis</h3>
+            <p>Si hay duda, usa <span class="hl">( )</span> para dejar intención explícita.</p>
+          </div>
+          <div class="box">
+            <h3>Orden de operaciones (resumen)</h3>
+            <ul>
+              <li>Primero paréntesis.</li>
+              <li>Luego * y /.</li>
+              <li>Luego + y -.</li>
+            </ul>
+            <p class="note">Si el resultado “se ve raro”, revisa precedencia antes de culpar al enunciado.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7 -->
+      <section class="slide">
+        <h2>Ejemplo guiado (enunciado)</h2>
+        <p><span class="hl">Problema:</span> Calcular el total a pagar de un producto con IVA y descuento.</p>
+        <div class="box">
+          <ul>
+            <li>Entrada: precio base (dinero), IVA (porcentaje), descuento (porcentaje).</li>
+            <li>Salida: total a pagar.</li>
+          </ul>
+        </div>
+        <p class="note">Vamos a convertir esto a IPO, variables y una fórmula no ambigua.</p>
+      </section>
+
+      <!-- Slide 8 -->
+      <section class="slide">
+        <h2>Ejemplo guiado (solución en pseudocódigo)</h2>
+        <div class="code">Leer precioBase
+Leer ivaPct
+Leer descuentoPct
+
+ivaValor       = precioBase * (ivaPct / 100)
+subtotal       = precioBase + ivaValor
+descuentoValor = subtotal * (descuentoPct / 100)
+total          = subtotal - descuentoValor
+
+Escribir total</div>
+        <p class="note">Observa: el descuento se calcula sobre subtotal (define esa regla; si fuese distinto, se ajusta).</p>
+      </section>
+
+      <!-- Slide 9 -->
+      <section class="slide">
+        <h2>Prueba de escritorio (cómo)</h2>
+        <div class="two">
+          <div class="box">
+            <h3>Pasos</h3>
+            <ul>
+              <li>Elige un caso de prueba (datos reales).</li>
+              <li>Calcula paso a paso (sin saltos).</li>
+              <li>Verifica coherencia (magnitudes, signos, unidades).</li>
+              <li>Repite con un caso límite.</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Tabla base</h3>
+            <div class="code">precioBase | ivaPct | descuentoPct | ivaValor | subtotal | descuentoValor | total
+---------- | ------ | ------------ | -------- | -------- | ------------- | -----
+?</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 10 -->
+      <section class="slide">
+        <h2>Prueba de escritorio (caso)</h2>
+        <div class="code">Caso:
+precioBase = 100000
+ivaPct = 19
+descuentoPct = 10</div>
+        <p>Haz la tabla y responde: ¿el total es razonable? (pista: debe ser menor que subtotal). </p>
+        <p class="note">Luego cambia descuentoPct a 0 y revisa si la fórmula sigue funcionando.</p>
+      </section>
+
+      <!-- Slide 11 -->
+      <section class="slide">
+        <h2>Actividad en clase (15–20 min)</h2>
+        <p><span class="hl">Reto:</span> Diseña el IPO + variables + pseudocódigo para:</p>
+        <div class="box">
+          <p><b>Convertir temperatura</b>: dado Celsius, calcular Fahrenheit.</p>
+          <div class="code">F = (C * 9/5) + 32</div>
+        </div>
+        <ul>
+          <li>Incluye 2 pruebas: C=0 y un caso negativo (ej: C=-10).</li>
+          <li>Entrega: foto/copia del IPO + prueba de escritorio (en tu cuaderno o archivo).</li>
+        </ul>
+      </section>
+
+      <!-- Slide 12 -->
+      <section class="slide">
+        <h2>Ticket de salida (5 min)</h2>
+        <ul>
+          <li>Escribe 1 diferencia entre “entrada” y “variable”.</li>
+          <li>Da 1 ejemplo donde los paréntesis evitan un error.</li>
+          <li>¿Qué te mostró la prueba de escritorio que no se ve en el enunciado?</li>
+        </ul>
+        <p class="note">Esto alimenta el Quiz 1 (próxima semana): conceptos + trazas simples.</p>
+      </section>
+
+      <!-- Slide 13 -->
+      <section class="slide">
+        <h2>Tarea para la próxima sesión</h2>
+        <ul>
+          <li>Resolver 2 problemas cortos con plantilla IPO (uno de dinero, uno de conversión).</li>
+          <li>En cada problema: variables con tipo sugerido + 2 casos de prueba.</li>
+          <li>Traer dudas puntuales (1 por estudiante).</li>
+        </ul>
+        <p class="note">Objetivo: llegar a Quiz 1 con práctica de lectura y trazado.</p>
+      </section>
+    </div>
+
+    <div class="footer">
+      <div class="keys">
+        Teclas: <kbd>←</kbd><kbd>→</kbd> · <kbd>Home</kbd> inicio · <kbd>End</kbd> final · <kbd>F</kbd> pantalla completa
+      </div>
+      <div id="status">Lista</div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let idx = 0;
+
+    function render(){
+      slides.forEach((s,i)=>s.classList.toggle('active', i===idx));
+      document.getElementById('counter').textContent = (idx+1) + '/' + slides.length;
+      document.getElementById('status').textContent = 'Sesión 02 · Diapositiva ' + (idx+1);
+      location.hash = '#slide-' + (idx+1);
+    }
+    function go(n){
+      idx = Math.max(0, Math.min(slides.length-1, n));
+      render();
+    }
+    function next(){ go(idx+1); }
+    function prev(){ go(idx-1); }
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight' || e.key === 'PageDown') next();
+      if(e.key === 'ArrowLeft'  || e.key === 'PageUp') prev();
+      if(e.key === 'Home') go(0);
+      if(e.key === 'End') go(slides.length-1);
+      if(e.key.toLowerCase() === 'f'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    // Hash navigation
+    if(location.hash.startsWith('#slide-')){
+      const n = parseInt(location.hash.replace('#slide-',''),10);
+      if(!Number.isNaN(n)) idx = Math.max(0, Math.min(slides.length-1, n-1));
+    }
+    render();
+  </script>
+</body>
+</html>

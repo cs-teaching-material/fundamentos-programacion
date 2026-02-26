@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sección 0 — Fundamentos (PSInt ↔ C#)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --text:#e9eefc;
+      --muted:#b7c0e3;
+      --accent:#7aa2ff;
+      --ok:#41d39b;
+      --warn:#ffcc66;
+      --danger:#ff6b6b;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+
+      --baseW: 1280;
+      --baseH: 720;
+
+      --pad: 22px;
+      --radius: 14px;
+      --border: 1px solid rgba(255,255,255,.10);
+    }
+
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);}
+    .deck{height:100%; display:flex; flex-direction:column;}
+
+    .topbar, .footer{
+      padding:10px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-color: rgba(255,255,255,.08);
+      gap:12px;
+    }
+    .topbar{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+    }
+    .footer{
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .title{font-weight:750; letter-spacing:.2px;}
+    .meta{color:var(--muted); font-size:13px;}
+    .badge{
+      color:var(--bg);
+      background:var(--accent);
+      border-radius:10px;
+      padding:3px 10px;
+      font-weight:800;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .stage{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px; /* menos margen exterior */
+      overflow:hidden;
+    }
+
+    /* Canvas 16:9 escalado al viewport */
+    .canvas{
+      width: calc(var(--baseW) * 1px);
+      height: calc(var(--baseH) * 1px);
+      transform-origin: top left;
+      background: var(--panel);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow:0 12px 42px rgba(0,0,0,.38);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      padding: var(--pad);
+      display:none;
+      overflow:hidden;
+    }
+    .slide.active{display:block;}
+
+    h1,h2,h3{margin:0 0 10px 0;}
+    h1{font-size:52px; line-height:1.05;}
+    h2{font-size:38px; line-height:1.12;}
+    h3{font-size:22px; color:var(--muted); font-weight:650;}
+
+    p{margin:10px 0; font-size:22px; line-height:1.35;}
+    ul{margin:10px 0 0 22px; font-size:22px; line-height:1.33;}
+    li{margin:8px 0;}
+
+    .kpi{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:14px; align-items:start; margin-top:10px;}
+    .grid3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px; align-items:start; margin-top:10px;}
+
+    .box{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:12px 12px;
+    }
+
+    .code{
+      font-family:var(--mono);
+      font-size:16px;
+      line-height:1.35;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      padding:12px 12px;
+      white-space:pre-wrap;
+    }
+
+    .note{margin-top:10px; color:var(--muted); font-size:15px;}
+    .small{font-size:16px; color:var(--muted);}
+
+    .hl{color:var(--accent); font-weight:800;}
+    .ok{color:var(--ok); font-weight:800;}
+    .warn{color:var(--warn); font-weight:800;}
+    .danger{color:var(--danger); font-weight:800;}
+
+    .keys kbd{
+      font-family:var(--mono);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+      margin:0 2px;
+      color:var(--text);
+    }
+
+    /* “Imágenes”/diagramas: siempre completas, sin recorte ni deformación */
+    figure{margin:0;}
+    .mediaWrap{
+      width:100%;
+      height: 360px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+      box-sizing:border-box;
+    }
+    .mediaWrap svg, .mediaWrap img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+    .caption{margin-top:8px; font-size:15px; color:var(--muted);}
+
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px; border:1px solid rgba(255,255,255,.10);}
+    th,td{padding:10px 10px; text-align:left; font-size:16px; border-bottom:1px solid rgba(255,255,255,.08);}
+    th{background:rgba(255,255,255,.06); color:var(--text);}
+    tr:last-child td{border-bottom:none;}
+    .tight p{margin:8px 0;}
+    .tight li{margin:6px 0;}
+  </style>
+</head>
+
+<body>
+  <div class="deck">
+    <div class="topbar">
+      <div>
+        <div class="title">Sección 0 — Fundamentos (PSInt ↔ C#)</div>
+        <div class="meta">Resumen de lo visto: algoritmo, IPO, variables/tipos, operadores, decisiones y verificación</div>
+      </div>
+      <div class="meta"><span class="badge" id="counter">1/1</span></div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="canvas" id="canvas">
+
+        <!-- Slide 1 -->
+        <section class="slide active">
+          <h1>Sección 0</h1>
+          <h3>Lo esencial para programar bien (antes de seguir subiendo nivel)</h3>
+          <div class="kpi">
+            <div class="chip">PSInt: pensar y modelar</div>
+            <div class="chip">C#: escribir y ejecutar</div>
+            <div class="chip">Meta: coherencia + pruebas</div>
+          </div>
+          <p class="note">Navegación: ← → · Pantalla completa: F</p>
+        </section>
+
+        <!-- Slide 2 -->
+        <section class="slide">
+          <h2>¿Qué significa “fundamentos”?</h2>
+          <div class="box">
+            <p>En este curso, “fundamentos” no es memorizar sintaxis: es poder explicar <span class="hl">qué entra</span>, <span class="hl">qué se calcula</span>, <span class="hl">qué sale</span> y <span class="hl">por qué es correcto</span>.</p>
+          </div>
+          <ul>
+            <li>PSInt te ayuda a modelar sin distraerte con detalles del lenguaje.</li>
+            <li>C# te obliga a ser preciso con tipos, entradas y estructura del programa.</li>
+            <li>La prueba de escritorio (y casos de prueba) es tu evidencia de calidad.</li>
+          </ul>
+        </section>
+
+        <!-- Slide 3 -->
+        <section class="slide">
+          <h2>Algoritmo: definición operativa</h2>
+          <div class="grid2">
+            <div class="box">
+              <p>Un algoritmo es una secuencia <span class="ok">finita</span> de pasos, ordenados y no ambiguos, que transforman entradas en salidas.</p>
+              <ul>
+                <li><span class="hl">Finito</span>: debe terminar.</li>
+                <li><span class="hl">No ambiguo</span>: un paso no puede interpretarse de 2 formas.</li>
+                <li><span class="hl">Verificable</span>: puedes probarlo con casos.</li>
+              </ul>
+            </div>
+            <div class="box">
+              <p>Señales de que tu algoritmo está “verde”:</p>
+              <ul>
+                <li>Usas variables sin definirlas (nombre, tipo, propósito).</li>
+                <li>Te saltas pasos (“obvio que da…”).</li>
+                <li>Solo probaste 1 ejemplo “bonito”.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide">
+          <h2>IPO: tu contrato</h2>
+          <div class="mediaWrap">
+            <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <style>
+                  .b{fill:#0f1730;stroke:rgba(255,255,255,.25);stroke-width:2;}
+                  .t{fill:#e9eefc;font-family:system-ui,Segoe UI,Roboto,Arial;font-size:22px;font-weight:700;}
+                  .m{fill:#b7c0e3;font-family:system-ui,Segoe UI,Roboto,Arial;font-size:18px;}
+                  .a{stroke:rgba(122,162,255,.9);stroke-width:3;marker-end:url(#arrow);}
+                </style>
+                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(122,162,255,.9)"/>
+                </marker>
+              </defs>
+
+              <rect class="b" x="30" y="80" rx="16" ry="16" width="250" height="130"/>
+              <text class="t" x="70" y="125">Entradas</text>
+              <text class="m" x="70" y="155">Datos que recibo</text>
+              <text class="m" x="70" y="185">(del usuario/sensor)</text>
+
+              <rect class="b" x="325" y="60" rx="16" ry="16" width="250" height="170"/>
+              <text class="t" x="365" y="110">Proceso</text>
+              <text class="m" x="365" y="140">Cálculos, reglas</text>
+              <text class="m" x="365" y="170">validación</text>
+              <text class="m" x="365" y="200">y decisiones</text>
+
+              <rect class="b" x="620" y="80" rx="16" ry="16" width="250" height="130"/>
+              <text class="t" x="660" y="125">Salidas</text>
+              <text class="m" x="660" y="155">Resultados visibles</text>
+              <text class="m" x="660" y="185">para el usuario</text>
+
+              <line class="a" x1="280" y1="145" x2="325" y2="145"/>
+              <line class="a" x1="575" y1="145" x2="620" y2="145"/>
+            </svg>
+          </div>
+          <div class="caption">Regla práctica: si un dato no está en “Entradas”, no puede aparecer mágicamente en “Proceso”.</div>
+        </section>
+
+        <!-- Slide 5 -->
+        <section class="slide tight">
+          <h2>Variables: nombre + tipo + propósito</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>En PSInt</h3>
+              <div class="code">Definir precioBase Como Real
+Definir ivaPct Como Real
+Definir total Como Real</div>
+              <p class="small">PSInt suele ser más flexible, pero tú debes ser disciplinado con el significado.</p>
+            </div>
+            <div class="box">
+              <h3>En C#</h3>
+              <div class="code">decimal precioBase;
+decimal ivaPct;
+decimal total;</div>
+              <p class="small">En C# el tipo “manda”: si escoges mal el tipo, te complicas el cálculo y la validación.</p>
+            </div>
+          </div>
+          <div class="box" style="margin-top:12px;">
+            <p><span class="hl">Regla práctica</span> (muy usada en ingeniería):</p>
+            <ul>
+              <li>Dinero → decimal.</li>
+              <li>Conteo (personas, ítems, horas enteras) → int.</li>
+              <li>Texto (códigos, ciudades) → string.</li>
+              <li>Verdadero/falso → bool.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Slide 6 -->
+        <section class="slide">
+          <h2>Mapa PSInt ↔ C# (equivalencias)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th>PSInt</th>
+                <th>C# (consola)</th>
+                <th>Notas importantes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Inicio del programa</td>
+                <td>Proceso / FinProceso</td>
+                <td><span class="code">static void Main(...){...}</span></td>
+                <td>Todo se ejecuta dentro de Main (por ahora).</td>
+              </tr>
+              <tr>
+                <td>Salida</td>
+                <td>Escribir</td>
+                <td><span class="code">Console.WriteLine(...)</span></td>
+                <td>WriteLine imprime y salta línea.</td>
+              </tr>
+              <tr>
+                <td>Entrada</td>
+                <td>Leer x</td>
+                <td><span class="code">Console.ReadLine()</span> + Parse/TryParse</td>
+                <td>ReadLine devuelve texto; toca convertir a número.</td>
+              </tr>
+              <tr>
+                <td>Condicional</td>
+                <td>Si / SiNo / FinSi</td>
+                <td><span class="code">if (...) { ... } else { ... }</span></td>
+                <td>En C# importan las llaves { }.</td>
+              </tr>
+              <tr>
+                <td>Selección</td>
+                <td>Segun</td>
+                <td><span class="code">switch</span> o <span class="code">tipo switch { ... }</span></td>
+                <td>Ideal cuando decides por “categoría”.</td>
+              </tr>
+              <tr>
+                <td>Lógicos</td>
+                <td>Y / O / No</td>
+                <td><span class="code">&&</span> / <span class="code">||</span> / <span class="code">!</span></td>
+                <td>Cuando mezclas AND/OR, usa paréntesis.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Slide 7 -->
+        <section class="slide">
+          <h2>Operadores y precedencia (por qué importan)</h2>
+          <div class="grid2">
+            <div class="box">
+              <p>Errores típicos de principiantes:</p>
+              <ul>
+                <li>Confundir porcentaje con valor (10 vs 0.10).</li>
+                <li>Olvidar paréntesis en fórmulas largas.</li>
+                <li>Asumir que el computador “entiende la intención”.</li>
+              </ul>
+            </div>
+            <div class="box">
+              <p><span class="hl">Regla simple</span> para evitar el 80% de errores:</p>
+              <ul>
+                <li>Si hay duda, escribe paréntesis.</li>
+                <li>Divide la fórmula en pasos y nómbralos.</li>
+                <li>Haz una prueba de escritorio con números fáciles.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="code" style="margin-top:12px;">Ejemplo (porcentaje):
+ivaValor = precioBase * (ivaPct / 100)
+No: ivaValor = precioBase * ivaPct / 100  // puede ser correcto, pero es más fácil equivocarse al leerlo</div>
+        </section>
+
+        <!-- Slide 8 -->
+        <section class="slide">
+          <h2>Entrada y salida: la diferencia clave</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>En PSInt</h3>
+              <div class="code">Leer horas
+Escribir "Total:", total</div>
+              <p class="small">PSInt “te deja” leer directamente números.</p>
+            </div>
+            <div class="box">
+              <h3>En C#</h3>
+              <div class="code">string s = Console.ReadLine() ?? "";
+if (!int.TryParse(s, out int horas))
+{
+  Console.WriteLine("Entrada inválida");
+  return;
+}</div>
+              <p class="small">C# lee texto: convertir/validar es parte del programa (no es opcional si quieres calidad).</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 9 -->
+        <section class="slide">
+          <h2>Decisiones: Si/SiNo ↔ if/else</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>PSInt</h3>
+              <div class="code">Si edad >= 18 Entonces
+  Escribir "Mayor de edad"
+SiNo
+  Escribir "Menor de edad"
+FinSi</div>
+            </div>
+            <div class="box">
+              <h3>C#</h3>
+              <div class="code">if (edad >= 18)
+{
+  Console.WriteLine("Mayor de edad");
+}
+else
+{
+  Console.WriteLine("Menor de edad");
+}</div>
+            </div>
+          </div>
+          <p class="small">Idea central: una condición produce verdadero/falso, y eso define la rama ejecutada.</p>
+        </section>
+
+        <!-- Slide 10 -->
+        <section class="slide">
+          <h2>Condiciones compuestas (AND/OR/NOT)</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>PSInt</h3>
+              <div class="code">Si (edad >= 18) Y (edad <= 65) Entonces
+  Escribir "Rango válido"
+FinSi</div>
+              <p class="small">En PSInt: Y/O/NO.</p>
+            </div>
+            <div class="box">
+              <h3>C#</h3>
+              <div class="code">if ((edad >= 18) && (edad <= 65))
+{
+  Console.WriteLine("Rango válido");
+}</div>
+              <p class="small">En C#: &&, || y ! (usa paréntesis para intención explícita).</p>
+            </div>
+          </div>
+          <div class="box" style="margin-top:12px;">
+            <p><span class="hl">Consejo de legibilidad</span>: si la condición es larga, nómbrala.</p>
+            <div class="code">bool esRangoValido = (edad >= 18) && (edad <= 65);
+if (esRangoValido) { ... }</div>
+          </div>
+        </section>
+
+        <!-- Slide 11 -->
+        <section class="slide">
+          <h2>Prueba de escritorio (la evidencia)</h2>
+          <div class="grid2">
+            <div class="box">
+              <p>La prueba de escritorio responde:</p>
+              <ul>
+                <li>¿Mi algoritmo hace lo que dice el enunciado?</li>
+                <li>¿Mis fórmulas tienen coherencia numérica?</li>
+                <li>¿Estoy cubriendo casos normales y bordes?</li>
+              </ul>
+            </div>
+            <div class="box">
+              <p>Cómo se hace (disciplina):</p>
+              <ul>
+                <li>Elige un caso con números reales.</li>
+                <li>Calcula paso a paso, sin “saltos mentales”.</li>
+                <li>Repite con un caso borde (0, umbral exacto, etc.).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="code" style="margin-top:12px;">Tabla típica:
+precioBase | ivaPct | descPct | ivaValor | subtotal | descValor | total
+--------- | ------ | ------- | -------- | -------- | -------- | -----</div>
+        </section>
+
+        <!-- Slide 12 -->
+        <section class="slide">
+          <h2>Ejemplo (PSInt): IVA + descuento</h2>
+          <div class="grid2">
+            <div class="box">
+              <p>Idea: convertir en pasos para que sea verificable.</p>
+              <ul>
+                <li>Primero IVA → valor.</li>
+                <li>Luego subtotal.</li>
+                <li>Luego descuento.</li>
+                <li>Luego total.</li>
+              </ul>
+            </div>
+            <div class="box">
+              <div class="code">Leer precioBase
+Leer ivaPct
+Leer descuentoPct
+
+ivaValor = precioBase * (ivaPct / 100)
+subtotal = precioBase + ivaValor
+descuentoValor = subtotal * (descuentoPct / 100)
+total = subtotal - descuentoValor
+
+Escribir total</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 13 -->
+        <section class="slide">
+          <h2>Ejemplo (C#): mismo algoritmo</h2>
+          <div class="box">
+            <p>En C#, lo clave es: <span class="hl">tipos</span> + <span class="hl">lectura</span> + <span class="hl">conversión</span>.</p>
+          </div>
+          <div class="code" style="margin-top:12px;">using System;
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    Console.Write("Precio base: ");
+    if (!decimal.TryParse(Console.ReadLine(), out decimal precioBase))
+    {
+      Console.WriteLine("Entrada inválida.");
+      return;
+    }
+
+    Console.Write("IVA (%): ");
+    if (!decimal.TryParse(Console.ReadLine(), out decimal ivaPct))
+    {
+      Console.WriteLine("Entrada inválida.");
+      return;
+    }
+
+    Console.Write("Descuento (%): ");
+    if (!decimal.TryParse(Console.ReadLine(), out decimal descuentoPct))
+    {
+      Console.WriteLine("Entrada inválida.");
+      return;
+    }
+
+    decimal ivaValor = precioBase * (ivaPct / 100m);
+    decimal subtotal = precioBase + ivaValor;
+    decimal descuentoValor = subtotal * (descuentoPct / 100m);
+    decimal total = subtotal - descuentoValor;
+
+    Console.WriteLine($"Total: {total}");
+  }
+}</div>
+          <p class="small">Nota: el separador decimal (punto/coma) depende de la configuración regional del sistema.</p>
+        </section>
+
+        <!-- Slide 14 -->
+        <section class="slide">
+          <h2>Checklist de calidad (antes de entregar)</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>Modelo</h3>
+              <ul>
+                <li>IPO completo (sin datos mágicos).</li>
+                <li>Variables con nombre y propósito.</li>
+                <li>Fórmulas en pasos (no un “bloque” ilegible).</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h3>Evidencia</h3>
+              <ul>
+                <li>Al menos 2 casos: normal + borde.</li>
+                <li>Resultados coherentes (sanity check).</li>
+                <li>Si hay if/else: probaste ambas ramas.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note">Si pasas este checklist, tu código tiende a ser correcto y mantenible.</p>
+        </section>
+
+        <!-- Slide 15 -->
+        <section class="slide">
+          <h2>Mini-actividad (10–15 min)</h2>
+          <div class="box">
+            <p><span class="hl">Objetivo</span>: traducir un PSInt simple a C# sin cambiar la lógica.</p>
+            <ul>
+              <li>Escoge un ejercicio previo (temperatura, IVA, parqueadero, etc.).</li>
+              <li>Escribe IPO.</li>
+              <li>Escribe pseudocódigo (PSInt).</li>
+              <li>Reescribe en C# con tipos correctos + TryParse.</li>
+              <li>Documenta 2 pruebas: normal y borde.</li>
+            </ul>
+          </div>
+          <p class="small">Entrega: código + 2 casos (con explicación del cálculo esperado).</p>
+        </section>
+
+        <!-- Slide 16 -->
+        <section class="slide">
+          <h2>Ticket de salida (5 min)</h2>
+          <ul>
+            <li>Escribe 1 diferencia entre “entrada” y “variable”.</li>
+            <li>¿Qué tipo usarías para dinero en C# y por qué?</li>
+            <li>Escribe 1 caso borde que deberías probar en tu mini-actividad.</li>
+          </ul>
+          <p class="note">Siguiente paso: aplicar todo esto a decisiones más complejas (tablas de decisión y reglas con prioridad).</p>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="keys">
+        Teclas: <kbd>←</kbd><kbd>→</kbd> · <kbd>Home</kbd> inicio · <kbd>End</kbd> final · <kbd>F</kbd> pantalla completa
+      </div>
+      <div id="status">Lista</div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const canvas = document.getElementById('canvas');
+    const stage = document.getElementById('stage');
+    let idx = 0;
+
+    function fitCanvas(){
+      const baseW = 1280, baseH = 720;
+      const rect = stage.getBoundingClientRect();
+      const padding = 8;
+      const availW = Math.max(1, rect.width - padding);
+      const availH = Math.max(1, rect.height - padding);
+      const scale = Math.min(availW / baseW, availH / baseH);
+      canvas.style.transform = `scale(${scale})`;
+    }
+
+    function render(){
+      slides.forEach((s,i)=>s.classList.toggle('active', i===idx));
+      document.getElementById('counter').textContent = (idx+1) + '/' + slides.length;
+      document.getElementById('status').textContent = 'Sección 0 · Diapositiva ' + (idx+1);
+      location.hash = '#slide-' + (idx+1);
+      fitCanvas();
+    }
+
+    function go(n){
+      idx = Math.max(0, Math.min(slides.length-1, n));
+      render();
+    }
+    function next(){ go(idx+1); }
+    function prev(){ go(idx-1); }
+
+    window.addEventListener('resize', fitCanvas);
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight' || e.key === 'PageDown') next();
+      if(e.key === 'ArrowLeft'  || e.key === 'PageUp') prev();
+      if(e.key === 'Home') go(0);
+      if(e.key === 'End') go(slides.length-1);
+      if(e.key.toLowerCase() === 'f'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    if(location.hash.startsWith('#slide-')){
+      const n = parseInt(location.hash.replace('#slide-',''),10);
+      if(!Number.isNaN(n)) idx = Math.max(0, Math.min(slides.length-1, n-1));
+    }
+
+    render();
+  </script>
+</body>
+</html>

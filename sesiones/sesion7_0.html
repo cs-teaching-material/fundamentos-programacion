@@ -1,0 +1,1029 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lógica de Programación — Sesión 7: Proyecto Integrador, Entrega 1</title>
+
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+
+      --h1: clamp(30px, 3.4vw, 48px);
+      --h2: clamp(22px, 2.3vw, 34px);
+      --p:  clamp(15px, 1.3vw, 19px);
+      --li: clamp(15px, 1.3vw, 19px);
+
+      --safe-top-cover: clamp(208px, 9vh, 128px);
+      --safe-left-cover: clamp(585px, 5.5vw, 110px);
+      --safe-right-cover: clamp(28px, 3vw, 72px);
+      --safe-bottom-cover: clamp(54px, 6vh, 92px);
+
+      --safe-top: clamp(100px, 9vh, 132px);
+      --safe-side: clamp(66px, 5.5vw, 108px);
+      --safe-bottom: clamp(52px, 6vh, 90px);
+    }
+
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:#ffffff;
+    }
+
+    .deck{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:clamp(10px, 2vw, 22px);
+      box-sizing:border-box;
+      background:#ffffff;
+    }
+
+    .stage{
+      width:min(96vw, calc(92vh * (16/9)));
+      aspect-ratio:16/9;
+      position:relative;
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      display:none;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .slide.active{ display:block; }
+
+    .slide.cover{
+      background:url("./Portada.png") center/cover no-repeat;
+      color:#ffffff;
+    }
+    .slide.content-slide{
+      background:
+        url("./Contenido.png") top left/contain no-repeat,
+        #ffffff;
+      color:var(--texto);
+    }
+
+    .inner{
+      height:100%;
+      box-sizing:border-box;
+      padding: var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+      display:flex;
+      flex-direction:column;
+      gap:clamp(10px, 1.1vw, 18px);
+    }
+    .cover .inner{
+      padding:
+        var(--safe-top-cover)
+        var(--safe-right-cover)
+        var(--safe-bottom-cover)
+        var(--safe-left-cover);
+    }
+
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:clamp(10px, 1.1vw, 16px);
+      min-height:0;
+    }
+
+    .header{
+      color:var(--azul-medio);
+      font-size:clamp(18px, 1.6vw, 22px);
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    h1{ margin:0; font-size:var(--h1); line-height:1.08; color:var(--texto); }
+    h2{ margin:0; font-size:var(--h2); line-height:1.15; color:var(--azul-medio); }
+
+    p{ margin:0; font-size:var(--p); line-height:1.4; color:var(--texto); }
+    li{ font-size:var(--li); line-height:1.4; color:var(--texto); }
+    ul,ol{ margin:0; padding-left:1.2em; }
+
+    .subtitle{
+      color:var(--turquesa);
+      font-weight:800;
+      font-size:clamp(18px, 1.8vw, 24px);
+      margin-top:clamp(6px, 1vw, 10px);
+    }
+
+    .cover h1{ color:#ffffff; }
+    .cover p{ color:#e5edf8; }
+    .cover .subtitle{ color:#f7df00; }
+
+    .note{
+      color:var(--muted);
+      font-size:clamp(12px, 1.05vw, 14px);
+      line-height:1.35;
+    }
+
+    .callout{
+      background:rgba(255,255,255,0.94);
+      border-left:6px solid var(--turquesa);
+      padding:clamp(10px, 1.1vw, 14px);
+      border-radius:6px;
+    }
+
+    .callout-warn{
+      background:rgba(255,248,230,0.97);
+      border-left:6px solid #f59e0b;
+      padding:clamp(10px, 1.1vw, 14px);
+      border-radius:6px;
+    }
+    .callout-warn p, .callout-warn li{ color:#78350f; }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1.15fr 0.9fr;
+      gap:clamp(12px, 1.6vw, 22px);
+      align-items:flex-start;
+      min-height:0;
+    }
+    .equal-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:clamp(12px, 1.6vw, 22px);
+      align-items:flex-start;
+      min-height:0;
+    }
+    @media(max-width:980px){
+      .two-col, .equal-col{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background:rgba(255,255,255,0.96);
+      border:1px solid #dde2f1;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+    .card-a{
+      background:rgba(255,255,255,0.96);
+      border:2px solid var(--turquesa);
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+    .card-b{
+      background:rgba(255,255,255,0.96);
+      border:2px solid #a78bfa;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#111827;
+      color:#e5e7eb;
+      padding:2px 8px;
+      border-radius:7px;
+      font-size:clamp(11px, 1vw, 13px);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:clamp(12px, 1.05vw, 14px);
+      line-height:1.35;
+      background:#0b1020;
+      color:#e5e7eb;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+      overflow:auto;
+      max-height: 44vh;
+      border:1px solid rgba(17,24,39,.25);
+      white-space:pre-wrap;
+    }
+
+    .imgbox{
+      background:rgba(255,255,255,0.96);
+      border:1px solid #dde2f1;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+    .imgwrap{
+      width:100%;
+      height: min(32vh, 260px);
+      border-radius:10px;
+      border:1px solid #dde2f1;
+      background:#ffffff;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
+      box-sizing:border-box;
+    }
+    .imgwrap svg{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:3px 10px;
+      border-radius:999px;
+      font-size:clamp(11px, 1vw, 13px);
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    .badge-a{ background:#e0f7fa; color:#015583; border:1px solid var(--turquesa); }
+    .badge-b{ background:#ede9fe; color:#5b21b6; border:1px solid #a78bfa; }
+    .badge-warn{ background:#fef3c7; color:#92400e; border:1px solid #f59e0b; }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:rgba(255,255,255,0.96);
+    }
+    th,td{
+      border:1px solid #dde2f1;
+      padding:clamp(6px, 0.9vw, 11px);
+      font-size:clamp(13px, 1.15vw, 17px);
+      color:var(--texto);
+      vertical-align:top;
+    }
+    th{
+      background:#f3f6fb;
+      text-transform:uppercase;
+      font-size:clamp(11px, 1vw, 13px);
+      letter-spacing:.06em;
+      color:var(--azul-medio);
+    }
+
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+      font-size:clamp(12px, 1.05vw, 14px);
+      gap:14px;
+    }
+    .counter{ font-weight:800; color:var(--azul-medio); }
+    .cover .counter{ color:#e5edf8; }
+
+    /* Botones de navegación */
+    .touch-nav{
+      position:absolute;
+      top:50%;
+      left:0;
+      right:0;
+      transform:translateY(-50%);
+      display:flex;
+      justify-content:space-between;
+      padding: 0 12px;
+      pointer-events:none;
+      z-index: 10;
+    }
+    .touch-nav button{
+      pointer-events:auto;
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      padding:0;
+      border:1px solid rgba(221,226,241,0.95);
+      background:rgba(255,255,255,0.92);
+      color:var(--texto);
+      font-weight:900;
+      box-shadow:0 10px 22px rgba(0,0,0,.12);
+      cursor:pointer;
+    }
+    #touchNav{ opacity:0; transform:translateY(-50%) translateY(6px); transition:.15s ease; }
+    .stage:hover #touchNav{ opacity:1; transform:translateY(-50%) translateY(0); }
+    @media (hover: none){
+      #touchNav{ opacity:1; transform:translateY(-50%); }
+    }
+  </style>
+</head>
+
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active" data-title="Portada">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesión 7: Proyecto Integrador</h1>
+          <div class="subtitle">Entrega 1 — Lanzamiento, propuesta y primer commit</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px); color:#e5edf8;">
+            Unidad 1 · Aplicando algoritmos simples · TIA: Proyecto — Entrega 1 · 10%
+          </p>
+          <p class="note" style="margin-top:clamp(14px,1.8vw,22px);">
+            Navegación: <span class="kbd">←</span> <span class="kbd">→</span> |
+            <span class="kbd">Home</span> <span class="kbd">End</span> |
+            <span class="kbd">F</span> pantalla completa · Mouse: botones · Touch: desliza
+          </p>
+        </div>
+        <div class="footer">
+          <span style="color:#e5edf8;">I.U. Pascual Bravo · Lógica de Programación · Grupo 810</span>
+          <span class="counter">1 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · AGENDA -->
+    <section class="slide content-slide" data-title="Agenda">
+      <div class="inner">
+        <div class="header">Agenda de la sesión (120 min)</div>
+        <div class="content">
+          <h2>Plan de trabajo</h2>
+          <ul>
+            <li>0–10 · Cierre Unidad 1: qué tienen que saber aplicar en el proyecto.</li>
+            <li>10–20 · El Proyecto Integrador: 3 entregas, propósito y reglas generales.</li>
+            <li>20–35 · Modalidades A y B: diferencias, criterios y proceso de elección.</li>
+            <li>35–50 · Requisitos de la Entrega 1 y cómo se califica.</li>
+            <li>50–60 · GitHub: estructura del repositorio y primer commit.</li>
+            <li>60–105 · Trabajo en clase: equipo, propuesta, IPO, variables y primer commit.</li>
+            <li>105–115 · Socialización rápida: cada equipo presenta su idea (1 min).</li>
+            <li>115–120 · Cierre, fechas y canales de entrega.</li>
+          </ul>
+          <div class="callout">
+            <p>
+              Al finalizar esta sesión cada equipo debe tener: modalidad definida, propuesta
+              aprobada, repositorio creado y al menos un commit con el README.
+            </p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesión 7 · Agenda</span>
+          <span class="counter">2 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · VISIÓN GENERAL DEL PROYECTO -->
+    <section class="slide content-slide" data-title="Proyecto Integrador">
+      <div class="inner">
+        <div class="header">El Proyecto Integrador</div>
+        <div class="content">
+          <h2>Una solución que crece con el curso</h2>
+          <p>
+            No es un ejercicio aislado. Cada entrega extiende la anterior con los nuevos conceptos
+            de la unidad. En la Entrega 3 tienes el mismo problema resuelto de forma completa y modular.
+          </p>
+
+          <div class="imgbox" style="margin-top:8px;">
+            <div class="imgwrap">
+              <svg viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M0 0 L10 5 L0 10z" fill="#05ADBC"/>
+                  </marker>
+                </defs>
+                <!-- E1 -->
+                <rect x="30" y="60" width="220" height="190" rx="14" fill="#e0f7fa" stroke="#05ADBC" stroke-width="2"/>
+                <text x="140" y="95" text-anchor="middle" font-family="Arial" font-size="17" font-weight="800" fill="#015583">Entrega 1</text>
+                <text x="140" y="116" text-anchor="middle" font-family="Arial" font-size="13" fill="#6b7280">Unidad 1 · 10%</text>
+                <text x="140" y="138" text-anchor="middle" font-family="Arial" font-size="13" fill="#6b7280">Fecha: 03/03/2026</text>
+                <text x="55" y="166" font-family="Arial" font-size="13" fill="#201F4B">· Variables y tipos</text>
+                <text x="55" y="186" font-family="Arial" font-size="13" fill="#201F4B">· Operadores</text>
+                <text x="55" y="206" font-family="Arial" font-size="13" fill="#201F4B">· Condicionales</text>
+                <text x="55" y="226" font-family="Arial" font-size="13" fill="#201F4B">· IPO + GitHub</text>
+                <!-- flecha -->
+                <line x1="252" y1="155" x2="368" y2="155" stroke="#05ADBC" stroke-width="3" marker-end="url(#arr)"/>
+                <!-- E2 -->
+                <rect x="370" y="60" width="220" height="190" rx="14" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+                <text x="480" y="95" text-anchor="middle" font-family="Arial" font-size="17" font-weight="800" fill="#015583">Entrega 2</text>
+                <text x="480" y="116" text-anchor="middle" font-family="Arial" font-size="13" fill="#6b7280">Unidad 2 · 10%</text>
+                <text x="480" y="138" text-anchor="middle" font-family="Arial" font-size="13" fill="#6b7280">Fecha: 07/04/2026</text>
+                <text x="395" y="166" font-family="Arial" font-size="13" fill="#201F4B">· Extiende E1</text>
+                <text x="395" y="186" font-family="Arial" font-size="13" fill="#201F4B">· Ciclos</text>
+                <text x="395" y="206" font-family="Arial" font-size="13" fill="#201F4B">· Arreglos/Listas</text>
+                <text x="395" y="226" font-family="Arial" font-size="13" fill="#201F4B">· Reporte iterativo</text>
+                <!-- flecha -->
+                <line x1="592" y1="155" x2="708" y2="155" stroke="#05ADBC" stroke-width="3" marker-end="url(#arr)"/>
+                <!-- E3 -->
+                <rect x="710" y="60" width="220" height="190" rx="14" fill="#faf5ff" stroke="#a78bfa" stroke-width="2"/>
+                <text x="820" y="95" text-anchor="middle" font-family="Arial" font-size="17" font-weight="800" fill="#015583">Entrega 3</text>
+                <text x="820" y="116" text-anchor="middle" font-family="Arial" font-size="13" fill="#6b7280">Unidad 3 · 20%</text>
+                <text x="820" y="138" text-anchor="middle" font-family="Arial" font-size="13" fill="#6b7280">Fecha: 19/05/2026</text>
+                <text x="735" y="166" font-family="Arial" font-size="13" fill="#201F4B">· Extiende E2</text>
+                <text x="735" y="186" font-family="Arial" font-size="13" fill="#201F4B">· Funciones</text>
+                <text x="735" y="206" font-family="Arial" font-size="13" fill="#201F4B">· Modularidad</text>
+                <text x="735" y="226" font-family="Arial" font-size="13" fill="#201F4B">· Sustentación 30%</text>
+              </svg>
+            </div>
+          </div>
+
+          <p class="note">
+            Regla clave: en cada entrega partes del código de la anterior y lo amplías.
+            No se empieza de cero en la Entrega 2 ni en la 3.
+          </p>
+        </div>
+        <div class="footer">
+          <span>Proyecto Integrador — Visión general</span>
+          <span class="counter">3 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · MODALIDADES -->
+    <section class="slide content-slide" data-title="Modalidades">
+      <div class="inner">
+        <div class="header">Modalidades del proyecto</div>
+        <div class="content equal-col">
+
+          <div class="card-a">
+            <p style="margin-bottom:8px;"><span class="badge badge-a">Modalidad A</span></p>
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Problema propuesto por el docente</h2>
+            <p style="margin-top:8px;">
+              El dominio y las reglas del problema ya están definidos. El equipo implementa
+              la solución en C# siguiendo la especificación entregada.
+            </p>
+            <ul style="margin-top:10px;">
+              <li>Enfoque: implementación correcta y evidencia de comprensión.</li>
+              <li>Sin tiempo de diseño del problema — pueden arrancar a codificar antes.</li>
+              <li>Útil si el equipo no tiene un dominio claro en mente.</li>
+            </ul>
+          </div>
+
+          <div class="card-b">
+            <p style="margin-bottom:8px;"><span class="badge badge-b">Modalidad B</span></p>
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Problema propuesto por el equipo</h2>
+            <p style="margin-top:8px;">
+              El equipo elige el dominio. Debe redactar una propuesta en clase
+              y obtener aprobación del docente <b>antes de terminar la sesión</b>.
+            </p>
+            <ul style="margin-top:10px;">
+              <li>El problema debe requerir ≥ 3 condicionales y ≥ 3 tipos de datos.</li>
+              <li>Sin aprobación antes de las 8:50 PM → pasa automáticamente a Modalidad A.</li>
+              <li>La rúbrica es idéntica para A y B.</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="callout-warn">
+          <p>
+            <b>Equipos:</b> máximo 2 integrantes. La sustentación (30%) es individual
+            y se califica por separado — cada integrante debe poder defender todo el código.
+          </p>
+        </div>
+        <div class="footer">
+          <span>Modalidades A y B</span>
+          <span class="counter">4 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · MODALIDAD A — PROBLEMA -->
+    <section class="slide content-slide" data-title="Problema propuesto">
+      <div class="inner">
+        <div class="header">Modalidad A — Problema del docente</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Sistema de clasificación de pedidos</h2>
+            <p style="margin-top:8px;">
+              Una tienda en línea necesita un programa que, dados los datos de un pedido,
+              determine su <b>categoría de despacho</b> y el <b>costo de envío</b>.
+            </p>
+            <ul style="margin-top:10px;">
+              <li><b>Entradas:</b> monto del pedido (decimal), ciudad destino (string),
+                tipo de cliente: "nuevo" / "recurrente" (string), cantidad de ítems (int).</li>
+              <li><b>Reglas a implementar:</b>
+                <ul style="margin-top:4px;">
+                  <li>Envío gratis si monto ≥ $150.000 Y cliente recurrente.</li>
+                  <li>Envío express si ítems ≥ 5 O monto ≥ $300.000.</li>
+                  <li>Envío estándar en todos los demás casos.</li>
+                  <li>Costo adicional si ciudad destino es "exterior".</li>
+                </ul>
+              </li>
+              <li><b>Salidas:</b> categoría de despacho, costo de envío, mensaje al cliente.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Lo que esto exige</h2>
+            <ul>
+              <li>Mínimo 3 tipos: <span class="kbd">decimal</span>, <span class="kbd">string</span>, <span class="kbd">int</span>.</li>
+              <li>Operadores: aritméticos, relacionales y lógicos (<span class="kbd">&amp;&amp;</span>, <span class="kbd">||</span>).</li>
+              <li>≥ 3 condicionales anidadas o con condiciones compuestas.</li>
+              <li>Decisiones de diseño reales: ¿cuándo aplica cada regla? ¿en qué orden evalúas?</li>
+            </ul>
+            <div class="callout" style="margin-top:12px;">
+              <p>
+                La complejidad no viene de la sintaxis, viene de que las reglas se cruzan.
+                Un caso de prueba mal pensado lo evidenciará en la sustentación.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Modalidad A — Detalle del problema</span>
+          <span class="counter">5 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · MODALIDAD B — CRITERIOS -->
+    <section class="slide content-slide" data-title="Modalidad B">
+      <div class="inner">
+        <div class="header">Modalidad B — Propuesta del equipo</div>
+        <div class="content two-col">
+          <div class="card-b">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">La propuesta debe incluir</h2>
+            <ol style="margin-top:8px;">
+              <li>Nombre del sistema y dominio (3 líneas máximo).</li>
+              <li>IPO esquemático: entradas (nombre + tipo), proceso en lenguaje natural, salidas con ejemplos.</li>
+              <li>Justificación de que requiere ≥ 3 condicionales y ≥ 3 tipos de datos distintos.</li>
+              <li>Al menos 2 reglas de negocio que generen condicionales compuestas.</li>
+            </ol>
+            <p class="note" style="margin-top:10px;">
+              Se redacta directamente en el README del repositorio.
+              No hay formato especial; claridad y completitud es lo que se evalúa.
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Ejemplos de dominio válido</h2>
+            <ul>
+              <li>Calculadora de tarifa de parqueadero (tipo vehículo, horas, día).</li>
+              <li>Clasificador de notas con estado académico y beca condicional.</li>
+              <li>Sistema de turnos de atención según tipo de usuario y prioridad.</li>
+              <li>Diagnóstico básico de dispositivo por síntomas ingresados.</li>
+              <li>Calculadora de descuentos de tienda (producto, cantidad, tipo de cliente).</li>
+            </ul>
+            <div class="callout-warn" style="margin-top:10px;">
+              <p>
+                Si la propuesta no tiene aprobación antes de terminar la sesión,
+                el equipo trabaja con <b>Modalidad A sin penalización</b>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Modalidad B — Criterios de propuesta</span>
+          <span class="counter">6 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · REQUISITOS TÉCNICOS ENTREGA 1 -->
+    <section class="slide content-slide" data-title="Requisitos Entrega 1">
+      <div class="inner">
+        <div class="header">Requisitos técnicos — Entrega 1</div>
+        <div class="content">
+          <h2>Qué debe tener el código entregado</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>Mínimo requerido</th>
+                <th>Nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Lenguaje</b></td>
+                <td>C# consola (.NET SDK)</td>
+                <td>Sin frameworks ni librerías externas</td>
+              </tr>
+              <tr>
+                <td><b>Condicionales</b></td>
+                <td>≥ 3 estructuras <span class="kbd">if / else if / else</span></td>
+                <td>Con operadores lógicos <span class="kbd">&amp;&amp;</span> <span class="kbd">||</span></td>
+              </tr>
+              <tr>
+                <td><b>Variables</b></td>
+                <td>≥ 3 tipos distintos, nombres en camelCase</td>
+                <td>Propósito claro; sin variables sin usar</td>
+              </tr>
+              <tr>
+                <td><b>Entrada</b></td>
+                <td><span class="kbd">Console.ReadLine()</span> con conversión explícita</td>
+                <td>TryParse recomendado (no obligatorio en E1)</td>
+              </tr>
+              <tr>
+                <td><b>Salida</b></td>
+                <td>Mensajes con contexto, no solo valores crudos</td>
+                <td>El usuario debe entender la respuesta</td>
+              </tr>
+              <tr>
+                <td><b>GitHub</b></td>
+                <td>Repositorio público + README + .gitignore</td>
+                <td>Enlace entregado en el LMS</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top:10px;">
+            <p>
+              Dado que solo tienen 2 días, el foco de la entrega es la propuesta sólida,
+              las variables bien declaradas y al menos la lógica condicional principal funcionando.
+            </p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Requisitos Entrega 1</span>
+          <span class="counter">7 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · CALIFICACIÓN -->
+    <section class="slide content-slide" data-title="Calificación">
+      <div class="inner">
+        <div class="header">Cómo se califica</div>
+        <div class="content equal-col">
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Entrega en GitHub — 70%</h2>
+            <table style="margin-top:10px;">
+              <thead>
+                <tr><th>Criterio</th><th>Peso</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Variables y tipos bien declarados</td><td>20%</td></tr>
+                <tr><td>Condicionales funcionales y correctas</td><td>25%</td></tr>
+                <tr><td>Operadores usados con propósito</td><td>15%</td></tr>
+                <tr><td>README + propuesta + casos de prueba</td><td>20%</td></tr>
+                <tr><td>Commits individuales ≥ 5% del avance c/u</td><td>20%</td></tr>
+              </tbody>
+            </table>
+            <p class="note" style="margin-top:10px;">
+              Si solo un integrante tiene commits, ese criterio (20%) se pierde para el otro.
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Sustentación oral — 30%</h2>
+            <p style="margin-top:8px;">
+              Se califica <b>por separado e individualmente</b>. Cada integrante
+              defiende el código completo, no solo "su parte".
+            </p>
+            <ul style="margin-top:10px;">
+              <li>El docente da una entrada no documentada; el estudiante predice la salida y traza la lógica.</li>
+              <li>Se pide justificar por qué se eligió un tipo de dato específico.</li>
+              <li>Se puede pedir modificar una regla en vivo (ej. cambiar un umbral).</li>
+            </ul>
+            <div class="callout-warn" style="margin-top:10px;">
+              <p>
+                Si un integrante no puede sustentar, pierde su 30% aunque el código esté correcto.
+                Ambos deben entender todo el proyecto.
+              </p>
+            </div>
+          </div>
+
+        </div>
+        <div class="footer">
+          <span>Estructura de calificación</span>
+          <span class="counter">8 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · GITHUB -->
+    <section class="slide content-slide" data-title="GitHub">
+      <div class="inner">
+        <div class="header">GitHub — Estructura y flujo</div>
+        <div class="content two-col">
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Estructura del repositorio</h2>
+            <div class="code">/src
+  Proyecto.cs
+README.md
+.gitignore       ← incluye bin/ y obj/</div>
+
+            <h2 style="font-size:clamp(18px,1.7vw,24px); margin-top:14px;">Commits mínimos esperados</h2>
+            <div class="code">init: README con descripción del problema y equipo
+feat: declaración de variables y lectura de entradas
+feat: lógica condicional principal implementada
+fix: ajustes según casos de prueba</div>
+            <p class="note" style="margin-top:8px;">
+              Cada integrante debe aparecer como autor en al menos 1 commit
+              que represente ≥ 5% del avance real del proyecto.
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">README mínimo</h2>
+            <ul>
+              <li><b>Nombre del proyecto</b> y equipo (ambos integrantes).</li>
+              <li><b>Descripción del problema</b> (3–5 líneas).</li>
+              <li><b>IPO:</b> tabla de entradas, proceso y salidas con ejemplos.</li>
+              <li><b>Variables:</b> nombre, tipo y propósito de cada una.</li>
+              <li><b>Casos de prueba:</b> mínimo 2 (normal + borde).</li>
+              <li><b>Instrucciones</b> para compilar y ejecutar.</li>
+            </ul>
+            <div class="callout-warn" style="margin-top:10px;">
+              <p>
+                Entrega: enlace del repositorio en el LMS antes de las
+                <b>23:59 del 03/03/2026</b>.
+                No se aceptan envíos por correo ni por chat.
+              </p>
+            </div>
+          </div>
+
+        </div>
+        <div class="footer">
+          <span>GitHub — Estructura y entrega</span>
+          <span class="counter">9 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · DIAGRAMA IPO -->
+    <section class="slide content-slide" data-title="Modelo IPO">
+      <div class="inner">
+        <div class="header">Herramienta de diseño</div>
+        <div class="content two-col">
+
+          <div class="imgbox">
+            <h2 style="font-size:clamp(18px,1.7vw,24px); margin-bottom:10px;">Modelo IPO del proyecto</h2>
+            <div class="imgwrap">
+              <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M0 0 L10 5 L0 10z" fill="#05ADBC"/>
+                  </marker>
+                </defs>
+                <!-- Entradas -->
+                <rect x="20" y="60" width="220" height="240" rx="12" fill="#e0f7fa" stroke="#05ADBC" stroke-width="2"/>
+                <text x="130" y="90" text-anchor="middle" font-family="Arial" font-size="18" font-weight="800" fill="#015583">ENTRADAS</text>
+                <text x="40" y="118" font-family="Arial" font-size="14" fill="#201F4B">nombre: tipo</text>
+                <text x="40" y="142" font-family="Arial" font-size="14" fill="#201F4B">nombre: tipo</text>
+                <text x="40" y="166" font-family="Arial" font-size="14" fill="#201F4B">nombre: tipo</text>
+                <text x="40" y="190" font-family="Arial" font-size="14" fill="#6b7280">...</text>
+                <text x="40" y="230" font-family="Arial" font-size="13" fill="#6b7280">¿De dónde vienen?</text>
+                <text x="40" y="250" font-family="Arial" font-size="13" fill="#6b7280">¿Qué tipo tienen?</text>
+                <text x="40" y="270" font-family="Arial" font-size="13" fill="#6b7280">¿Tienen restricciones?</text>
+                <!-- flecha 1 -->
+                <line x1="242" y1="180" x2="328" y2="180" stroke="#05ADBC" stroke-width="3" marker-end="url(#arr2)"/>
+                <!-- Proceso -->
+                <rect x="330" y="60" width="240" height="240" rx="12" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+                <text x="450" y="90" text-anchor="middle" font-family="Arial" font-size="18" font-weight="800" fill="#015583">PROCESO</text>
+                <text x="350" y="118" font-family="Arial" font-size="14" fill="#201F4B">Regla 1: si... entonces</text>
+                <text x="350" y="142" font-family="Arial" font-size="14" fill="#201F4B">Regla 2: si... entonces</text>
+                <text x="350" y="166" font-family="Arial" font-size="14" fill="#201F4B">Regla 3: si... entonces</text>
+                <text x="350" y="190" font-family="Arial" font-size="14" fill="#6b7280">...</text>
+                <text x="350" y="230" font-family="Arial" font-size="13" fill="#6b7280">¿Qué decisiones toma?</text>
+                <text x="350" y="250" font-family="Arial" font-size="13" fill="#6b7280">¿Las reglas se cruzan?</text>
+                <text x="350" y="270" font-family="Arial" font-size="13" fill="#6b7280">¿Hay orden de evaluación?</text>
+                <!-- flecha 2 -->
+                <line x1="572" y1="180" x2="658" y2="180" stroke="#05ADBC" stroke-width="3" marker-end="url(#arr2)"/>
+                <!-- Salidas -->
+                <rect x="660" y="60" width="220" height="240" rx="12" fill="#faf5ff" stroke="#a78bfa" stroke-width="2"/>
+                <text x="770" y="90" text-anchor="middle" font-family="Arial" font-size="18" font-weight="800" fill="#015583">SALIDAS</text>
+                <text x="680" y="118" font-family="Arial" font-size="14" fill="#201F4B">resultado 1</text>
+                <text x="680" y="142" font-family="Arial" font-size="14" fill="#201F4B">resultado 2</text>
+                <text x="680" y="166" font-family="Arial" font-size="14" fill="#201F4B">mensaje al usuario</text>
+                <text x="680" y="230" font-family="Arial" font-size="13" fill="#6b7280">¿Qué ve el usuario?</text>
+                <text x="680" y="250" font-family="Arial" font-size="13" fill="#6b7280">¿Tiene contexto claro?</text>
+                <text x="680" y="270" font-family="Arial" font-size="13" fill="#6b7280">¿Cubre todos los casos?</text>
+              </svg>
+            </div>
+            <p class="note" style="margin-top:8px;">
+              El IPO va en el README. Es el diseño antes del código.
+            </p>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Variables: tabla de diseño</h2>
+            <table>
+              <thead>
+                <tr><th>Nombre</th><th>Tipo C#</th><th>Propósito</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>monto</td><td>decimal</td><td>Valor del pedido en pesos</td></tr>
+                <tr><td>ciudad</td><td>string</td><td>Destino del envío</td></tr>
+                <tr><td>cantItems</td><td>int</td><td>Número de ítems</td></tr>
+                <tr><td>tipoCliente</td><td>string</td><td>"nuevo" o "recurrente"</td></tr>
+                <tr><td>costoEnvio</td><td>decimal</td><td>Resultado calculado</td></tr>
+                <tr><td>categoria</td><td>string</td><td>Tipo de despacho asignado</td></tr>
+              </tbody>
+            </table>
+            <p class="note" style="margin-top:10px;">
+              Esta tabla va en el README. El docente la revisa para verificar
+              que los tipos tienen sentido antes de ver el código.
+            </p>
+          </div>
+
+        </div>
+        <div class="footer">
+          <span>IPO y tabla de variables</span>
+          <span class="counter">10 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · TRABAJO EN CLASE -->
+    <section class="slide content-slide" data-title="Trabajo en clase">
+      <div class="inner">
+        <div class="header">Trabajo en clase (60–105 min)</div>
+        <div class="content two-col">
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Pasos guiados</h2>
+            <ol>
+              <li><b>Definir equipo y modalidad</b> (5 min) — confirmar integrante, elegir A o B.</li>
+              <li><b>Propuesta</b> (15 min) — si es B, redactar y obtener aprobación ahora.</li>
+              <li><b>Crear repositorio en GitHub</b> (10 min) — nombre, .gitignore, README vacío, agregar colaborador.</li>
+              <li><b>Diseño en README</b> (15 min) — escribir IPO y tabla de variables.</li>
+              <li><b>Primer commit</b> (5 min) — <span class="kbd">init: README con propuesta y diseño IPO</span>. Ambos verifican que ven el commit.</li>
+              <li><b>Arranque del código</b> (15 min) — declarar variables, leer entradas, primer condicional funcional.</li>
+              <li><b>Segundo commit</b> — <span class="kbd">feat: variables y lectura de entradas</span>.</li>
+            </ol>
+          </div>
+
+          <div>
+            <div class="callout">
+              <p><b>Regla de commits:</b></p>
+              <p style="margin-top:6px;">
+                Ambos integrantes deben tener commits propios antes de terminar la sesión.
+                Configuren Git con su usuario de GitHub en la máquina que usen.
+              </p>
+            </div>
+            <div class="callout-warn" style="margin-top:12px;">
+              <p><b>No para la sesión:</b></p>
+              <ul style="margin-top:6px;">
+                <li>No es necesario que el código esté 100% completo hoy.</li>
+                <li>La prioridad es: propuesta clara + IPO en README + primer commit.</li>
+                <li>El resto lo completan en los 2 días siguientes.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+        <div class="footer">
+          <span>Trabajo en clase</span>
+          <span class="counter">11 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · SOCIALIZACIÓN -->
+    <section class="slide content-slide" data-title="Socialización">
+      <div class="inner">
+        <div class="header">Socialización rápida (105–115 min)</div>
+        <div class="content">
+          <h2>Cada equipo presenta en 1 minuto</h2>
+          <div class="equal-col" style="margin-top:10px;">
+            <div class="card">
+              <p><b>Deben responder:</b></p>
+              <ol style="margin-top:8px;">
+                <li>¿Qué problema resuelve su sistema?</li>
+                <li>¿Cuáles son sus entradas y de qué tipo?</li>
+                <li>¿Cuál es la regla condicional más compleja que van a implementar?</li>
+              </ol>
+              <p class="note" style="margin-top:10px;">
+                No es una sustentación. Es una verificación de que el enfoque
+                es viable y el dominio es suficientemente rico.
+              </p>
+            </div>
+            <div class="card">
+              <p><b>El docente verifica:</b></p>
+              <ul style="margin-top:8px;">
+                <li>Que el problema realmente requiere ≥ 3 condicionales.</li>
+                <li>Que los tipos de datos tienen sentido para el dominio.</li>
+                <li>Que ambos integrantes conocen el problema (no solo uno).</li>
+                <li>Que el repositorio tiene al menos 1 commit visible.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:10px;">
+            <p>
+              Si el docente detecta un problema con el enfoque, el equipo tiene hasta el cierre de la clase
+              para ajustar. Después de eso, la propuesta queda bloqueada para la entrega.
+            </p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Socialización — Validación de propuestas</span>
+          <span class="counter">12 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · CIERRE Y CHECKLIST -->
+    <section class="slide content-slide" data-title="Cierre">
+      <div class="inner">
+        <div class="header">Cierre y próximos pasos</div>
+        <div class="content equal-col">
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Checklist antes de salir hoy</h2>
+            <ul style="margin-top:8px; list-style:none; padding-left:0;">
+              <li>☐ Equipo definido (máx. 2 integrantes).</li>
+              <li>☐ Modalidad elegida (A o B aprobada).</li>
+              <li>☐ Repositorio creado, público, colaborador agregado.</li>
+              <li>☐ README con IPO y tabla de variables.</li>
+              <li>☐ Al menos 1 commit visible de cada integrante.</li>
+              <li>☐ Propuesta presentada en la socialización.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2 style="font-size:clamp(18px,1.7vw,24px);">Fechas clave</h2>
+            <table>
+              <thead><tr><th>Qué</th><th>Cuándo</th></tr></thead>
+              <tbody>
+                <tr><td>Entrega 1 en LMS</td><td><b>03/03/2026 — 23:59</b></td></tr>
+                <tr><td>Sesión 8 — Prueba Unidad 1</td><td>05/03/2026</td></tr>
+                <tr><td>Inicio Unidad 2</td><td>12/03/2026</td></tr>
+                <tr><td>Entrega 2 (extiende E1)</td><td>07/04/2026</td></tr>
+                <tr><td>Entrega 3 + sustentación</td><td>19/05/2026</td></tr>
+              </tbody>
+            </table>
+            <p class="note" style="margin-top:10px;">
+              Navegación: <span class="kbd">←</span> <span class="kbd">→</span> |
+              <span class="kbd">Home</span> <span class="kbd">End</span> |
+              <span class="kbd">F</span> · Botones · Desliza
+            </p>
+          </div>
+
+        </div>
+        <div class="footer">
+          <span>Sesión 7 · Cierre</span>
+          <span class="counter">13 / 13</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Botones de navegación -->
+    <div class="touch-nav" id="touchNav">
+      <button type="button" id="btnPrev" aria-label="Anterior">←</button>
+      <button type="button" id="btnNext" aria-label="Siguiente">→</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function(){
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const counters = Array.from(document.querySelectorAll('.counter'));
+    const stage = document.getElementById('stage');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+
+    let idx = 0;
+
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+    function show(i){
+      idx = clamp(i, 0, slides.length - 1);
+      slides.forEach((s,k) => s.classList.toggle('active', k === idx));
+      const label = (idx+1) + " / " + slides.length;
+      counters.forEach(el => el.textContent = label);
+      history.replaceState(null, "", "#" + (idx+1));
+    }
+
+    function next(){ show(idx+1); }
+    function prev(){ show(idx-1); }
+
+    const m = (location.hash || "").match(/^#(\d+)$/);
+    if(m){
+      const start = parseInt(m[1], 10);
+      if(!isNaN(start)) idx = clamp(start-1, 0, slides.length-1);
+    }
+    show(idx);
+
+    btnPrev.addEventListener('click', prev);
+    btnNext.addEventListener('click', next);
+
+    document.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if(k === 'f' || k === 'F'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        return;
+      }
+      if(k === 'ArrowRight' || k === 'PageDown' || k === ' '){ e.preventDefault(); next(); }
+      else if(k === 'ArrowLeft' || k === 'PageUp'){ e.preventDefault(); prev(); }
+      else if(k === 'Home'){ e.preventDefault(); show(0); }
+      else if(k === 'End'){ e.preventDefault(); show(slides.length-1); }
+    });
+
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if(isTouch){
+      let x0=null, y0=null, t0=0;
+      const SWIPE_MIN_X=50, SWIPE_MAX_Y=80, SWIPE_MAX_MS=800;
+
+      stage.addEventListener('touchstart', (e)=>{
+        const t=e.changedTouches[0];
+        x0=t.clientX; y0=t.clientY; t0=Date.now();
+      }, {passive:true});
+
+      stage.addEventListener('touchend', (e)=>{
+        if(x0===null||y0===null) return;
+        const t=e.changedTouches[0];
+        const dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0;
+        x0=null; y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y) return;
+        if(dx<=-SWIPE_MIN_X) next();
+        else if(dx>=SWIPE_MIN_X) prev();
+      }, {passive:true});
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sesión 4 — Condicionales (nivel universitario)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --text:#e9eefc;
+      --muted:#b7c0e3;
+      --accent:#7aa2ff;
+      --ok:#41d39b;
+      --warn:#ffcc66;
+      --danger:#ff6b6b;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+
+      /* Tamaño base 16:9 (se escala al viewport sin deformar) */
+      --baseW: 1280;
+      --baseH: 720;
+
+      /* Ajustes de densidad */
+      --pad: 22px;
+      --radius: 14px;
+      --border: 1px solid rgba(255,255,255,.10);
+    }
+
+    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);}
+    .deck{height:100%; display:flex; flex-direction:column;}
+
+    .topbar, .footer{
+      padding:10px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-color: rgba(255,255,255,.08);
+    }
+    .topbar{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+      gap:12px;
+    }
+    .footer{
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      font-size:13px;
+      gap:12px;
+    }
+    .title{font-weight:700; letter-spacing:.2px;}
+    .meta{color:var(--muted); font-size:13px;}
+    .badge{
+      color:var(--bg);
+      background:var(--accent);
+      border-radius:10px;
+      padding:3px 10px;
+      font-weight:750;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    /* Stage: ocupa todo lo que queda y centra el canvas */
+    .stage{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px; /* reduce márgenes vacíos */
+      overflow:hidden;
+    }
+
+    /* Canvas fijo 16:9 que se escala con transform */
+    .canvas{
+      width: calc(var(--baseW) * 1px);
+      height: calc(var(--baseH) * 1px);
+      transform-origin: top left;
+      background: var(--panel);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow:0 12px 42px rgba(0,0,0,.38);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      padding: var(--pad);
+      display:none;
+      overflow:hidden;
+    }
+    .slide.active{display:block;}
+
+    /* Tipografía responsive (dentro del canvas) */
+    h1,h2,h3{margin:0 0 10px 0;}
+    h1{font-size:52px; line-height:1.05;}
+    h2{font-size:38px; line-height:1.12;}
+    h3{font-size:22px; color:var(--muted); font-weight:650;}
+
+    p{margin:10px 0; font-size:22px; line-height:1.35;}
+    ul{margin:10px 0 0 22px; font-size:22px; line-height:1.33;}
+    li{margin:8px 0;}
+
+    .kpi{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:start;
+      margin-top:10px;
+    }
+    .grid3{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:14px;
+      align-items:start;
+      margin-top:10px;
+    }
+
+    .box{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:12px 12px;
+    }
+
+    .code{
+      font-family:var(--mono);
+      font-size:16px;
+      line-height:1.35;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      padding:12px 12px;
+      white-space:pre-wrap;
+    }
+
+    .note{margin-top:10px; color:var(--muted); font-size:15px;}
+    .small{font-size:16px; color:var(--muted);}
+
+    .hl{color:var(--accent); font-weight:750;}
+    .ok{color:var(--ok); font-weight:750;}
+    .warn{color:var(--warn); font-weight:750;}
+    .danger{color:var(--danger); font-weight:750;}
+
+    .keys kbd{
+      font-family:var(--mono);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+      margin:0 2px;
+      color:var(--text);
+    }
+
+    /* “Imágenes”/diagramas: siempre completas, sin recorte ni deformación */
+    figure{margin:0;}
+    .mediaWrap{
+      width:100%;
+      height: 360px; /* espacio fijo dentro del slide */
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+      box-sizing:border-box;
+    }
+    .mediaWrap svg, .mediaWrap img{
+      width:100%;
+      height:100%;
+      object-fit:contain; /* para <img> */
+    }
+    .caption{
+      margin-top:8px;
+      font-size:15px;
+      color:var(--muted);
+    }
+
+    /* Ajustes para contenido denso */
+    .tight p{margin:8px 0;}
+    .tight li{margin:6px 0;}
+    .hr{height:1px; background:rgba(255,255,255,.10); margin:12px 0;}
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="topbar">
+      <div>
+        <div class="title">Lógica de Programación — Sesión 4</div>
+        <div class="meta">Unidad 1 · Condicionales anidados · Condiciones compuestas · Tablas de decisión · Pruebas por ramas (C#)</div>
+      </div>
+      <div class="meta"><span class="badge" id="counter">1/1</span></div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="canvas" id="canvas">
+        <!-- Slide 1 -->
+        <section class="slide active">
+          <h1>Sesión 4</h1>
+          <h3>Decisiones “serias”: prioridad, cobertura y trazabilidad</h3>
+          <div class="kpi">
+            <div class="chip">Si/Si-no anidado bien diseñado</div>
+            <div class="chip">AND/OR con paréntesis (sin ambigüedad)</div>
+            <div class="chip">Tabla de decisión → código</div>
+            <div class="chip">Pruebas: ramas + bordes</div>
+          </div>
+          <p class="note">Navegación: ← → · Pantalla completa: F</p>
+        </section>
+
+        <!-- Slide 2 -->
+        <section class="slide">
+          <h2>Objetivos medibles</h2>
+          <ul>
+            <li>Convertir un conjunto de reglas en una <span class="hl">tabla de decisión</span> completa (sin huecos, sin solapes).</li>
+            <li>Traducir tabla de decisión a <span class="hl">if/else</span> o <span class="hl">switch</span> con prioridad explícita.</li>
+            <li>Diseñar un set mínimo de pruebas con <span class="hl">cobertura de ramas</span> y <span class="hl">casos borde</span>.</li>
+            <li>Implementar el ejercicio en C# respetando tipos (<span class="hl">decimal</span> para dinero) y validando rangos.</li>
+          </ul>
+          <p class="small">Meta universitaria: que puedas defender tu solución (reglas, pruebas y código coherente).</p>
+        </section>
+
+        <!-- Slide 3 -->
+        <section class="slide tight">
+          <h2>Problema típico: reglas que “se pisan”</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>Lo que pasa en la vida real</h3>
+              <ul>
+                <li>Hay múltiples descuentos, recargos, excepciones y topes.</li>
+                <li>Dos reglas pueden aplicar al mismo tiempo.</li>
+                <li>Si no defines prioridad, el resultado depende del orden del programador.</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h3>La solución técnica</h3>
+              <ul>
+                <li>Escribes reglas como condiciones + acciones.</li>
+                <li>Defines <span class="hl">prioridad</span> (qué gana cuando hay conflicto).</li>
+                <li>Usas tabla de decisión + pruebas por ramas.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note">Hoy entrenamos un método repetible: reglas → tabla → código → pruebas.</p>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide">
+          <h2>Ejercicio guía (enunciado)</h2>
+          <div class="box">
+            <p><span class="hl">Sistema de cobro de parqueadero (por día)</span></p>
+            <ul>
+              <li>Entrada: tipoVehiculo (1=Moto, 2=Carro), horas (0..24), esFestivo (S/N).</li>
+              <li>Tarifa base por hora: Moto 2000; Carro 3500.</li>
+              <li>Regla A: si horas ≥ 8, se cobra “tope diario”: Moto 12000; Carro 20000.</li>
+              <li>Regla B: si esFestivo = S, recargo del 10% sobre lo cobrado (incluye tope).</li>
+              <li>Salida: total a pagar.</li>
+            </ul>
+          </div>
+          <p class="small">Este ejercicio fuerza: rangos, prioridad (tope vs por hora) y condición compuesta.</p>
+        </section>
+
+        <!-- Slide 5 -->
+        <section class="slide">
+          <h2>Modelo mental (diagrama en español)</h2>
+          <div class="mediaWrap">
+            <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <style>
+                  .b{fill:#0f1730;stroke:rgba(255,255,255,.25);stroke-width:2;}
+                  .t{fill:#e9eefc;font-family:system-ui,Segoe UI,Roboto,Arial;font-size:20px;}
+                  .m{fill:#b7c0e3;font-family:system-ui,Segoe UI,Roboto,Arial;font-size:18px;}
+                  .a{stroke:rgba(122,162,255,.9);stroke-width:3;marker-end:url(#arrow);}
+                </style>
+                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(122,162,255,.9)"/>
+                </marker>
+              </defs>
+
+              <rect class="b" x="30" y="30" rx="14" ry="14" width="260" height="90"/>
+              <text class="t" x="60" y="70">Entradas</text>
+              <text class="m" x="60" y="98">tipo, horas, festivo</text>
+
+              <rect class="b" x="330" y="30" rx="14" ry="14" width="520" height="90"/>
+              <text class="t" x="360" y="70">Decisión 1: ¿aplica tope diario?</text>
+              <text class="m" x="360" y="98">horas ≥ 8 → usar tope, si no → horas * tarifa</text>
+
+              <rect class="b" x="330" y="150" rx="14" ry="14" width="520" height="90"/>
+              <text class="t" x="360" y="190">Decisión 2: ¿hay recargo?</text>
+              <text class="m" x="360" y="218">festivo = S → total = base * 1.10</text>
+
+              <rect class="b" x="30" y="300" rx="14" ry="14" width="820" height="90"/>
+              <text class="t" x="60" y="340">Salida</text>
+              <text class="m" x="60" y="368">total a pagar (decimal), con pruebas por casos borde</text>
+
+              <line class="a" x1="290" y1="75" x2="330" y2="75"/>
+              <line class="a" x1="590" y1="120" x2="590" y2="150"/>
+              <line class="a" x1="590" y1="240" x2="590" y2="300"/>
+            </svg>
+          </div>
+          <div class="caption">Diagrama de flujo conceptual: separa decisiones y evita mezclar reglas en una sola condición gigante.</div>
+        </section>
+
+        <!-- Slide 6 -->
+        <section class="slide tight">
+          <h2>Tabla de decisión (mínima y completa)</h2>
+          <div class="box">
+            <p>Condiciones:</p>
+            <ul>
+              <li>C1: horas ≥ 8</li>
+              <li>C2: festivo = S</li>
+            </ul>
+          </div>
+          <div class="code">Caso | C1 (tope) | C2 (festivo) | Acción base                    | Acción final
+-----|-----------|--------------|--------------------------------|------------------------------
+1    | F         | F            | total = horas * tarifa         | total = total
+2    | F         | V            | total = horas * tarifa         | total = total * 1.10
+3    | V         | F            | total = tope(tipoVehiculo)     | total = total
+4    | V         | V            | total = tope(tipoVehiculo)     | total = total * 1.10</div>
+          <p class="note">Esta tabla obliga a cubrir 4 escenarios; si te falta uno, tu código queda incompleto.</p>
+        </section>
+
+        <!-- Slide 7 -->
+        <section class="slide">
+          <h2>Pseudocódigo (fiel a la tabla)</h2>
+          <div class="code">Leer tipoVehiculo
+Leer horas
+Leer esFestivo
+
+Si horas >= 8 Entonces
+  base = topeSegunTipo(tipoVehiculo)
+Si no
+  base = horas * tarifaSegunTipo(tipoVehiculo)
+FinSi
+
+Si esFestivo == "S" Entonces
+  total = base * 1.10
+Si no
+  total = base
+FinSi
+
+Escribir total</div>
+          <p class="small">Nota: “tarifaSegunTipo” y “topeSegunTipo” pueden ser un switch en C#.</p>
+        </section>
+
+        <!-- Slide 8 -->
+        <section class="slide tight">
+          <h2>C# (estructura + tipos correctos)</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3>Por qué <span class="hl">decimal</span></h3>
+              <ul>
+                <li>El problema es dinero (tarifas, tope, recargo).</li>
+                <li>decimal reduce errores de aproximación en cálculos financieros.</li>
+                <li>Usa sufijo <span class="hl">m</span> en literales: 3500m, 1.10m.</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h3>Precondiciones (rango)</h3>
+              <ul>
+                <li>horas debe estar entre 0 y 24.</li>
+                <li>tipoVehiculo debe ser 1 o 2.</li>
+                <li>festivo debe ser S o N.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note">Universitario: o validas o declaras la precondición (y la cumples en pruebas).</p>
+        </section>
+
+        <!-- Slide 9 -->
+        <section class="slide">
+          <h2>Implementación C# (paso 1: entrada robusta)</h2>
+          <div class="code">using System;
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    Console.Write("Tipo (1=Moto, 2=Carro): ");
+    string sTipo = Console.ReadLine() ?? "";
+    if (!int.TryParse(sTipo, out int tipo) || (tipo != 1 && tipo != 2))
+    {
+      Console.WriteLine("Tipo inválido.");
+      return;
+    }
+
+    Console.Write("Horas (0..24): ");
+    string sHoras = Console.ReadLine() ?? "";
+    if (!int.TryParse(sHoras, out int horas) || horas < 0 || horas > 24)
+    {
+      Console.WriteLine("Horas inválidas.");
+      return;
+    }
+
+    Console.Write("¿Es festivo? (S/N): ");
+    string festivo = (Console.ReadLine() ?? "").Trim().ToUpperInvariant();
+    if (festivo != "S" && festivo != "N")
+    {
+      Console.WriteLine("Valor de festivo inválido.");
+      return;
+    }
+
+    // Paso 2: calcular...
+  }
+}</div>
+          <p class="small">Esto evita que el programa “explote” por un dato mal digitado.</p>
+        </section>
+
+        <!-- Slide 10 -->
+        <section class="slide">
+          <h2>Implementación C# (paso 2: tarifas con switch)</h2>
+          <div class="code">decimal tarifaHora = tipo switch
+{
+  1 => 2000m,  // Moto
+  2 => 3500m,  // Carro
+  _ => 0m
+};
+
+decimal topeDiario = tipo switch
+{
+  1 => 12000m,
+  2 => 20000m,
+  _ => 0m
+};</div>
+          <p class="note">switch expresa “selección por categoría” de forma clara y auditable.</p>
+        </section>
+
+        <!-- Slide 11 -->
+        <section class="slide">
+          <h2>Implementación C# (paso 3: decisiones según tabla)</h2>
+          <div class="code">decimal baseCobro;
+
+if (horas >= 8)
+{
+  baseCobro = topeDiario;
+}
+else
+{
+  baseCobro = horas * tarifaHora;
+}
+
+decimal total = baseCobro;
+
+if (festivo == "S")
+{
+  total = total * 1.10m;
+}
+
+Console.WriteLine($"Total a pagar: {total}");</div>
+          <p class="small">La estructura coincide con la tabla de decisión: primero base (tope o por hora), luego recargo.</p>
+        </section>
+
+        <!-- Slide 12 -->
+        <section class="slide tight">
+          <h2>Pruebas (cobertura de ramas + bordes)</h2>
+          <div class="box">
+            <p><span class="hl">Casos mínimos recomendados</span></p>
+            <ul>
+              <li>Caso normal sin tope, no festivo: tipo=1, horas=2, N.</li>
+              <li>Caso normal sin tope, festivo: tipo=2, horas=3, S.</li>
+              <li><span class="warn">Borde del tope</span>: horas=8 (debe activar tope).</li>
+              <li><span class="warn">Borde inferior</span>: horas=0 (total debe ser 0 o recargo sobre 0).</li>
+            </ul>
+          </div>
+          <div class="code">Caso | tipo | horas | festivo | Esperado (explicación)
+-----|------|-------|---------|------------------------
+A    | 1    | 2     | N       | 2*2000 = 4000
+B    | 2    | 3     | S       | (3*3500)=10500 → *1.10 = 11550
+C    | 2    | 8     | N       | tope carro = 20000
+D    | 1    | 0     | S       | 0 → *1.10 = 0</div>
+          <p class="note">Cada caso justifica una rama (y C y D son bordes).</p>
+        </section>
+
+        <!-- Slide 13 -->
+        <section class="slide">
+          <h2>Error frecuente 1: condiciones mezcladas</h2>
+          <div class="grid2">
+            <div class="box">
+              <h3 class="danger">Mal enfoque</h3>
+              <div class="code">if ((horas >= 8 && festivo=="S") || ...)
+{
+  // muchas cosas aquí
+}</div>
+              <p class="small">Difícil de leer, difícil de probar, fácil de dañar con cambios.</p>
+            </div>
+            <div class="box">
+              <h3 class="ok">Buen enfoque</h3>
+              <div class="code">baseCobro = (horas >= 8) ? tope : horas * tarifa;
+if (festivo == "S") total = baseCobro * 1.10m;</div>
+              <p class="small">Decisiones separadas = pruebas más simples.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 14 -->
+        <section class="slide">
+          <h2>Error frecuente 2: “huecos” en rangos</h2>
+          <div class="box">
+            <p>Si tu regla es “0–2”, “3–5”, “6+”, debes escribirla sin dejar números sin dueño.</p>
+            <div class="code">Ejemplo correcto:
+if (h <= 2) ...
+else if (h <= 5) ...
+else ...</div>
+          </div>
+          <p class="note">Esto aplica a tus proyectos: la ambigüedad se vuelve bug.</p>
+        </section>
+
+        <!-- Slide 15 -->
+        <section class="slide">
+          <h2>Actividad (obligatoria, 30–35 min)</h2>
+          <div class="box">
+            <p><span class="hl">En parejas</span> (o individual si es virtual):</p>
+            <ul>
+              <li>Escribe la tabla de decisión del parqueadero.</li>
+              <li>Implementa en C# con TryParse + switch + if/else.</li>
+              <li>Documenta 4 casos de prueba (incluye horas=8 y horas=0).</li>
+            </ul>
+          </div>
+          <p class="small">Entrega: archivo .cs + captura/tabla de pruebas (con explicación breve por caso).</p>
+        </section>
+
+        <!-- Slide 16 -->
+        <section class="slide">
+          <h2>Aplicación al proyecto (10–15 min)</h2>
+          <div class="box">
+            <ul>
+              <li>Identifica 2 reglas de tu proyecto que puedan “pisarse”.</li>
+              <li>Define prioridad (quién gana) y escríbela en texto.</li>
+              <li>Construye una mini tabla de decisión (2 condiciones → 4 casos).</li>
+            </ul>
+          </div>
+          <p class="note">Si tu proyecto está bien modelado hoy, mañana programar es “mecánico”.</p>
+        </section>
+
+        <!-- Slide 17 -->
+        <section class="slide">
+          <h2>Reto (opcional, sin nota)</h2>
+          <div class="box">
+            <p><span class="hl">Auditoría de validación:</span> agrega mensajes de error específicos.</p>
+            <ul>
+              <li>Si horas está fuera de 0..24, explica el rango permitido.</li>
+              <li>Si tipo no es 1 o 2, muestra opciones válidas.</li>
+              <li>Si festivo no es S/N, normaliza y vuelve a pedir (solo si te alcanza el tiempo).</li>
+            </ul>
+          </div>
+          <p class="small">Esto sube calidad, pero no cambia la nota (reto opcional).</p>
+        </section>
+
+        <!-- Slide 18 -->
+        <section class="slide">
+          <h2>Ticket de salida (5 min)</h2>
+          <ul>
+            <li>Escribe 1 caso borde y explica qué rama valida.</li>
+            <li>¿Qué parte resolviste con switch y por qué?</li>
+            <li>¿Qué prioridad de reglas existe en el ejercicio?</li>
+          </ul>
+          <p class="note">Próxima sesión: condicionales más complejos + más énfasis en pruebas (sin perder C#).</p>
+        </section>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="keys">
+        Teclas: <kbd>←</kbd><kbd>→</kbd> · <kbd>Home</kbd> inicio · <kbd>End</kbd> final · <kbd>F</kbd> pantalla completa
+      </div>
+      <div id="status">Lista</div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const canvas = document.getElementById('canvas');
+    const stage = document.getElementById('stage');
+
+    let idx = 0;
+
+    function fitCanvas(){
+      // Base 16:9 fija
+      const baseW = 1280, baseH = 720;
+
+      // Medimos el espacio disponible real del stage (ya descontó topbar/footer)
+      const rect = stage.getBoundingClientRect();
+
+      // Dejamos un pequeño aire para no pegar al borde
+      const padding = 8;
+      const availW = Math.max(1, rect.width - padding);
+      const availH = Math.max(1, rect.height - padding);
+
+      const scale = Math.min(availW / baseW, availH / baseH);
+
+      canvas.style.transform = `scale(${scale})`;
+    }
+
+    function render(){
+      slides.forEach((s,i)=>s.classList.toggle('active', i===idx));
+      document.getElementById('counter').textContent = (idx+1) + '/' + slides.length;
+      document.getElementById('status').textContent = 'Sesión 4 · Diapositiva ' + (idx+1);
+      location.hash = '#slide-' + (idx+1);
+      fitCanvas();
+    }
+
+    function go(n){
+      idx = Math.max(0, Math.min(slides.length-1, n));
+      render();
+    }
+    function next(){ go(idx+1); }
+    function prev(){ go(idx-1); }
+
+    window.addEventListener('resize', fitCanvas);
+
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight' || e.key === 'PageDown') next();
+      if(e.key === 'ArrowLeft'  || e.key === 'PageUp') prev();
+      if(e.key === 'Home') go(0);
+      if(e.key === 'End') go(slides.length-1);
+      if(e.key.toLowerCase() === 'f'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+
+    if(location.hash.startsWith('#slide-')){
+      const n = parseInt(location.hash.replace('#slide-',''),10);
+      if(!Number.isNaN(n)) idx = Math.max(0, Math.min(slides.length-1, n-1));
+    }
+
+    render();
+  </script>
+</body>
+</html>
