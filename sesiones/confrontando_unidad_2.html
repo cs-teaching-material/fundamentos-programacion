@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confrontando mi saber — Lógica de Programación</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      padding: 30px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── ENCABEZADO ── */
+    .page-header {
+      background: #1a1a2e;
+      color: #fff;
+      border-radius: 10px;
+      padding: 26px 30px;
+      margin-bottom: 18px;
+    }
+    .page-header h1 { font-size: 1.45rem; font-weight: 700; margin-bottom: 4px; }
+    .page-header .subtitle { font-size: 0.88rem; color: #a0aec0; margin-bottom: 14px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .info-box { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 10px 14px; }
+    .info-box label { display: block; font-size: 0.7rem; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .info-box input {
+      background: transparent; border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      color: #e2e8f0; font-size: 0.9rem; font-weight: 600;
+      width: 100%; outline: none; padding: 2px 0;
+    }
+    .info-box input::placeholder { color: #4a5568; }
+
+    /* ── BARRA DE ACCIONES ── */
+    .action-bar {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .btn {
+      padding: 9px 18px; border-radius: 8px;
+      font-size: 0.86rem; font-weight: 600;
+      cursor: pointer; border: none; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-dark { background: #1a1a2e; color: #fff; }
+    .btn-green { background: #38a169; color: #fff; }
+    .btn-gray { background: #e2e8f0; color: #1a1a2e; }
+    .save-ok { font-size: 0.8rem; color: #38a169; align-self: center; display: none; }
+
+    /* ── INSTRUCCIONES ── */
+    .instrucciones {
+      background: #fff8e1; border-left: 4px solid #ecc94b;
+      border-radius: 8px; padding: 14px 18px;
+      margin-bottom: 20px; font-size: 0.88rem; line-height: 1.7;
+    }
+    .instrucciones ul { margin-top: 6px; padding-left: 18px; }
+    .instrucciones li { margin-bottom: 3px; }
+
+    /* ── PROGRESO ── */
+    .progress-wrap {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+    }
+    .progress-label {
+      font-size: 0.72rem; font-weight: 700; color: #718096;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+    }
+    .dots { display: flex; gap: 8px; flex-wrap: wrap; }
+    .dot {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      border: 2px solid #e2e8f0; color: #a0aec0;
+      cursor: pointer; transition: all 0.2s;
+      text-decoration: none;
+    }
+    .dot.done { background: #38a169; border-color: #38a169; color: #fff; }
+
+    /* ── SECCIÓN TITLE ── */
+    .section-title {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #718096;
+      margin: 26px 0 10px;
+    }
+
+    /* ── TARJETAS (details/summary) ── */
+    details {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 10px; margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    summary {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; cursor: pointer;
+      list-style: none; user-select: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary:hover { background: #f9fafb; }
+
+    .num {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.86rem; color: #fff; flex-shrink: 0;
+    }
+    .n1 { background: #48bb78; }
+    .n2 { background: #4299e1; }
+    .n3 { background: #ed8936; }
+    .n4 { background: #9f7aea; }
+    .n5 { background: #e53e3e; }
+
+    .meta { flex: 1; }
+    .meta h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 3px; }
+    .tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .tag { font-size: 0.69rem; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
+    .t-tema { background: #ebf8ff; color: #2b6cb0; }
+    .t-time { background: #f0fff4; color: #276749; }
+    .t-bas  { background: #f0fff4; color: #276749; }
+    .t-med  { background: #fffbeb; color: #92400e; }
+    .t-adv  { background: #fff5f5; color: #c53030; }
+
+    .chk { color: #38a169; font-size: 1rem; display: none; }
+    details.done .chk { display: block; }
+
+    .arrow { color: #a0aec0; font-size: 0.85rem; transition: transform 0.2s; }
+    details[open] .arrow { transform: rotate(180deg); }
+
+    /* ── CUERPO DEL RETO ── */
+    .body { padding: 18px; border-top: 1px solid #f0f4f8; }
+
+    .enunciado { font-size: 0.9rem; line-height: 1.75; color: #2d3748; margin-bottom: 12px; }
+
+    .cond {
+      background: #f7fafc; border-radius: 6px;
+      padding: 11px 15px; margin-bottom: 12px; font-size: 0.86rem;
+    }
+    .cond p {
+      font-weight: 700; font-size: 0.74rem; color: #4a5568;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;
+    }
+    .cond ul { padding-left: 16px; line-height: 1.8; color: #4a5568; }
+
+    .code-block {
+      background: #1a1a2e; color: #a8d8a8;
+      font-family: 'Courier New', monospace; font-size: 0.81rem;
+      border-radius: 6px; padding: 11px 15px;
+      margin-bottom: 12px; line-height: 1.7;
+      white-space: pre; overflow-x: auto;
+    }
+    .code-block .cm { color: #718096; }
+
+    .resp-label {
+      display: block; font-size: 0.74rem; font-weight: 700;
+      color: #4a5568; text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 5px;
+    }
+
+    textarea {
+      width: 100%; min-height: 150px;
+      border: 1px solid #e2e8f0; border-radius: 6px;
+      padding: 10px 12px; font-family: 'Courier New', monospace;
+      font-size: 0.86rem; color: #1a1a2e;
+      background: #f9fafb; resize: vertical; outline: none;
+      line-height: 1.6; transition: border-color 0.15s;
+    }
+    textarea:focus { border-color: #4299e1; background: #fff; }
+
+    .ta-footer {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 5px; margin-bottom: 10px;
+    }
+    .cc { font-size: 0.73rem; color: #a0aec0; }
+    .btn-done {
+      padding: 5px 13px; background: #f0fff4;
+      color: #276749; border: 1px solid #9ae6b4;
+      border-radius: 6px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-done:hover { background: #c6f6d5; }
+    details.done .btn-done { background: #38a169; color: #fff; border-color: #38a169; }
+
+    /* ── TABLA PRUEBA DE ESCRITORIO ── */
+    .prueba { border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin: 10px 0; }
+    .prueba-title {
+      background: #edf2f7; padding: 7px 13px;
+      font-size: 0.74rem; font-weight: 700;
+      color: #4a5568; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th {
+      background: #f7fafc; padding: 7px 11px; text-align: left;
+      font-weight: 600; color: #4a5568;
+      border-bottom: 1px solid #e2e8f0; font-size: 0.75rem;
+    }
+    td { padding: 6px 10px; border-bottom: 1px solid #f0f4f8; color: #4a5568; }
+    td input[type="text"] {
+      width: 100%; border: none; background: transparent;
+      font-size: 0.82rem; outline: none; color: #2d3748;
+      border-bottom: 1px dashed #cbd5e0; padding: 1px 0;
+    }
+
+    /* ── EXTRA ── */
+    .extra {
+      background: #faf5ff; border-left: 3px solid #9f7aea;
+      border-radius: 0 6px 6px 0; padding: 9px 13px;
+      margin-top: 10px; font-size: 0.84rem; color: #553c9a;
+    }
+    .extra strong { font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── REFLEXIÓN ── */
+    .reflexion {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 20px; margin-bottom: 18px;
+    }
+    .reflexion h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 14px; }
+    .ref-item { margin-bottom: 14px; }
+    .ref-item p { font-size: 0.87rem; color: #2d3748; margin-bottom: 5px; line-height: 1.5; }
+    .ref-item textarea { min-height: 65px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #1a1a2e; color: #718096;
+      border-radius: 10px; padding: 14px 20px;
+      font-size: 0.8rem; text-align: center; margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ENCABEZADO -->
+<div class="page-header">
+  <h1>Confrontando mi saber — Lógica de Programación</h1>
+  <div class="subtitle">Unidad 2 · Clase 1 · Actividad autoguiada · C#</div>
+  <div class="info-grid">
+    <div class="info-box">
+      <label for="n1">Nombre estudiante 1</label>
+      <input type="text" id="n1" placeholder="Tu nombre completo">
+    </div>
+    <div class="info-box">
+      <label for="n2">Nombre estudiante 2 (pareja)</label>
+      <input type="text" id="n2" placeholder="Opcional">
+    </div>
+  </div>
+</div>
+
+<!-- ACCIONES -->
+<div class="action-bar">
+  <button class="btn btn-dark" onclick="guardar()">Guardar progreso</button>
+  <button class="btn btn-green" onclick="descargar()">Descargar respuestas (.txt)</button>
+  <button class="btn btn-gray" onclick="reiniciar()">Reiniciar</button>
+  <span class="save-ok" id="saveOk">Guardado ✓</span>
+</div>
+
+<!-- INSTRUCCIONES -->
+<div class="instrucciones">
+  <strong>Instrucciones generales</strong>
+  <ul>
+    <li>Haz clic en cada tarjeta para abrirla y leer el reto.</li>
+    <li>Escribe tu código en la caja de texto. El progreso se <strong>guarda automáticamente</strong>.</li>
+    <li>Si te bloqueas más de <strong>10 minutos</strong>, escribe dónde te detuviste y pasa al siguiente.</li>
+    <li>Al terminar, haz clic en <strong>"Descargar respuestas"</strong> y sube el archivo a Classroom.</li>
+  </ul>
+</div>
+
+<!-- PROGRESO -->
+<div class="progress-wrap">
+  <div class="progress-label">Progreso</div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<!-- ═══════════ SECCIÓN 1 ═══════════ -->
+<div class="section-title">Sección 1 — Variables y operadores · ~20 minutos</div>
+
+<details id="d1">
+  <summary>
+    <div class="num n1">1</div>
+    <div class="meta">
+      <h3>Datos de un estudiante</h3>
+      <div class="tags">
+        <span class="tag t-tema">Variables</span>
+        <span class="tag t-tema">Entrada / Salida</span>
+        <span class="tag t-time">⏱ 10 min</span>
+        <span class="tag t-bas">Básico</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      Diseña un algoritmo que pida al usuario su <strong>nombre</strong>, su <strong>edad</strong> y su
+      <strong>promedio académico</strong> (número Decimal). Muestra un mensaje con este formato:
+    </div>
+    <div class="code-block"><span class="cm">// Salida esperada</span>
+Estudiante: Ana Gómez
+Edad: 20 años
+Promedio: 4.3</div>
+    <div class="cond">
+      <p>Condiciones</p>
+      <ul>
+        <li>Declara variables con tipos explícitos: Cadena, Entero y Decimal.</li>
+        <li>No hagas cálculos; solo captura y muestra datos.</li>
+      </ul>
+    </div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r1" placeholder="Algoritmo DatosEstudiante&#10;   Definir nombre Como Cadena&#10;   ...&#10;FinAlgoritmo" oninput="ta(1)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc1">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(1)">Marcar completado</button>
+    </div>
+  </div>
+</details>
+
+<details id="d2">
+  <summary>
+    <div class="num n1">2</div>
+    <div class="meta">
+      <h3>Calculadora de pedido con IVA</h3>
+      <div class="tags">
+        <span class="tag t-tema">Operadores aritméticos</span>
+        <span class="tag t-time">⏱ 10 min</span>
+        <span class="tag t-bas">Básico</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      El usuario ingresa la <strong>cantidad de unidades</strong> y el <strong>precio por unidad</strong>.
+      Calcula y muestra el <strong>subtotal</strong>, el <strong>IVA (19%)</strong> y el <strong>total</strong>.
+    </div>
+    <div class="code-block"><span class="cm">// Entrada: cantidad=3, precio=25000</span>
+Subtotal:  $ 75000
+IVA (19%): $ 14250
+Total:     $ 89250</div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r2" placeholder="Algoritmo CalculadoraPedido&#10;   ...&#10;FinAlgoritmo" oninput="ta(2)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc2">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(2)">Marcar completado</button>
+    </div>
+    <div class="extra">
+      <strong>★ Extra</strong> — Agrega una variable <em>descuento</em> (porcentaje ingresado) que se aplique al subtotal antes del IVA.
+    </div>
+  </div>
+</details>
+
+<!-- ═══════════ SECCIÓN 2 ═══════════ -->
+<div class="section-title">Sección 2 — Condicionales · ~30 minutos</div>
+
+<details id="d3">
+  <summary>
+    <div class="num n2">3</div>
+    <div class="meta">
+      <h3>Clasificación de notas</h3>
+      <div class="tags">
+        <span class="tag t-tema">Si / SiNo</span>
+        <span class="tag t-time">⏱ 12 min</span>
+        <span class="tag t-bas">Básico</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">El usuario ingresa una nota (0.0 a 5.0). Muestra su categoría:</div>
+    <div class="cond">
+      <p>Escala</p>
+      <ul>
+        <li>4.6 – 5.0 → Excelente</li>
+        <li>4.0 – 4.5 → Sobresaliente</li>
+        <li>3.0 – 3.9 → Aprobado</li>
+        <li>Menor a 3.0 → Reprobado</li>
+        <li>Fuera de rango → Nota inválida</li>
+      </ul>
+    </div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r3" placeholder="Algoritmo ClasificacionNotas&#10;   ...&#10;FinAlgoritmo" oninput="ta(3)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc3">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(3)">Marcar completado</button>
+    </div>
+  </div>
+</details>
+
+<details id="d4">
+  <summary>
+    <div class="num n2">4</div>
+    <div class="meta">
+      <h3>Semáforo de velocidad</h3>
+      <div class="tags">
+        <span class="tag t-tema">Condicionales anidadas</span>
+        <span class="tag t-tema">Operadores lógicos</span>
+        <span class="tag t-time">⏱ 18 min</span>
+        <span class="tag t-med">Medio</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      Un radar captura la velocidad (km/h) y el tipo de vía (1=urbana, 2=carretera, 3=autopista).
+      Indica si el conductor va despacio, bien o excede el límite, y cuántos km/h excede si aplica.
+    </div>
+    <div class="cond">
+      <p>Límites</p>
+      <ul>
+        <li>Urbana: máx. 50 km/h &nbsp;|&nbsp; Carretera: máx. 80 km/h &nbsp;|&nbsp; Autopista: máx. 120 km/h</li>
+        <li>Tipo de vía inválido → mostrar error</li>
+      </ul>
+    </div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r4" placeholder="Algoritmo SemaforoVelocidad&#10;   ...&#10;FinAlgoritmo" oninput="ta(4)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc4">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(4)">Marcar completado</button>
+    </div>
+    <div class="prueba">
+      <div class="prueba-title">Prueba de escritorio — completa la tabla</div>
+      <table>
+        <thead><tr><th>Velocidad</th><th>Tipo de vía</th><th>¿Qué debería imprimir?</th><th>¿Qué imprime tu algoritmo?</th></tr></thead>
+        <tbody>
+          <tr><td>45</td><td>1 (urbana)</td><td><input type="text" id="p4a" oninput="guardarAuto()"></td><td><input type="text" id="p4b" oninput="guardarAuto()"></td></tr>
+          <tr><td>95</td><td>2 (carretera)</td><td><input type="text" id="p4c" oninput="guardarAuto()"></td><td><input type="text" id="p4d" oninput="guardarAuto()"></td></tr>
+          <tr><td>130</td><td>3 (autopista)</td><td><input type="text" id="p4e" oninput="guardarAuto()"></td><td><input type="text" id="p4f" oninput="guardarAuto()"></td></tr>
+          <tr><td>60</td><td>5 (inválido)</td><td><input type="text" id="p4g" oninput="guardarAuto()"></td><td><input type="text" id="p4h" oninput="guardarAuto()"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="extra">
+      <strong>★ Extra</strong> — Si vía=urbana, es hora pico (1=sí) y vehículo de carga (1=sí), el límite baja a 30 km/h.
+    </div>
+  </div>
+</details>
+
+<!-- ═══════════ SECCIÓN 3 ═══════════ -->
+<div class="section-title">Sección 3 — Ciclos · ~40 minutos</div>
+
+<details id="d5">
+  <summary>
+    <div class="num n3">5</div>
+    <div class="meta">
+      <h3>Tabla de multiplicar con Para</h3>
+      <div class="tags">
+        <span class="tag t-tema">Ciclo Para</span>
+        <span class="tag t-time">⏱ 10 min</span>
+        <span class="tag t-bas">Básico</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">El usuario ingresa un número entero positivo. Imprime su tabla de multiplicar del 1 al 10.</div>
+    <div class="code-block"><span class="cm">// Entrada: 7</span>
+7 x  1 =  7
+7 x  2 = 14
+...
+7 x 10 = 70</div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r5" placeholder="Algoritmo TablaMultiplicar&#10;   ...&#10;FinAlgoritmo" oninput="ta(5)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc5">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(5)">Marcar completado</button>
+    </div>
+    <div class="extra">
+      <strong>★ Extra</strong> — Imprime las tablas del 1 al N (N lo ingresa el usuario). Usa un ciclo Para dentro de otro.
+    </div>
+  </div>
+</details>
+
+<details id="d6">
+  <summary>
+    <div class="num n3">6</div>
+    <div class="meta">
+      <h3>Validación de contraseña con Mientras</h3>
+      <div class="tags">
+        <span class="tag t-tema">Ciclo Mientras</span>
+        <span class="tag t-time">⏱ 15 min</span>
+        <span class="tag t-med">Medio</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      Contraseña fija: <strong>"acceso123"</strong>. El usuario tiene <strong>3 intentos</strong>.
+      Si acierta → "Bienvenido". Si agota los intentos → "Acceso bloqueado" + cuántos intentos usó.
+    </div>
+    <div class="cond">
+      <p>Restricciones</p>
+      <ul>
+        <li>Usa un ciclo <strong>Mientras</strong>. Se detiene si el usuario acierta antes de 3 intentos.</li>
+        <li>Tras cada error: "Intento X de 3 incorrecto. Intenta de nuevo."</li>
+      </ul>
+    </div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r6" placeholder="Algoritmo ValidarContrasena&#10;   ...&#10;FinAlgoritmo" oninput="ta(6)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc6">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(6)">Marcar completado</button>
+    </div>
+  </div>
+</details>
+
+<details id="d7">
+  <summary>
+    <div class="num n3">7</div>
+    <div class="meta">
+      <h3>Menú de opciones con Repetir–Hasta</h3>
+      <div class="tags">
+        <span class="tag t-tema">Ciclo Repetir–Hasta</span>
+        <span class="tag t-time">⏱ 15 min</span>
+        <span class="tag t-med">Medio</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      Muestra un menú de 4 opciones (Saludar, Mostrar fecha, Número aleatorio, Salir) de forma repetida
+      hasta que el usuario elija la opción 4.
+    </div>
+    <div class="cond">
+      <p>Restricciones</p>
+      <ul>
+        <li>Usa <strong>Repetir–Hasta</strong>. El menú se muestra siempre al menos una vez.</li>
+        <li>Opción fuera de 1–4 → "Opción no válida".</li>
+      </ul>
+    </div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r7" placeholder="Algoritmo MenuOpciones&#10;   ...&#10;FinAlgoritmo" oninput="ta(7)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc7">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(7)">Marcar completado</button>
+    </div>
+  </div>
+</details>
+
+<!-- ═══════════ SECCIÓN 4 ═══════════ -->
+<div class="section-title">Sección 4 — Reto integrador · ~30 minutos</div>
+
+<details id="d8">
+  <summary>
+    <div class="num n4">8</div>
+    <div class="meta">
+      <h3>Sistema de registro de ventas</h3>
+      <div class="tags">
+        <span class="tag t-tema">Variables · Ciclos · Condicionales</span>
+        <span class="tag t-time">⏱ 30 min</span>
+        <span class="tag t-adv">Avanzado</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      El usuario define cuántos productos (N) registrar. Por cada uno: nombre, cantidad y precio unitario.
+      Al final muestra:
+    </div>
+    <div class="cond">
+      <p>Salida requerida</p>
+      <ul>
+        <li>Total recaudado en el día.</li>
+        <li>Nombre del producto más vendido (por cantidad).</li>
+        <li>Cuántos productos tuvieron ventas superiores a $100.000.</li>
+        <li>Si total &lt; $500.000 → "Ventas bajas hoy".</li>
+      </ul>
+    </div>
+    <div class="cond">
+      <p>Restricciones</p>
+      <ul>
+        <li>Al menos un ciclo <strong>Para</strong>, variables acumuladoras, sin arreglos.</li>
+      </ul>
+    </div>
+    <span class="resp-label">Análisis previo — variables, ciclos y condicionales que usarás</span>
+    <textarea id="r8a" placeholder="Variables que necesito: ...&#10;Tipo de ciclo: ...&#10;Dónde van las condicionales: ..." style="min-height:75px;" oninput="guardarAuto()"></textarea>
+    <span class="resp-label" style="margin-top:10px; display:block;">Tu código</span>
+    <textarea id="r8" placeholder="Algoritmo RegistroVentas&#10;   ...&#10;FinAlgoritmo" oninput="ta(8)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc8">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(8)">Marcar completado</button>
+    </div>
+    <div class="extra">
+      <strong>★ Extra</strong> — Permite detener el registro antes de N productos con una condición de salida adicional dentro del ciclo.
+    </div>
+  </div>
+</details>
+
+<!-- ═══════════ SECCIÓN 5 ═══════════ -->
+<div class="section-title">Sección 5 — Reto avanzado (si terminaste antes) · ~20 minutos</div>
+
+<details id="d9">
+  <summary>
+    <div class="num n5">9</div>
+    <div class="meta">
+      <h3>Adivina el número</h3>
+      <div class="tags">
+        <span class="tag t-tema">Ciclos anidados</span>
+        <span class="tag t-tema">Condicionales</span>
+        <span class="tag t-time">⏱ 20 min</span>
+        <span class="tag t-adv">Avanzado</span>
+      </div>
+    </div>
+    <span class="chk">✓</span>
+    <span class="arrow">▼</span>
+  </summary>
+  <div class="body">
+    <div class="enunciado">
+      El sistema tiene un número secreto (constante, p. ej. 47). El usuario tiene <strong>7 intentos</strong>.
+      Tras cada intento: "Muy alto", "Muy bajo" o "¡Correcto!". Al final, muestra cuántos intentos usó.
+    </div>
+    <div class="cond">
+      <p>Nivel extra</p>
+      <ul>
+        <li>Al terminar, pregunta si quiere jugar de nuevo. Si acepta, el secreto cambia al doble del anterior (módulo 100 si supera 100).</li>
+      </ul>
+    </div>
+    <span class="resp-label">Tu código</span>
+    <textarea id="r9" placeholder="Algoritmo AdivinaElNumero&#10;   ...&#10;FinAlgoritmo" oninput="ta(9)"></textarea>
+    <div class="ta-footer">
+      <span class="cc" id="cc9">0 caracteres</span>
+      <button class="btn-done" onclick="marcar(9)">Marcar completado</button>
+    </div>
+  </div>
+</details>
+
+<!-- ═══════════ REFLEXIÓN ═══════════ -->
+<div class="section-title">Reflexión final · 10 minutos</div>
+
+<div class="reflexion">
+  <h3>Responde antes de descargar tus respuestas</h3>
+  <div class="ref-item">
+    <p>1. ¿Cuál reto te pareció más difícil? ¿Por qué?</p>
+    <textarea id="rf1" placeholder="Tu respuesta..." oninput="guardarAuto()"></textarea>
+  </div>
+  <div class="ref-item">
+    <p>2. ¿En qué reto usaste más de un tipo de ciclo? Explica por qué elegiste ese ciclo.</p>
+    <textarea id="rf2" placeholder="Tu respuesta..." oninput="guardarAuto()"></textarea>
+  </div>
+  <div class="ref-item">
+    <p>3. En una sola oración: diferencia entre <em>Mientras</em> y <em>Repetir–Hasta</em>.</p>
+    <textarea id="rf3" placeholder="Tu respuesta..." style="min-height:60px;" oninput="guardarAuto()"></textarea>
+  </div>
+  <div class="ref-item">
+    <p>4. ¿Qué pregunta sobre ciclos tienes?</p>
+    <textarea id="rf4" placeholder="Tu respuesta..." oninput="guardarAuto()"></textarea>
+  </div>
+</div>
+
+<div class="action-bar">
+  <button class="btn btn-dark" onclick="guardar()">Guardar progreso</button>
+  <button class="btn btn-green" onclick="descargar()">Descargar respuestas (.txt)</button>
+</div>
+
+<div class="footer">
+  Lógica de Programación · Unidad 2 · Clase 1 &nbsp;|&nbsp; Descarga tu archivo y súbelo a Classroom al terminar.
+</div>
+
+<script>
+const SK = 'lp_u2c1';
+const N = 9;
+
+const TITULOS = ['','Datos de un estudiante','Calculadora de pedido con IVA',
+  'Clasificación de notas','Semáforo de velocidad','Tabla de multiplicar con Para',
+  'Validación de contraseña con Mientras','Menú de opciones con Repetir-Hasta',
+  'Sistema de registro de ventas','Adivina el número'];
+
+// Progreso
+function renderDots() {
+  const c = document.getElementById('dots');
+  c.innerHTML = '';
+  for (let i = 1; i <= N; i++) {
+    const d = document.getElementById('d' + i);
+    const done = d && d.classList.contains('done');
+    const el = document.createElement('a');
+    el.className = 'dot' + (done ? ' done' : '');
+    el.textContent = i;
+    el.href = '#d' + i;
+    c.appendChild(el);
+  }
+}
+
+// Actualizar contador de textarea
+function ta(n) {
+  const el = document.getElementById('r' + n);
+  const cc = document.getElementById('cc' + n);
+  if (el && cc) cc.textContent = el.value.length + ' caracteres';
+  guardarAuto();
+}
+
+// Marcar reto completo
+function marcar(n) {
+  const d = document.getElementById('d' + n);
+  d.classList.toggle('done');
+  guardar();
+  renderDots();
+}
+
+// Auto-guardar con debounce
+let _t;
+function guardarAuto() {
+  clearTimeout(_t);
+  _t = setTimeout(guardar, 1500);
+}
+
+function guardar() {
+  const data = {
+    n1: val('n1'), n2: val('n2'),
+    r: {}, p4: {}, rf: {}, done: [], open: []
+  };
+  for (let i = 1; i <= N; i++) {
+    data.r['r'+i] = val('r'+i);
+    const d = document.getElementById('d'+i);
+    if (d && d.classList.contains('done')) data.done.push(i);
+    if (d && d.open) data.open.push(i);
+  }
+  data.r['r8a'] = val('r8a');
+  ['p4a','p4b','p4c','p4d','p4e','p4f','p4g','p4h'].forEach(id => { data.p4[id] = val(id); });
+  for (let i = 1; i <= 4; i++) data.rf['rf'+i] = val('rf'+i);
+  localStorage.setItem(SK, JSON.stringify(data));
+  const ok = document.getElementById('saveOk');
+  ok.style.display = 'inline';
+  setTimeout(() => ok.style.display = 'none', 2000);
+}
+
+function cargar() {
+  const raw = localStorage.getItem(SK);
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    set('n1', d.n1); set('n2', d.n2);
+    for (let i = 1; i <= N; i++) {
+      set('r'+i, d.r && d.r['r'+i]);
+      const cc = document.getElementById('cc'+i);
+      const ta = document.getElementById('r'+i);
+      if (cc && ta) cc.textContent = ta.value.length + ' caracteres';
+    }
+    set('r8a', d.r && d.r['r8a']);
+    if (d.p4) Object.keys(d.p4).forEach(id => set(id, d.p4[id]));
+    if (d.rf) for (let i = 1; i <= 4; i++) set('rf'+i, d.rf['rf'+i]);
+    if (d.done) d.done.forEach(n => {
+      const el = document.getElementById('d'+n);
+      if (el) el.classList.add('done');
+    });
+    if (d.open) d.open.forEach(n => {
+      const el = document.getElementById('d'+n);
+      if (el) el.open = true;
+    });
+  } catch(e) {}
+}
+
+function val(id) { const e = document.getElementById(id); return e ? e.value : ''; }
+function set(id, v) { const e = document.getElementById(id); if (e && v) e.value = v; }
+
+function descargar() {
+  guardar();
+  const nom = val('n1') || '(sin nombre)';
+  const nom2 = val('n2');
+  const fecha = new Date().toLocaleString('es-CO');
+  let txt = '==========================================';
+  txt += '  RETOS - LOGICA DE PROGRAMACION   Unidad 2 - Clase 1 ';
+  txt += '==========================================';
+  txt += 'Estudiante 1: ' + nom + '';
+  if (nom2) txt += 'Estudiante 2: ' + nom2 + '';
+  txt += 'Fecha: ' + fecha + '';
+  for (let i = 1; i <= N; i++) {
+    const d = document.getElementById('d'+i);
+    const estado = d && d.classList.contains('done') ? '[COMPLETADO]' : '[en progreso]';
+    txt += '------------------------------------------';
+    txt += 'RETO ' + i + ': ' + TITULOS[i] + ' ' + estado + '';
+    txt += '------------------------------------------';
+    if (i === 8 && val('r8a')) txt += 'Analisis previo:' + val('r8a') + '';
+    txt += 'Pseudocodigo:' + (val('r'+i) || '(sin respuesta)') + '';
+    if (i === 4) {
+      txt += 'Prueba de escritorio:';
+      const casos = [['45','1-urbana'],['95','2-carretera'],['130','3-autopista'],['60','5-invalido']];
+      const ids = [['p4a','p4b'],['p4c','p4d'],['p4e','p4f'],['p4g','p4h']];
+      casos.forEach((c,idx) => {
+        txt += '  Vel='+c[0]+', Via='+c[1]+'';
+        txt += '    Esperado: '+(val(ids[idx][0])||'-')+'';
+        txt += '    Mi algoritmo: '+(val(ids[idx][1])||'-')+'';
+      });
+    }
+    txt += '';
+  }
+  txt += '==========================================  REFLEXION==========================================';
+  const pregs = ['1. Reto mas dificil y por que:','2. Ciclos usados:','3. Diferencia Mientras vs Repetir-Hasta:','4. Pregunta para el profesor:'];
+  for (let i = 1; i <= 4; i++) txt += pregs[i-1] + '' + (val('rf'+i)||'(sin respuesta)') + '';
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'retos_' + nom.replace(/\s+/g,'_') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function reiniciar() {
+  if (!confirm('¿Borrar todo el progreso guardado?')) return;
+  localStorage.removeItem(SK);
+  location.reload();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  cargar();
+  renderDots();
+  // Abrir primer reto por defecto
+  const d1 = document.getElementById('d1');
+  if (d1) d1.open = true;
+});
+</script>
+</body>
+</html>

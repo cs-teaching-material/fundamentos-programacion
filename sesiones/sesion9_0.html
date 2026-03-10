@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lógica de Programación - Sesión 9: Ciclos y patrones iterativos</title>
+
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+
+      --h1: clamp(30px, 3.4vw, 48px);
+      --h2: clamp(22px, 2.3vw, 34px);
+      --p:  clamp(15px, 1.3vw, 19px);
+      --li: clamp(15px, 1.3vw, 19px);
+
+      --safe-top-cover: clamp(208px, 9vh, 128px);
+      --safe-left-cover: clamp(585px, 5.5vw, 110px);
+      --safe-right-cover: clamp(28px, 3vw, 72px);
+      --safe-bottom-cover: clamp(54px, 6vh, 92px);
+
+      --safe-top: clamp(100px, 9vh, 132px);
+      --safe-side: clamp(66px, 5.5vw, 108px);
+      --safe-bottom: clamp(52px, 6vh, 90px);
+    }
+
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:#ffffff;
+    }
+
+    .deck{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:clamp(10px, 2vw, 22px);
+      box-sizing:border-box;
+      background:#ffffff;
+    }
+
+    .stage{
+      width:min(96vw, calc(92vh * (16/9)));
+      aspect-ratio:16/9;
+      position:relative;
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      display:none;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .slide.active{ display:block; }
+
+    .slide.cover{
+      background:url("./Portada.png") center/cover no-repeat;
+      color:#ffffff;
+    }
+    .slide.content-slide{
+      background:
+        url("./Contenido.png") top left/contain no-repeat,
+        #ffffff;
+      color:var(--texto);
+    }
+
+    .inner{
+      height:100%;
+      box-sizing:border-box;
+      padding: var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+      display:flex;
+      flex-direction:column;
+      gap:clamp(10px, 1.1vw, 18px);
+    }
+    .cover .inner{
+      padding:
+        var(--safe-top-cover)
+        var(--safe-right-cover)
+        var(--safe-bottom-cover)
+        var(--safe-left-cover);
+    }
+
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:clamp(10px, 1.1vw, 16px);
+      min-height:0;
+    }
+
+    .header{
+      color:var(--azul-medio);
+      font-size:clamp(18px, 1.6vw, 22px);
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    h1{
+      margin:0;
+      font-size:var(--h1);
+      line-height:1.08;
+      color:var(--texto);
+    }
+    h2{
+      margin:0;
+      font-size:var(--h2);
+      line-height:1.15;
+      color:var(--azul-medio);
+    }
+
+    p{
+      margin:0;
+      font-size:var(--p);
+      line-height:1.4;
+      color:var(--texto);
+    }
+    li{
+      font-size:var(--li);
+      line-height:1.4;
+      color:var(--texto);
+    }
+    ul,ol{ margin:0; padding-left:1.2em; }
+
+    .subtitle{
+      color:var(--turquesa);
+      font-weight:800;
+      font-size:clamp(18px, 1.8vw, 24px);
+      margin-top:clamp(6px, 1vw, 10px);
+    }
+
+    .cover h1{ color:#ffffff; }
+    .cover p{ color:#e5edf8; }
+    .cover .subtitle{ color:#f7df00; }
+
+    .note{
+      color:var(--muted);
+      font-size:clamp(12px, 1.05vw, 14px);
+      line-height:1.35;
+    }
+
+    .callout{
+      background:rgba(255,255,255,0.94);
+      border-left:6px solid var(--turquesa);
+      padding:clamp(10px, 1.1vw, 14px);
+      border-radius:6px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1.15fr 0.9fr;
+      gap:clamp(12px, 1.6vw, 22px);
+      align-items:flex-start;
+      min-height:0;
+    }
+    .equal-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:clamp(12px, 1.6vw, 22px);
+      align-items:flex-start;
+      min-height:0;
+    }
+    @media(max-width:980px){
+      .two-col,.equal-col{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background:rgba(255,255,255,0.96);
+      border:1px solid #dde2f1;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#111827;
+      color:#e5e7eb;
+      padding:2px 8px;
+      border-radius:7px;
+      font-size:clamp(11px, 1vw, 13px);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:clamp(12px, 1.05vw, 14px);
+      line-height:1.35;
+      background:#0b1020;
+      color:#e5e7eb;
+      border-radius:10px;
+      padding:clamp(10px, 1.1vw, 14px);
+      overflow:auto;
+      max-height: 44vh;
+      border:1px solid rgba(17,24,39,.25);
+      white-space:pre-wrap;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:rgba(255,255,255,0.96);
+    }
+    th,td{
+      border:1px solid #dde2f1;
+      padding:clamp(8px, 1vw, 12px);
+      font-size:clamp(14px, 1.2vw, 18px);
+      color:var(--texto);
+      vertical-align:top;
+    }
+    th{
+      background:#f3f6fb;
+      text-transform:uppercase;
+      font-size:clamp(12px, 1.1vw, 14px);
+      letter-spacing:.06em;
+      color:var(--azul-medio);
+    }
+
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:var(--muted);
+      font-size:clamp(12px, 1.05vw, 14px);
+      gap:14px;
+    }
+
+    .counter{
+      font-weight:800;
+      color:var(--azul-medio);
+    }
+    .cover .counter{ color:#e5edf8; }
+
+    .touch-nav{
+      position:absolute;
+      top:50%;
+      left:0;
+      right:0;
+      transform:translateY(-50%);
+      display:flex;
+      justify-content:space-between;
+      padding: 0 12px;
+      pointer-events:none;
+      z-index: 10;
+    }
+    .touch-nav button{
+      pointer-events:auto;
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      padding:0;
+      border:1px solid rgba(221,226,241,0.95);
+      background:rgba(255,255,255,0.92);
+      color:var(--texto);
+      font-weight:900;
+      box-shadow:0 10px 22px rgba(0,0,0,.12);
+      cursor:pointer;
+    }
+
+    #touchNav{
+      opacity:0;
+      transform:translateY(-50%) translateY(6px);
+      transition:.15s ease;
+    }
+    .stage:hover #touchNav{
+      opacity:1;
+      transform:translateY(-50%) translateY(0);
+    }
+    @media (hover: none){
+      #touchNav{ opacity:1; transform:translateY(-50%); }
+    }
+  </style>
+</head>
+
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active" data-title="Portada">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesión 9</h1>
+          <div class="subtitle">Ciclos, patrones iterativos y control de flujo</div>
+          <p style="margin-top:clamp(10px, 1.4vw, 18px); color:#e5edf8;">
+            Unidad 2 · Los ciclos y su utilidad en la escritura de algoritmos
+          </p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">
+            Navegación: ← → · Home / End · F pantalla completa · Táctil: desliza
+          </p>
+        </div>
+        <div class="footer">
+          <span style="color:#e5edf8;">Lógica de Programación · Grupo 810</span>
+          <span class="counter">1 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · OBJETIVOS SESIÓN -->
+    <section class="slide content-slide" data-title="Objetivos">
+      <div class="inner">
+        <div class="header">Objetivos de aprendizaje</div>
+        <div class="content">
+          <h2>Qué vas a dominar al final de la sesión</h2>
+          <ul>
+            <li>Distinguir con precisión cuándo usar <strong>while</strong>, <strong>do-while</strong> y <strong>for</strong> según la naturaleza del problema.</li>
+            <li>Diseñar ciclos seguros evitando errores de <em>off-by-one</em> y bucles infinitos involuntarios.</li>
+            <li>Construir patrones robustos con <strong>contadores</strong>, <strong>acumuladores</strong> y <strong>banderas lógicas</strong>.</li>
+            <li>Aplicar control de flujo avanzado con <strong>break</strong> y <strong>continue</strong> sin generar "código espagueti".</li>
+            <li>Integrar todo en un ejemplo práctico: sistema de caja registradora con validación fuerte de entradas.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesión 9 · Objetivos</span>
+          <span class="counter">2 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · AGENDA DETALLADA -->
+    <section class="slide content-slide" data-title="Agenda Detallada">
+      <div class="inner">
+        <div class="header">Ruta de las 3 horas</div>
+        <div class="content">
+          <h2>Agenda (180 minutos)</h2>
+          <ul>
+            <li>0–20 min · Fundamentos de la iteración y principio DRY.</li>
+            <li>20–40 min · Scope y ciclo de vida de variables dentro y fuera de bucles.</li>
+            <li>40–70 min · Tipos de ciclos: while vs do-while vs for (heurística realista).</li>
+            <li>70–105 min · Patrones de diseño: contadores, acumuladores y banderas.</li>
+            <li>105–130 min · Anti-patrones, bucles infinitos y control con break/continue.</li>
+            <li>130–175 min · Ejemplo integrador: caja registradora robusta con TryParse.</li>
+            <li>175–180 min · Preguntas y aclaraciones focalizadas (dudas de profundidad).</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesión 9 · Agenda</span>
+          <span class="counter">3 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · MOTIVACIÓN/DRY -->
+    <section class="slide content-slide" data-title="Motivación">
+      <div class="inner">
+        <div class="header">¿Por qué ciclos?</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Principio DRY</h2>
+            <p><strong>Don't Repeat Yourself.</strong> Cada bloque copiado/pegado es deuda técnica: si cambia la regla, debes buscar y corregir N lugares distintos.</p>
+            <ul style="margin-top:8px;">
+              <li>Código duplicado = más probabilidad de inconsistencias.</li>
+              <li>Los ciclos centralizan la lógica y repiten solo los datos, no el algoritmo.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Analogía mínima</h2>
+            <p>Imagina sumar las ventas de 365 días:</p>
+            <ul style="margin-top:8px;">
+              <li>Versión ingenua: 365 líneas <span class="kbd">total = total + ventaDiaX;</span></li>
+              <li>Versión iterativa: 4 líneas con un <span class="kbd">for</span> que recorre un arreglo de ventas.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Fundamento · DRY</span>
+          <span class="counter">4 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · ANATOMÍA UNIVERSAL -->
+    <section class="slide content-slide" data-title="Anatomía Ciclo">
+      <div class="inner">
+        <div class="header">Anatomía universal de un ciclo</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Tres componentes indispensables</h2>
+            <ul>
+              <li><strong>Inicialización:</strong> Estado inicial (contador en 0, acumulador en 0, bandera en true).</li>
+              <li><strong>Condición:</strong> Pregunta lógica que decide si seguimos o detenemos el ciclo.</li>
+              <li><strong>Actualización:</strong> Cambio en las variables que evita que la condición sea true para siempre.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Ejemplo genérico</h2>
+            <div class="code">int i = 0;                // Inicialización
+while (i < 5)            // Condición
+{
+    Console.WriteLine(i);
+    i = i + 1;           // Actualización
+}</div>
+            <p class="note" style="margin-top:8px;">Si omites la actualización, <strong>i</strong> nunca cambia y el ciclo es infinito.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Fundamento · Anatomía</span>
+          <span class="counter">5 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · SCOPE 1 -->
+    <section class="slide content-slide" data-title="Scope 1">
+      <div class="inner">
+        <div class="header">Scope: variables dentro y fuera</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Ciclo de vida en memoria</h2>
+            <p>Las variables declaradas dentro de un bloque <span class="kbd">{ }</span> existen solo mientras se ejecuta ese bloque.</p>
+            <div class="code">int suma = 0; // Vive en el método completo
+
+while (suma < 100)
+{
+    int parcial = 10; // Se crea y se destruye en cada vuelta
+    suma += parcial;
+}
+
+// Aquí 'suma' existe, 'parcial' NO.</div>
+          </div>
+          <div class="card">
+            <h2>Regla práctica</h2>
+            <ul>
+              <li>Declara fuera del ciclo: contadores, acumuladores, banderas.</li>
+              <li>Declara dentro del ciclo: variables temporales que solo importan en esa vuelta.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Scope y memoria</span>
+          <span class="counter">6 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · SCOPE 2 COMPARACIÓN -->
+    <section class="slide content-slide" data-title="Scope 2">
+      <div class="inner">
+        <div class="header">Scope: ejemplo comparativo</div>
+        <div class="content equal-col">
+          <div class="card">
+            <h2>Mala práctica</h2>
+            <div class="code">while (true)
+{
+    int intentos = 0;
+    intentos++;
+    Console.WriteLine(intentos);
+}</div>
+            <p class="note" style="margin-top:8px;">El contador se reinicia a 0 en cada vuelta; el valor impreso será siempre 1.</p>
+          </div>
+          <div class="card">
+            <h2>Buena práctica</h2>
+            <div class="code">int intentos = 0;
+while (true)
+{
+    intentos++;
+    Console.WriteLine(intentos);
+}</div>
+            <p class="note" style="margin-top:8px;">El contador persiste fuera del ciclo; se observan 1, 2, 3, ... en la salida.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Scope comparado</span>
+          <span class="counter">7 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · WHILE -->
+    <section class="slide content-slide" data-title="While">
+      <div class="inner">
+        <div class="header">Ciclo while: pensar antes de actuar</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Características</h2>
+            <ul>
+              <li>La condición se evalúa <strong>antes</strong> del bloque.</li>
+              <li>Puede ejecutarse 0 veces (si la condición inicial es false).</li>
+              <li>Ideal cuando no sabes cuántas iteraciones vas a necesitar.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Ejemplo contextual</h2>
+            <div class="code">Console.Write("Ingrese un número positivo: ");
+int n = int.Parse(Console.ReadLine());
+
+while (n <= 0)
+{
+    Console.Write("Error. Ingrese un número positivo: ");
+    n = int.Parse(Console.ReadLine());
+}</div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>While · Pre-condición</span>
+          <span class="counter">8 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · DO-WHILE -->
+    <section class="slide content-slide" data-title="DoWhile">
+      <div class="inner">
+        <div class="header">Ciclo do-while: actuar antes de pensar</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Características</h2>
+            <ul>
+              <li>Siempre ejecuta el bloque al menos <strong>una</strong> vez.</li>
+              <li>La condición se evalúa al final.</li>
+              <li>Útil para menús y validaciones que requieren mostrar algo al menos una vez.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Ejemplo menú</h2>
+            <div class="code">int opcion;
+do
+{
+    Console.WriteLine("1. Depositar");
+    Console.WriteLine("2. Retirar");
+    Console.WriteLine("0. Salir");
+    Console.Write("Opción: ");
+    opcion = int.Parse(Console.ReadLine());
+} while (opcion != 0);</div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Do-while · Post-condición</span>
+          <span class="counter">9 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · FOR -->
+    <section class="slide content-slide" data-title="For">
+      <div class="inner">
+        <div class="header">Ciclo for: control por contador</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Firma clásica</h2>
+            <div class="code">for (int i = 1; i <= 5; i++)
+{
+    Console.WriteLine($"Iteración {i}");
+}</div>
+            <p class="note" style="margin-top:8px;">Tres partes: inicialización · condición · actualización.</p>
+          </div>
+          <div class="card">
+            <h2>Cuándo usar for</h2>
+            <ul>
+              <li>Conoce el número exacto de repeticiones desde el inicio.</li>
+              <li>Recorres estructuras indexadas: arreglos, listas.</li>
+              <li>Necesitas un índice explícito a cada paso.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>For · Control por índice</span>
+          <span class="counter">10 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · TABLA COMPARATIVA -->
+    <section class="slide content-slide" data-title="Comparación ciclos">
+      <div class="inner">
+        <div class="header">Comparando while, do-while y for</div>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Ciclo</th>
+                <th>Evalúa condición</th>
+                <th>Iteraciones mínimas</th>
+                <th>Uso típico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>while</strong></td>
+                <td>Antes del bloque</td>
+                <td>0</td>
+                <td>Repetir mientras una condición externa se cumpla (lecturas, búsquedas).</td>
+              </tr>
+              <tr>
+                <td><strong>do-while</strong></td>
+                <td>Después del bloque</td>
+                <td>1</td>
+                <td>Menús, validaciones que siempre se muestran al menos una vez.</td>
+              </tr>
+              <tr>
+                <td><strong>for</strong></td>
+                <td>Antes del bloque</td>
+                <td>0</td>
+                <td>Recorridos con cantidad de vueltas conocida, estructuras indexadas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Resumen comparativo</span>
+          <span class="counter">11 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · PATRONES: CONTADOR -->
+    <section class="slide content-slide" data-title="Contador">
+      <div class="inner">
+        <div class="header">Patrón: Contador</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Definición</h2>
+            <p>Variable que registra cuántas veces ocurre algo.</p>
+            <div class="code">int mayoresDeEdad = 0;
+
+for (int i = 0; i < 5; i++)
+{
+    Console.Write("Edad: ");
+    int edad = int.Parse(Console.ReadLine());
+
+    if (edad >= 18)
+    {
+        mayoresDeEdad++; // Contador
+    }
+}</div>
+          </div>
+          <div class="card">
+            <h2>Errores comunes</h2>
+            <ul>
+              <li>No inicializar a 0 → residuos de memoria (en otros lenguajes).</li>
+              <li>Ubicar el <span class="kbd">++</span> en el lugar equivocado (antes o después de la condición).</li>
+              <li>Condición mal elegida → Cuenta 4 cuando debió ser 5 (off-by-one).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Patrón Contador</span>
+          <span class="counter">12 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · PATRONES: ACUMULADOR -->
+    <section class="slide content-slide" data-title="Acumulador">
+      <div class="inner">
+        <div class="header">Patrón: Acumulador</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Definición</h2>
+            <p>Variable que va sumando (o combinando) valores sucesivos.</p>
+            <div class="code">decimal suma = 0m;
+int cantidad = 0;
+
+for (int i = 0; i < 3; i++)
+{
+    Console.Write("Nota: ");
+    decimal nota = decimal.Parse(Console.ReadLine());
+
+    suma += nota;   // Acumulador
+    cantidad++;     // Contador
+}
+
+decimal promedio = suma / cantidad;</div>
+          </div>
+          <div class="card">
+            <h2>Precisión numérica</h2>
+            <ul>
+              <li>En finanzas: usar <span class="kbd">decimal</span> en lugar de <span class="kbd">double</span>.</li>
+              <li>Las operaciones dentro de un ciclo se repiten muchas veces; pequeños errores flotantes se acumulan.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Patrón Acumulador</span>
+          <span class="counter">13 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · PATRONES: BANDERA -->
+    <section class="slide content-slide" data-title="Bandera">
+      <div class="inner">
+        <div class="header">Patrón: Bandera Lógica (Flag)</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Definición</h2>
+            <p>Variable <span class="kbd">bool</span> que representa un estado: activo / inactivo, encontrado / no encontrado, continuar / salir.</p>
+            <div class="code">bool encontrado = false;
+int i = 0;
+
+while (!encontrado && i < arreglo.Length)
+{
+    if (arreglo[i] == buscado)
+    {
+        encontrado = true; // Cambia el estado
+    }
+    i++;
+}</div>
+          </div>
+          <div class="card">
+            <h2>Ventajas frente a múltiples break</h2>
+            <ul>
+              <li>La condición del ciclo explica el objetivo (<span class="kbd">!encontrado</span>).</li>
+              <li>Evita saltos abruptos de flujo que dificultan leer el código.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Patrón Bandera</span>
+          <span class="counter">14 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · ANTI-PATRONES -->
+    <section class="slide content-slide" data-title="Anti-patrones">
+      <div class="inner">
+        <div class="header">Anti-patrones en ciclos</div>
+        <div class="content equal-col">
+          <div class="card">
+            <h2>Bucle infinito involuntario</h2>
+            <div class="code">int x = 0;
+while (x < 10)
+{
+    Console.WriteLine(x);
+    // Falta actualizar x
+}</div>
+            <p class="note" style="margin-top:8px;">La condición siempre es true; el valor de <strong>x</strong> nunca cambia.</p>
+          </div>
+          <div class="card">
+            <h2>Condición imposible / trivial</h2>
+            <ul>
+              <li><span class="kbd">while (i > 10 && i < 5)</span> → Nunca entra.</li>
+              <li><span class="kbd">while (true)</span> sin bandera ni break controlado → bloqueo total.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Evitar errores clásicos</span>
+          <span class="counter">15 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · BREAK Y CONTINUE -->
+    <section class="slide content-slide" data-title="BreakContinue">
+      <div class="inner">
+        <div class="header">Control de flujo: break y continue</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>break</h2>
+            <div class="code">for (int i = 0; i < 100; i++)
+{
+    if (arreglo[i] == buscado)
+    {
+        Console.WriteLine("Encontrado");
+        break; // Sale del for
+    }
+}</div>
+          </div>
+          <div class="card">
+            <h2>continue</h2>
+            <div class="code">for (int i = 0; i < 10; i++)
+{
+    if (i % 2 == 0)
+    {
+        continue; // salta pares
+    }
+    Console.WriteLine(i); // Solo imprime impares
+}</div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Control avanzado de flujo</span>
+          <span class="counter">16 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 · DISEÑO EJEMPLO CAJA -->
+    <section class="slide content-slide" data-title="Diseño Caja">
+      <div class="inner">
+        <div class="header">Ejemplo integrador: caja registradora</div>
+        <div class="content">
+          <h2>Requerimiento funcional</h2>
+          <ul>
+            <li>Permitir ingresar precios de artículos hasta que el usuario digite 0.</li>
+            <li>Rechazar entradas no numéricas o negativas y volver a pedir el valor.</li>
+            <li>Al finalizar, mostrar número de artículos válidos y subtotal.</li>
+            <li>Usar al menos: <strong>while</strong>, <strong>do-while</strong>, <strong>TryParse</strong>, contador, acumulador y bandera.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Diseño de la solución</span>
+          <span class="counter">17 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 · CÓDIGO CAJA 1 -->
+    <section class="slide content-slide" data-title="Caja 1">
+      <div class="inner">
+        <div class="header">Caja registradora — Parte 1</div>
+        <div class="content">
+          <div class="code">decimal subtotal = 0m;       // Acumulador
+int cantidadArticulos = 0;   // Contador
+bool registrarOtro = true;   // Bandera
+
+Console.WriteLine("=== SISTEMA DE CAJA ===");
+
+while (registrarOtro)
+{
+    decimal precio = 0m;
+    bool entradaValida = false;
+
+    // Sub-ciclo de validación estricta
+    do
+    {
+        Console.Write($"\nPrecio del art #{cantidadArticulos + 1} (0 para finalizar): ");
+        string entrada = Console.ReadLine();
+
+        if (decimal.TryParse(entrada, out precio) && precio >= 0)
+        {
+            entradaValida = true;
+        }
+        else
+        {
+            Console.WriteLine("Error: ingrese un número válido y >= 0.");
+        }
+    } while (!entradaValida);</div>
+        </div>
+        <div class="footer">
+          <span>Caja · Validación de entrada</span>
+          <span class="counter">18 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 · CÓDIGO CAJA 2 -->
+    <section class="slide content-slide" data-title="Caja 2">
+      <div class="inner">
+        <div class="header">Caja registradora — Parte 2</div>
+        <div class="content">
+          <div class="code">    // Lógica de negocio después de validar
+    if (precio == 0)
+    {
+        registrarOtro = false; // Cambia la bandera y salimos del while principal
+    }
+    else
+    {
+        subtotal += precio;     // Actualiza acumulador
+        cantidadArticulos++;    // Actualiza contador
+    }
+}
+
+Console.WriteLine("\n=== RESUMEN COMPRA ===");
+Console.WriteLine($"Artículos procesados: {cantidadArticulos}");
+Console.WriteLine($"Total a pagar: ${subtotal:N2}");</div>
+          <p class="note" style="margin-top:8px;">Observa cómo cada patrón (contador, acumulador, bandera) tiene un rol claro y evita estados inconsistentes.</p>
+        </div>
+        <div class="footer">
+          <span>Caja · Lógica de negocio</span>
+          <span class="counter">19 / 20</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 · CIERRE -->
+    <section class="slide content-slide" data-title="Cierre">
+      <div class="inner">
+        <div class="header">Cierre conceptual</div>
+        <div class="content">
+          <h2>Lo que debe quedar sólido</h2>
+          <ul>
+            <li>Los ciclos son una herramienta para evitar duplicación de lógica y manejar datos de tamaño variable.</li>
+            <li>El tipo de ciclo adecuado depende de la <strong>información disponible</strong> (número de vueltas conocido o no) y de la experiencia de usuario requerida.</li>
+            <li>Patrones de contadores, acumuladores y banderas son la base de casi todos los algoritmos iterativos.</li>
+            <li>La robustez viene de combinar buena elección de ciclo, correcto scope y validación de entradas.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesión 9 · Cierre</span>
+          <span class="counter">20 / 20</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">◀</button>
+    <button id="btnNext" aria-label="Siguiente">▶</button>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const counters = Array.from(document.querySelectorAll('.counter'));
+    const stage = document.getElementById('stage');
+
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+
+    let idx = 0;
+
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+    function show(i){
+      idx = clamp(i, 0, slides.length - 1);
+      slides.forEach((s,k) => s.classList.toggle('active', k === idx));
+      const label = (idx+1) + " / " + slides.length;
+      counters.forEach(el => el.textContent = label);
+      history.replaceState(null, "", "#" + (idx+1));
+    }
+
+    function next(){ show(idx+1); }
+    function prev(){ show(idx-1); }
+
+    const m = (location.hash || "").match(/^#(\d+)$/);
+    if(m){
+      const start = parseInt(m[1], 10);
+      if(!isNaN(start)) idx = clamp(start-1, 0, slides.length-1);
+    }
+    show(idx);
+
+    btnPrev.addEventListener('click', prev);
+    btnNext.addEventListener('click', next);
+
+    document.addEventListener('keydown', (e) => {
+      const k = e.key;
+
+      if(k === 'f' || k === 'F'){
+        if(!document.fullscreenElement){
+          document.documentElement.requestFullscreen?.();
+        }else{
+          document.exitFullscreen?.();
+        }
+        return;
+      }
+
+      if(k === 'ArrowRight' || k === 'PageDown' || k === ' '){
+        e.preventDefault(); next();
+      }else if(k === 'ArrowLeft' || k === 'PageUp'){
+        e.preventDefault(); prev();
+      }else if(k === 'Home'){
+        e.preventDefault(); show(0);
+      }else if(k === 'End'){
+        e.preventDefault(); show(slides.length-1);
+      }
+    });
+
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    if(isTouch){
+      let x0=null, y0=null, t0=0;
+      const SWIPE_MIN_X = 50;
+      const SWIPE_MAX_Y = 80;
+      const SWIPE_MAX_MS = 800;
+
+      stage.addEventListener('touchstart', (e)=>{
+        const t = e.changedTouches[0];
+        x0=t.clientX; y0=t.clientY; t0=Date.now();
+      }, {passive:true});
+
+      stage.addEventListener('touchend', (e)=>{
+        if(x0===null || y0===null) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - x0;
+        const dy = t.clientY - y0;
+        const dt = Date.now() - t0;
+        x0=null; y0=null;
+
+        if(dt > SWIPE_MAX_MS) return;
+        if(Math.abs(dy) > SWIPE_MAX_Y) return;
+
+        if(dx <= -SWIPE_MIN_X) next();
+        else if(dx >= SWIPE_MIN_X) prev();
+      }, {passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
