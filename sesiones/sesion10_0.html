@@ -296,7 +296,7 @@
         </div>
         <div class="footer">
           <span style="color:#e5edf8;">Lógica de Programación · Grupos 810 / 811</span>
-          <span class="counter">1 / 14</span>
+          <span class="counter">1 / 16</span>
         </div>
       </div>
     </section>
@@ -316,7 +316,7 @@
         </div>
         <div class="footer">
           <span>Sesión 10 · Objetivos</span>
-          <span class="counter">2 / 14</span>
+          <span class="counter">2 / 16</span>
         </div>
       </div>
     </section>
@@ -345,7 +345,7 @@
         </div>
         <div class="footer">
           <span>Base conceptual iterativa</span>
-          <span class="counter">3 / 14</span>
+          <span class="counter">3 / 16</span>
         </div>
       </div>
     </section>
@@ -369,7 +369,7 @@
         </div>
         <div class="footer">
           <span>Planteamiento del problema</span>
-          <span class="counter">4 / 14</span>
+          <span class="counter">4 / 16</span>
         </div>
       </div>
     </section>
@@ -401,7 +401,7 @@
         </div>
         <div class="footer">
           <span>Diseño iterativo simple</span>
-          <span class="counter">5 / 14</span>
+          <span class="counter">5 / 16</span>
         </div>
       </div>
     </section>
@@ -455,7 +455,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Implementación iterativa base</span>
-          <span class="counter">6 / 14</span>
+          <span class="counter">6 / 16</span>
         </div>
       </div>
     </section>
@@ -482,41 +482,181 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Motivación hacia estructuras</span>
-          <span class="counter">7 / 14</span>
+          <span class="counter">7 / 16</span>
         </div>
       </div>
     </section>
 
     <!-- 8 · INTRO ARREGLOS -->
-    <section class="slide content-slide" data-title="Arreglos intro">
+    <section class="slide content-slide" data-title="¿Qué es un arreglo?">
       <div class="inner">
-        <div class="header">Introducción conceptual a arreglos</div>
-        <div class="content two-col">
-          <div class="card">
-            <h2>Arreglo como estructura de almacenamiento</h2>
-            <ul>
-              <li>Es una colección de elementos del mismo tipo, almacenados en posiciones contiguas de memoria.</li>
-              <li>Cada elemento se accede mediante un índice entero, que comienza en 0.</li>
-              <li>Su tamaño se fija cuando se crea y no puede cambiarse posteriormente.</li>
-            </ul>
+        <div class="header">¿Qué es un arreglo? Concepto y analogía</div>
+        <div class="content">
+          <div class="two-col" style="flex:0 0 auto;">
+            <div class="card">
+              <h2>La analogía de las casillas numeradas</h2>
+              <p>Imagina una fila de casillas de correo en un edificio. Cada casilla:</p>
+              <ul>
+                <li>Guarda exactamente <strong>un valor</strong> del mismo tipo que todas las demás.</li>
+                <li>Tiene un <strong>número de casilla</strong> fijo grabado en la puerta — eso es el <em>índice</em>.</li>
+                <li>Se puede abrir directamente si sabes el número — acceso en <strong>tiempo constante O(1)</strong>.</li>
+              </ul>
+              <p style="margin-top:6px;">En C#, un arreglo ocupa un bloque <strong>contiguo</strong> de memoria RAM, lo que hace el acceso por índice extremadamente rápido.</p>
+            </div>
+            <div class="card">
+              <h2>Propiedades fundamentales</h2>
+              <ul>
+                <li><strong>Tipo homogéneo:</strong> todos los elementos son del mismo tipo (<span class="kbd">double</span>, <span class="kbd">int</span>, <span class="kbd">string</span>…).</li>
+                <li><strong>Índice base 0:</strong> el primer elemento está en la posición <span class="kbd">0</span>, no en la <span class="kbd">1</span>.</li>
+                <li><strong>Tamaño fijo:</strong> se define al crear el arreglo con <span class="kbd">new</span> y <strong>no puede cambiar</strong> después.</li>
+                <li><strong>Longitud accesible:</strong> la propiedad <span class="kbd">.Length</span> siempre indica cuántos elementos tiene el arreglo.</li>
+              </ul>
+            </div>
           </div>
-          <div class="card">
-            <h2>Relación con los ciclos</h2>
-            <ul>
-              <li>El índice del arreglo es, típicamente, el mismo contador del ciclo (<span class="kbd">i</span>).</li>
-              <li>El patrón for sobre arreglos es tan frecuente que se considera un esquema canónico.</li>
-              <li>El control riguroso de los límites (0 a Length-1) evita errores de índice fuera de rango.</li>
-            </ul>
+          <div class="card" style="flex:0 0 auto;">
+            <h2>Visualización en memoria: arreglo de 5 notas</h2>
+            <table style="margin-top:6px;">
+              <thead>
+                <tr>
+                  <th>Índice (i)</th>
+                  <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700;color:var(--azul-medio);">notas[i]</td>
+                  <td>4.5</td><td>3.2</td><td>1.8</td><td>5.0</td><td>2.7</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--muted);font-size:clamp(11px,0.95vw,13px);">Estudiante</td>
+                  <td style="color:var(--muted);font-size:clamp(11px,0.95vw,13px);">1</td>
+                  <td style="color:var(--muted);font-size:clamp(11px,0.95vw,13px);">2</td>
+                  <td style="color:var(--muted);font-size:clamp(11px,0.95vw,13px);">3</td>
+                  <td style="color:var(--muted);font-size:clamp(11px,0.95vw,13px);">4</td>
+                  <td style="color:var(--muted);font-size:clamp(11px,0.95vw,13px);">5</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="note" style="margin-top:6px;">⚠ El índice va de <strong>0</strong> a <strong>Length − 1</strong>. Para 5 elementos: índices 0, 1, 2, 3, 4. El índice 5 provoca <span class="kbd">IndexOutOfRangeException</span>.</p>
           </div>
         </div>
         <div class="footer">
-          <span>Fundamento de estructuras</span>
-          <span class="counter">8 / 14</span>
+          <span>Fundamento conceptual de arreglos</span>
+          <span class="counter">8 / 16</span>
         </div>
       </div>
     </section>
 
-    <!-- 9 · DISEÑO CON ARREGLOS -->
+    <!-- 9 · SINTAXIS ARREGLOS EN C# -->
+    <section class="slide content-slide" data-title="Sintaxis de arreglos en C#">
+      <div class="inner">
+        <div class="header">Sintaxis en C#: declarar, crear e inicializar arreglos</div>
+        <div class="content">
+          <div class="two-col" style="flex:0 0 auto;">
+            <div class="card">
+              <h2>Las tres formas de crear un arreglo</h2>
+              <div class="code">// Forma 1: declarar y luego asignar con new
+double[] notas;
+notas = new double[5];   // 5 posiciones, todas en 0.0
+
+// Forma 2: declarar y crear en una línea
+double[] notas = new double[5];
+
+// Forma 3: declarar con valores iniciales (literal)
+double[] notas = { 4.5, 3.2, 1.8, 5.0, 2.7 };
+
+// Forma 3 alternativa (equivalente)
+double[] notas = new double[] { 4.5, 3.2, 1.8, 5.0, 2.7 };</div>
+            </div>
+            <div class="card">
+              <h2>Leer y escribir elementos</h2>
+              <div class="code">double[] notas = new double[5];
+
+// Escribir en una posición
+notas[0] = 4.5;  // primer elemento
+notas[4] = 2.7;  // último elemento (Length - 1)
+
+// Leer una posición
+double primera = notas[0];  // 4.5
+double ultima  = notas[4];  // 2.7
+
+// Leer cuántos elementos tiene
+int cuantos = notas.Length; // 5
+
+// ¡CUIDADO! Esto lanza IndexOutOfRangeException:
+// double error = notas[5];</div>
+            </div>
+          </div>
+          <div class="callout" style="flex:0 0 auto;">
+            <p><strong>Regla de oro:</strong> los índices válidos siempre son <span class="kbd">0</span> hasta <span class="kbd">notas.Length - 1</span>. En un arreglo de 5 elementos: posiciones 0, 1, 2, 3 y 4. Nunca se usa el índice 5.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sintaxis y operaciones básicas</span>
+          <span class="counter">9 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · FOR vs FOREACH -->
+    <section class="slide content-slide" data-title="for vs foreach en arreglos">
+      <div class="inner">
+        <div class="header">Recorrer arreglos: for con índice vs foreach</div>
+        <div class="content">
+          <div class="two-col" style="flex:0 0 auto;">
+            <div class="card">
+              <h2>for con índice: control total</h2>
+              <div class="code">// Accedo al índice i en cada iteración
+for (int i = 0; i &lt; notas.Length; i++)
+{
+    Console.WriteLine($"Nota #{i + 1}: {notas[i]}");
+
+    // Puedo modificar el arreglo:
+    if (notas[i] &lt; 0) notas[i] = 0;
+
+    // Puedo acceder a elementos vecinos:
+    // notas[i - 1], notas[i + 1]
+}</div>
+              <p class="note" style="margin-top:6px;">Úsalo cuando necesitas el índice, modificar elementos o comparar posiciones adyacentes.</p>
+            </div>
+            <div class="card">
+              <h2>foreach: legibilidad sin índice</h2>
+              <div class="code">// La variable 'nota' toma el valor de cada elemento
+foreach (double nota in notas)
+{
+    Console.WriteLine($"Nota: {nota}");
+
+    // foreach NO puede modificar el arreglo:
+    // nota = 0;  ← Error de compilación
+}
+
+// Equivalente más legible para solo leer:
+double suma = 0;
+foreach (double nota in notas)
+    suma += nota;</div>
+              <p class="note" style="margin-top:6px;">Úsalo cuando solo lees los datos y no necesitas saber la posición. El código queda más limpio.</p>
+            </div>
+          </div>
+          <table style="flex:0 0 auto; margin-top:4px;">
+            <thead>
+              <tr><th>¿Qué necesito?</th><th>for con índice</th><th>foreach</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Solo leer todos los elementos</td><td>✓</td><td>✓ (preferido)</td></tr>
+              <tr><td>Modificar elementos del arreglo</td><td>✓</td><td>✗</td></tr>
+              <tr><td>Acceder al número de posición (i)</td><td>✓</td><td>✗</td></tr>
+              <tr><td>Recorrer en orden inverso</td><td>✓</td><td>✗</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Patrones de recorrido</span>
+          <span class="counter">10 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · DISEÑO CON ARREGLOS -->
     <section class="slide content-slide" data-title="Con arreglos">
       <div class="inner">
         <div class="header">Versión 2: solución iterativa usando arreglos</div>
@@ -540,7 +680,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Rediseño con almacenamiento</span>
-          <span class="counter">9 / 14</span>
+          <span class="counter">11 / 16</span>
         </div>
       </div>
     </section>
@@ -598,7 +738,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Implementación con estructuras</span>
-          <span class="counter">10 / 14</span>
+          <span class="counter">12 / 16</span>
         </div>
       </div>
     </section>
@@ -627,7 +767,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Robustez en índices</span>
-          <span class="counter">11 / 14</span>
+          <span class="counter">13 / 16</span>
         </div>
       </div>
     </section>
@@ -656,7 +796,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Articulación con la planificación</span>
-          <span class="counter">12 / 14</span>
+          <span class="counter">14 / 16</span>
         </div>
       </div>
     </section>
@@ -679,7 +819,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Trabajo guiado</span>
-          <span class="counter">13 / 14</span>
+          <span class="counter">15 / 16</span>
         </div>
       </div>
     </section>
@@ -699,7 +839,7 @@ Console.WriteLine($"Aprobados: {aprobados}");</div>
         </div>
         <div class="footer">
           <span>Sesión 10 · Cierre</span>
-          <span class="counter">14 / 14</span>
+          <span class="counter">16 / 16</span>
         </div>
       </div>
     </section>
