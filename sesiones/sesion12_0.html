@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lógica de Programación - Sesión 12: Proyecto Entrega 2</title>
+
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+
+      --h1: clamp(30px, 3.4vw, 48px);
+      --h2: clamp(22px, 2.3vw, 34px);
+      --p:  clamp(15px, 1.3vw, 19px);
+      --li: clamp(15px, 1.3vw, 19px);
+
+      --safe-top-cover: clamp(208px, 9vh, 128px);
+      --safe-left-cover: clamp(585px, 5.5vw, 110px);
+      --safe-right-cover: clamp(28px, 3vw, 72px);
+      --safe-bottom-cover: clamp(54px, 6vh, 92px);
+
+      --safe-top: clamp(100px, 9vh, 132px);
+      --safe-side: clamp(66px, 5.5vw, 108px);
+      --safe-bottom: clamp(52px, 6vh, 90px);
+    }
+
+    body{ margin:0; font-family:Arial, Helvetica, sans-serif; background:#ffffff; }
+
+    .deck{
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:clamp(10px,2vw,22px); box-sizing:border-box; background:#ffffff;
+    }
+
+    .stage{
+      width:min(96vw, calc(92vh * (16/9)));
+      aspect-ratio:16/9; position:relative;
+    }
+
+    .slide{
+      position:absolute; inset:0; display:none;
+      box-shadow:0 14px 40px rgba(0,0,0,.35); overflow:hidden;
+    }
+    .slide.active{ display:block; }
+
+    .slide.cover{
+      background:url("./Portada.png") center/cover no-repeat; color:#ffffff;
+    }
+    .slide.content-slide{
+      background: url("./Contenido.png") top left/contain no-repeat, #ffffff;
+      color:var(--texto);
+    }
+
+    .inner{
+      height:100%; box-sizing:border-box;
+      padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+      display:flex; flex-direction:column; gap:clamp(10px,1.1vw,18px);
+    }
+    .cover .inner{
+      padding: var(--safe-top-cover) var(--safe-right-cover)
+               var(--safe-bottom-cover) var(--safe-left-cover);
+    }
+
+    .content{ flex:1; display:flex; flex-direction:column; gap:clamp(10px,1.1vw,16px); min-height:0; }
+
+    .header{
+      color:var(--azul-medio); font-size:clamp(18px,1.6vw,22px);
+      font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    }
+
+    h1{ margin:0; font-size:var(--h1); line-height:1.08; color:var(--texto); }
+    h2{ margin:0; font-size:var(--h2); line-height:1.15; color:var(--azul-medio); }
+
+    p{ margin:0; font-size:var(--p); line-height:1.4; color:var(--texto); }
+    li{ font-size:var(--li); line-height:1.4; color:var(--texto); }
+    ul,ol{ margin:0; padding-left:1.2em; }
+
+    .subtitle{
+      color:var(--turquesa); font-weight:800;
+      font-size:clamp(18px,1.8vw,24px); margin-top:clamp(6px,1vw,10px);
+    }
+
+    .cover h1{ color:#ffffff; }
+    .cover p{ color:#e5edf8; }
+    .cover .subtitle{ color:#f7df00; }
+
+    .note{ color:var(--muted); font-size:clamp(12px,1.05vw,14px); line-height:1.35; }
+
+    .callout{
+      background:rgba(255,255,255,0.94); border-left:6px solid var(--turquesa);
+      padding:clamp(10px,1.1vw,14px); border-radius:6px;
+    }
+
+    .two-col{
+      display:grid; grid-template-columns:1.15fr 0.9fr;
+      gap:clamp(12px,1.6vw,22px); align-items:flex-start; min-height:0;
+    }
+    .equal-col{
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:clamp(12px,1.6vw,22px); align-items:flex-start; min-height:0;
+    }
+    @media(max-width:980px){ .two-col,.equal-col{ grid-template-columns:1fr; } }
+
+    .card{
+      background:rgba(255,255,255,0.96); border:1px solid #dde2f1;
+      border-radius:10px; padding:clamp(10px,1.1vw,14px);
+    }
+
+    .kbd{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      background:#111827; color:#e5e7eb; padding:2px 8px; border-radius:7px;
+      font-size:clamp(11px,1vw,13px); border:1px solid rgba(255,255,255,.08);
+    }
+
+    .code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:clamp(12px,1.05vw,14px); line-height:1.35;
+      background:#0b1020; color:#e5e7eb; border-radius:10px;
+      padding:clamp(10px,1.1vw,14px); overflow:auto; max-height:44vh;
+      border:1px solid rgba(17,24,39,.25); white-space:pre-wrap;
+    }
+
+    table{ width:100%; border-collapse:collapse; background:rgba(255,255,255,0.96); }
+    th,td{
+      border:1px solid #dde2f1; padding:clamp(8px,1vw,12px);
+      font-size:clamp(14px,1.2vw,18px); color:var(--texto); vertical-align:top;
+    }
+    th{
+      background:#f3f6fb; text-transform:uppercase;
+      font-size:clamp(12px,1.1vw,14px); letter-spacing:.06em; color:var(--azul-medio);
+    }
+
+    .footer{
+      display:flex; justify-content:space-between; align-items:center;
+      color:var(--muted); font-size:clamp(12px,1.05vw,14px); gap:14px;
+    }
+
+    .counter{ font-weight:800; color:var(--azul-medio); }
+    .cover .counter{ color:#e5edf8; }
+
+    .touch-nav{
+      position:absolute; top:50%; left:0; right:0; transform:translateY(-50%);
+      display:flex; justify-content:space-between; padding:0 12px;
+      pointer-events:none; z-index:10;
+    }
+    .touch-nav button{
+      pointer-events:auto; width:44px; height:44px; border-radius:999px; padding:0;
+      border:1px solid rgba(221,226,241,0.95); background:rgba(255,255,255,0.92);
+      color:var(--texto); font-weight:900; box-shadow:0 10px 22px rgba(0,0,0,.12); cursor:pointer;
+    }
+
+    #touchNav{ opacity:0; transform:translateY(-50%) translateY(6px); transition:.15s ease; }
+    .stage:hover #touchNav{ opacity:1; transform:translateY(-50%) translateY(0); }
+    @media (hover:none){ #touchNav{ opacity:1; transform:translateY(-50%); } }
+  </style>
+</head>
+
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesión 12</h1>
+          <div class="subtitle">Proyecto Integrador — Entrega 2</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px); color:#e5edf8;">
+            Unidad 2 · Escalado iterativo: menú continuo, registros múltiples y reportes estadísticos
+          </p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">
+            Navegación: ← → · Home / End · F pantalla completa · Táctil: desliza
+          </p>
+        </div>
+        <div class="footer">
+          <span style="color:#e5edf8;">Lógica de Programación · Grupos 810 / 811</span>
+          <span class="counter">1 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · OBJETIVOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Propósito de la sesión</div>
+        <div class="content">
+          <h2>De una solución secuencial a un sistema iterativo completo</h2>
+          <ul>
+            <li>Comprender qué significa escalar un programa de Unidad 1 (lineal, de una sola ejecución) a un sistema que gestiona múltiples registros en memoria durante una misma sesión.</li>
+            <li>Diseñar y justificar la arquitectura de control del sistema: menú <span class="kbd">do-while</span> como núcleo del ciclo de vida del programa.</li>
+            <li>Integrar <span class="kbd">List&lt;T&gt;</span> como estructura de almacenamiento principal y producir reportes estadísticos mediante ciclos explícitos.</li>
+            <li>Aplicar la rúbrica de evaluación de la Entrega 2 como guía de diseño desde el inicio del desarrollo.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesión 12 · Objetivos</span>
+          <span class="counter">2 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · QUÉ CAMBIÓ DESDE ENTREGA 1 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Análisis: Entrega 1 vs Entrega 2</div>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimensión</th>
+                <th>Entrega 1 (Unidad 1)</th>
+                <th>Entrega 2 (Unidad 2)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Ciclo de vida</strong></td>
+                <td>Ejecución única, flujo secuencial, termina tras mostrar la salida.</td>
+                <td>Ciclo continuo: el sistema vive mientras el usuario no decida salir.</td>
+              </tr>
+              <tr>
+                <td><strong>Datos procesados</strong></td>
+                <td>Variables atómicas (un cliente, un pedido, una operación).</td>
+                <td>Colecciones de N registros almacenados en <span class="kbd">List&lt;T&gt;</span>.</td>
+              </tr>
+              <tr>
+                <td><strong>Salida</strong></td>
+                <td>Resultado de una sola operación.</td>
+                <td>Reportes estadísticos sobre el conjunto completo de registros.</td>
+              </tr>
+              <tr>
+                <td><strong>Robustez</strong></td>
+                <td>Opcional / básica.</td>
+                <td>Validación estricta obligatoria con <span class="kbd">TryParse</span> y guardas defensivas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Evolución del sistema</span>
+          <span class="counter">3 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · RÚBRICA DE EVALUACIÓN -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Rúbrica de Entrega 2 como mapa de diseño</div>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>Indicador evaluado</th>
+                <th>Error que invalida</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ciclo de control</td>
+                <td>Menú implementado con <span class="kbd">do-while</span> funcional.</td>
+                <td>Menú implementado con <span class="kbd">while(true)</span> sin bandera ni condición semántica.</td>
+              </tr>
+              <tr>
+                <td>Almacenamiento</td>
+                <td>Registros múltiples en arreglo o <span class="kbd">List&lt;T&gt;</span>.</td>
+                <td>Variables atómicas reutilizadas: el registro anterior se sobreescribe sin guardarse.</td>
+              </tr>
+              <tr>
+                <td>Reportes</td>
+                <td>Métricas calculadas con ciclos explícitos sobre la colección.</td>
+                <td>Cálculos acumulados dentro del ciclo de carga (confunde las dos fases).</td>
+              </tr>
+              <tr>
+                <td>Robustez</td>
+                <td>Cero colapsos ante entradas inválidas.</td>
+                <td>Uso de <span class="kbd">Parse</span> sin manejo de excepción.</td>
+              </tr>
+              <tr>
+                <td>Legibilidad</td>
+                <td>Nombres semánticos, sin números mágicos, commits descriptivos.</td>
+                <td>Variables <span class="kbd">x</span>, <span class="kbd">temp1</span>, <span class="kbd">aux2</span>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Rúbrica como guía de diseño</span>
+          <span class="counter">4 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · ARQUITECTURA ESPERADA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Arquitectura del sistema: visión estructural</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Estructura en tres capas lógicas</h2>
+            <ul>
+              <li><strong>Capa de control:</strong> El ciclo <span class="kbd">do-while</span> + <span class="kbd">switch</span> que orquesta todo el sistema. Responsabilidad única: recibir la intención del usuario y delegar.</li>
+              <li><strong>Capa de datos:</strong> La <span class="kbd">List&lt;T&gt;</span> declarada antes del ciclo principal. Responsabilidad única: persistir los registros en memoria volátil mientras el sistema esté activo.</li>
+              <li><strong>Capa de lógica de negocio:</strong> Los bloques de código que registran, validan y calculan. En Unidad 3 estos bloques se convertirán en funciones.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Flujo de ejecución</h2>
+            <ol>
+              <li>Sistema inicia → List vacía instanciada.</li>
+              <li>Menú presentado → usuario elige opción.</li>
+              <li>Opción ejecuta su bloque lógico.</li>
+              <li>Sistema regresa al menú (vuelve al paso 2).</li>
+              <li>Opción "Salir" activa bandera → ciclo termina.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Arquitectura de tres capas lógicas</span>
+          <span class="counter">5 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · ESQUELETO BASE DEL SISTEMA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Esqueleto base del sistema (punto de partida)</div>
+        <div class="content">
+          <div class="code">using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Capa de datos: alcance global respecto al ciclo
+        List&lt;double&gt; registros = new List&lt;double&gt;();
+        bool sistemaActivo = true;
+
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("=== MI SISTEMA - ENTREGA 2 ===");
+            Console.WriteLine("1. Registrar nuevo dato");
+            Console.WriteLine("2. Ver reporte estadístico");
+            Console.WriteLine("0. Salir");
+            Console.Write("\nOpción: ");
+
+            string opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1":
+                    // Bloque de captura y validación
+                    break;
+                case "2":
+                    // Bloque de reportes estadísticos
+                    break;
+                case "0":
+                    sistemaActivo = false;
+                    break;
+                default:
+                    Console.WriteLine("Opción no válida. Presione Enter.");
+                    Console.ReadLine();
+                    break;
+            }
+
+        } while (sistemaActivo);
+    }
+}</div>
+        </div>
+        <div class="footer">
+          <span>Esqueleto del ciclo de vida del sistema</span>
+          <span class="counter">6 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · BLOQUE DE REGISTRO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Bloque de Registro: Validación y Almacenamiento</div>
+        <div class="content">
+          <h2>Implementación del caso "1": registrar con defensa total</h2>
+          <div class="code">case "1":
+    Console.Write("Ingrese el valor a registrar: ");
+    string entrada = Console.ReadLine();
+    double valorIngresado;
+
+    if (double.TryParse(entrada, out valorIngresado))
+    {
+        // Segunda guardia: validación de dominio del negocio
+        if (valorIngresado &lt; 0)
+        {
+            Console.WriteLine("El valor no puede ser negativo.");
+        }
+        else
+        {
+            registros.Add(valorIngresado);
+            Console.WriteLine($"Registro #{registros.Count} guardado: {valorIngresado:F2}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Formato inválido. Solo se aceptan valores numéricos.");
+    }
+
+    Console.WriteLine("Presione Enter para continuar.");
+    Console.ReadLine();
+    break;</div>
+          <p class="note" style="margin-top:8px;"><span class="kbd">TryParse</span> opera como primera guardia (¿es parseable?). La condición de dominio opera como segunda guardia (¿cumple la regla de negocio?). Ambas capas son independientes y obligatorias.</p>
+        </div>
+        <div class="footer">
+          <span>Captura robusta de datos</span>
+          <span class="counter">7 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · BLOQUE DE REPORTE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Bloque de Reporte: Procesamiento Estadístico</div>
+        <div class="content">
+          <h2>Implementación del caso "2": métricas sobre la colección</h2>
+          <div class="code">case "2":
+    if (registros.Count == 0)
+    {
+        Console.WriteLine("No hay registros para procesar.");
+    }
+    else
+    {
+        double suma = 0.0;           // Acumulador — se reinicia en cada reporte
+        double maximo = double.MinValue;
+        double minimo = double.MaxValue;
+        int superanUmbral = 0;
+        const double UMBRAL = 50.0;  // Sin números mágicos
+
+        for (int i = 0; i &lt; registros.Count; i++)
+        {
+            double val = registros[i];
+            suma += val;
+            if (val &gt; maximo) maximo = val;
+            if (val &lt; minimo) minimo = val;
+            if (val &gt; UMBRAL) superanUmbral++;
+        }
+
+        double promedio = suma / registros.Count;
+
+        Console.WriteLine($"\nTotal de registros : {registros.Count}");
+        Console.WriteLine($"Promedio           : {promedio:F2}");
+        Console.WriteLine($"Máximo             : {maximo:F2}");
+        Console.WriteLine($"Mínimo             : {minimo:F2}");
+        Console.WriteLine($"Superan {UMBRAL}     : {superanUmbral}");
+    }
+    Console.WriteLine("Presione Enter para continuar.");
+    Console.ReadLine();
+    break;</div>
+        </div>
+        <div class="footer">
+          <span>Generación de Reportes Iterativos</span>
+          <span class="counter">8 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · SEPARACIÓN DE FASES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Principio fundamental: separación de fases</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Fase de carga (caso "1")</h2>
+            <p>Responsabilidad única: capturar un dato, validarlo y añadirlo a la colección. No debe calcular métricas. No debe iterar sobre datos históricos. Solo agrega y confirma.</p>
+            <div class="callout" style="margin-top:10px;">
+              <p><strong>Anti-patrón:</strong> Acumular la suma dentro del bloque de registro para "ahorrar" el ciclo del reporte. Esto obliga a reinicializar acumuladores manualmente y rompe la lógica si el usuario elimina o edita registros.</p>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Fase de procesamiento (caso "2")</h2>
+            <p>Responsabilidad única: recorrer la colección y producir métricas desde cero. Sus acumuladores internos son variables locales temporales que nacen y mueren en cada invocación del reporte.</p>
+            <p class="note" style="margin-top:8px;">Este patrón es directamente transferible a funciones en la Unidad 3: cada bloque de <span class="kbd">switch</span> se convierte en un método con una firma clara.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Separación de responsabilidades</span>
+          <span class="counter">9 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · DISEÑO DE LA ENTIDAD -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Decisión de Diseño: ¿Qué almacena la colección?</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Colección de primitivos (<span class="kbd">List&lt;double&gt;</span>)</h2>
+            <p>Adecuada cuando cada registro es un valor numérico simple (medición, precio, calificación). El sistema produce estadísticas sobre ese único campo.</p>
+            <ul style="margin-top:8px;">
+              <li>Simple de recorrer.</li>
+              <li>Limitada para datos con múltiples atributos (ej. nombre + valor).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Colección de strings (<span class="kbd">List&lt;string&gt;</span>)</h2>
+            <p>Permite guardar texto libre (nombres, categorías) para luego filtrar o mostrar en reportes. Puede combinarse con una <span class="kbd">List&lt;double&gt;</span> paralela indexada.</p>
+            <ul style="margin-top:8px;">
+              <li>Requiere mantener índices sincronizados entre ambas listas.</li>
+              <li>Antecede conceptualmente al uso de clases en cursos futuros.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Modelado de datos</span>
+          <span class="counter">10 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · MÚLTIPLES MÉTRICAS EN REPORTES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Extensión: Múltiples métricas en un solo recorrido</div>
+        <div class="content">
+          <h2>Eficiencia algorítmica: un solo ciclo O(N) para todas las métricas</h2>
+          <div class="callout">
+            <p>Un error común es implementar un ciclo separado por cada métrica (uno para suma, uno para máximo, uno para contar condición). Esto genera complejidad <span class="kbd">O(k·N)</span> siendo k el número de métricas.</p>
+            <p>La solución óptima combina todas las métricas en un único recorrido: cada iteración actualiza simultáneamente acumulador, extremos y contadores condicionales.</p>
+          </div>
+          <div class="code">// Un solo recorrido — O(N) — múltiples métricas
+for (int i = 0; i &lt; registros.Count; i++)
+{
+    double v = registros[i];
+    suma        += v;                       // Acumulador
+    if (v &gt; maximo)       maximo = v;       // Seguimiento del máximo
+    if (v &lt; minimo)       minimo = v;       // Seguimiento del mínimo
+    if (v &gt;= UMBRAL_ALTO) contadorAlto++;   // Contador condicional 1
+    if (v &lt;  UMBRAL_BAJO) contadorBajo++;   // Contador condicional 2
+}</div>
+        </div>
+        <div class="footer">
+          <span>Complejidad algorítmica y eficiencia</span>
+          <span class="counter">11 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · COMMITS Y GITHUB -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Control de versiones: Estrategia de Commits</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Principio de commits atómicos</h2>
+            <p>Cada commit debe representar un estado funcional y coherente del sistema, no un archivo a medias. Una buena estrategia de commits para la Entrega 2:</p>
+            <ol>
+              <li><span class="kbd">feat: agregar esqueleto do-while con menú base</span></li>
+              <li><span class="kbd">feat: implementar registro con validación TryParse</span></li>
+              <li><span class="kbd">feat: agregar bloque de reporte estadístico</span></li>
+              <li><span class="kbd">fix: corregir reinicialización de acumuladores en reporte</span></li>
+              <li><span class="kbd">docs: actualizar README con instrucciones de ejecución</span></li>
+            </ol>
+          </div>
+          <div class="card">
+            <h2>README mínimo exigido</h2>
+            <ul>
+              <li>Descripción del problema que resuelve el sistema.</li>
+              <li>Instrucciones para compilar y ejecutar (<span class="kbd">dotnet run</span>).</li>
+              <li>Casos de prueba: entrada válida, entrada inválida, colección vacía.</li>
+              <li>Restricciones de dominio conocidas (ej. valores positivos, rango máximo).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Buenas prácticas de ingeniería de software</span>
+          <span class="counter">12 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · ANTI-PATRONES FRECUENTES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Anti-patrones que invalidan la entrega</div>
+        <div class="content equal-col">
+          <div class="card">
+            <h2>En el ciclo de control</h2>
+            <ul>
+              <li>Usar <span class="kbd">while(true)</span> sin bandera semántica: el código no expresa intención; es una caja negra para quien lo lee.</li>
+              <li>Anidar un segundo menú dentro de un caso sin un sub-ciclo propio: mezcla dos niveles de navegación en el mismo bloque.</li>
+              <li>No limpiar la consola (<span class="kbd">Console.Clear()</span>) entre iteraciones: la interfaz acumula basura visual que confunde al usuario.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>En el manejo de datos</h2>
+            <ul>
+              <li>Declarar la <span class="kbd">List&lt;T&gt;</span> dentro del <span class="kbd">do-while</span>: todos los registros se pierden en cada vuelta del menú.</li>
+              <li>Confiar en <span class="kbd">Parse</span> directamente: un solo carácter no numérico colapsa el sistema sin posibilidad de recuperación.</li>
+              <li>Mostrar el reporte cuando <span class="kbd">Count == 0</span> sin validar: división por cero al calcular el promedio.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Errores de diseño de alto impacto</span>
+          <span class="counter">13 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · MIRADA A UNIDAD 3 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">El código de hoy es el material de Unidad 3</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Lo que ocurrirá en Unidad 3</h2>
+            <p>Cada bloque del <span class="kbd">switch</span> que hoy escriben como código incrustado se convertirá en un <strong>método estático</strong> con firma explícita:</p>
+            <div class="code">// Hoy (monolítico):
+case "2":
+  // 30 líneas de reporte aquí
+  break;
+
+// Unidad 3 (modular):
+case "2":
+  MostrarReporte(registros);
+  break;</div>
+          </div>
+          <div class="card">
+            <h2>Deuda técnica intencional</h2>
+            <p>Si cada bloque de <span class="kbd">case</span> tiene <strong>menos de 20 líneas</strong> y una responsabilidad clara, la refactorización en Unidad 3 será trivial.</p>
+            <p>Si un bloque supera las 40 líneas con lógica entremezclada, la modularización se vuelve una cirugía costosa.</p>
+            <p class="note" style="margin-top:8px;">Escribir código modularizable no requiere funciones todavía; requiere disciplina de responsabilidad única desde el principio.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Preparación para programación modular</span>
+          <span class="counter">14 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · TALLER EN CLASE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Trabajo en clase: construcción guiada</div>
+        <div class="content">
+          <h2>Desarrollo de la Entrega 2 desde el esqueleto</h2>
+          <div class="callout">
+            <p><strong>Punto de partida obligatorio:</strong> El esqueleto base (slide 6) debe estar en su repositorio con un primer commit antes de agregar cualquier lógica.</p>
+          </div>
+          <ul style="margin-top:10px;">
+            <li>Definir la entidad del proyecto propio: ¿Qué registra su sistema? (temperaturas, ventas, velocidades, notas, inventario, otros).</li>
+            <li>Implementar el bloque de registro con doble guardia (formato + dominio) y confirmar con prueba manual de entrada inválida.</li>
+            <li>Implementar el bloque de reporte con al menos tres métricas distintas en un único ciclo <span class="kbd">for</span>.</li>
+            <li>Verificar el comportamiento cuando la colección está vacía: el sistema debe responder con mensaje, no con excepción.</li>
+            <li>Alcance evaluado en esta entrega: solo <span class="kbd">do-while</span>, <span class="kbd">switch</span>, <span class="kbd">List&lt;T&gt;</span>, ciclos y <span class="kbd">TryParse</span> (no se exige modularizar en funciones todavía).</li>
+            <li>Realizar mínimo tres commits semánticamente descriptivos antes de finalizar la sesión.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Construcción incremental y verificada</span>
+          <span class="counter">15 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · CIERRE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Cierre: lo que debe quedar sólido</div>
+        <div class="content">
+          <h2>Criterios de éxito de la Entrega 2</h2>
+          <ul>
+            <li>El sistema sobrevive cualquier entrada del usuario sin colapsar: es la diferencia entre un prototipo y un producto mínimo viable.</li>
+            <li>La colección persiste correctamente entre todas las invocaciones del menú: el alcance de la lista es el contrato de memoria del sistema.</li>
+            <li>Los acumuladores del reporte se reinician en cada invocación: mezclar estado de reporte con estado de datos es el error de arquitectura más costoso en sistemas iterativos.</li>
+            <li>El código está preparado para ser refactorizado en Unidad 3 sin reescribirse: la responsabilidad única por bloque es hoy una decisión de diseño, no una exigencia de sintaxis.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesión 12 · Cierre</span>
+          <span class="counter">16 / 16</span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">◀</button>
+    <button id="btnNext" aria-label="Siguiente">▶</button>
+  </div>
+</div><!-- /deck -->
+
+<script>
+  (function(){
+    const slides   = Array.from(document.querySelectorAll('.slide'));
+    const counters = Array.from(document.querySelectorAll('.counter'));
+    const stage    = document.getElementById('stage');
+    const btnPrev  = document.getElementById('btnPrev');
+    const btnNext  = document.getElementById('btnNext');
+    let idx = 0;
+
+    function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+
+    function show(i){
+      idx = clamp(i,0,slides.length-1);
+      slides.forEach((s,k) => s.classList.toggle('active', k===idx));
+      const label = (idx+1)+" / "+slides.length;
+      counters.forEach(el => el.textContent = label);
+      history.replaceState(null,"","#"+(idx+1));
+    }
+
+    function next(){ show(idx+1); }
+    function prev(){ show(idx-1); }
+
+    const m = (location.hash||"").match(/^#(\d+)$/);
+    if(m){ const s=parseInt(m[1],10); if(!isNaN(s)) idx=clamp(s-1,0,slides.length-1); }
+    show(idx);
+
+    btnPrev.addEventListener('click',prev);
+    btnNext.addEventListener('click',next);
+
+    document.addEventListener('keydown',(e)=>{
+      const k=e.key;
+      if(k==='f'||k==='F'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        return;
+      }
+      if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); next(); }
+      else if(k==='ArrowLeft'||k==='PageUp'){         e.preventDefault(); prev(); }
+      else if(k==='Home'){                             e.preventDefault(); show(0); }
+      else if(k==='End'){                              e.preventDefault(); show(slides.length-1); }
+    });
+
+    const isTouch = ('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    if(isTouch){
+      let x0=null,y0=null,t0=0;
+      const SWIPE_MIN_X=50, SWIPE_MAX_Y=80, SWIPE_MAX_MS=800;
+      stage.addEventListener('touchstart',(e)=>{
+        const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now();
+      },{passive:true});
+      stage.addEventListener('touchend',(e)=>{
+        if(x0===null||y0===null) return;
+        const t=e.changedTouches[0];
+        const dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0;
+        x0=null; y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y) return;
+        if(dx<=-SWIPE_MIN_X) next();
+        else if(dx>=SWIPE_MIN_X) prev();
+      },{passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
