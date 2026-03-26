@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 14: Cierre Unidad 2</title>
+
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+
+      --h1: clamp(30px, 3.4vw, 48px);
+      --h2: clamp(22px, 2.3vw, 34px);
+      --p:  clamp(15px, 1.3vw, 19px);
+      --li: clamp(15px, 1.3vw, 19px);
+
+      --safe-top-cover: clamp(208px, 9vh, 128px);
+      --safe-left-cover: clamp(585px, 5.5vw, 110px);
+      --safe-right-cover: clamp(28px, 3vw, 72px);
+      --safe-bottom-cover: clamp(54px, 6vh, 92px);
+
+      --safe-top: clamp(100px, 9vh, 132px);
+      --safe-side: clamp(66px, 5.5vw, 108px);
+      --safe-bottom: clamp(52px, 6vh, 90px);
+    }
+
+    body{ margin:0; font-family:Arial, Helvetica, sans-serif; background:#ffffff; }
+
+    .deck{
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:clamp(10px,2vw,22px); box-sizing:border-box; background:#ffffff;
+    }
+
+    .stage{
+      width:min(96vw, calc(92vh * (16/9)));
+      aspect-ratio:16/9; position:relative;
+    }
+
+    .slide{
+      position:absolute; inset:0; display:none;
+      box-shadow:0 14px 40px rgba(0,0,0,.35); overflow:hidden;
+    }
+    .slide.active{ display:block; }
+
+    .slide.cover{
+      background:url("./Portada.png") center/cover no-repeat; color:#ffffff;
+    }
+    .slide.content-slide{
+      background: url("./Contenido.png") top left/contain no-repeat, #ffffff;
+      color:var(--texto);
+    }
+
+    .inner{
+      height:100%; box-sizing:border-box;
+      padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+      display:flex; flex-direction:column; gap:clamp(10px,1.1vw,18px);
+    }
+    .cover .inner{
+      padding: var(--safe-top-cover) var(--safe-right-cover)
+               var(--safe-bottom-cover) var(--safe-left-cover);
+    }
+
+    .content{ flex:1; display:flex; flex-direction:column; gap:clamp(10px,1.1vw,16px); min-height:0; }
+
+    .header{
+      color:var(--azul-medio); font-size:clamp(18px,1.6vw,22px);
+      font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    }
+
+    h1{ margin:0; font-size:var(--h1); line-height:1.08; color:var(--texto); }
+    h2{ margin:0; font-size:var(--h2); line-height:1.15; color:var(--azul-medio); }
+
+    p{ margin:0; font-size:var(--p); line-height:1.4; color:var(--texto); }
+    li{ font-size:var(--li); line-height:1.4; color:var(--texto); }
+    ul,ol{ margin:0; padding-left:1.2em; }
+
+    .subtitle{
+      color:var(--turquesa); font-weight:800;
+      font-size:clamp(18px,1.8vw,24px); margin-top:clamp(6px,1vw,10px);
+    }
+
+    .cover h1{ color:#ffffff; }
+    .cover p{ color:#e5edf8; }
+    .cover .subtitle{ color:#f7df00; }
+
+    .note{ color:var(--muted); font-size:clamp(12px,1.05vw,14px); line-height:1.35; }
+
+    .callout{
+      background:rgba(255,255,255,0.94); border-left:6px solid var(--turquesa);
+      padding:clamp(10px,1.1vw,14px); border-radius:6px;
+    }
+
+    .two-col{
+      display:grid; grid-template-columns:1.15fr 0.9fr;
+      gap:clamp(12px,1.6vw,22px); align-items:flex-start; min-height:0;
+    }
+    .equal-col{
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:clamp(12px,1.6vw,22px); align-items:flex-start; min-height:0;
+    }
+    @media(max-width:980px){ .two-col,.equal-col{ grid-template-columns:1fr; } }
+
+    .card{
+      background:rgba(255,255,255,0.96); border:1px solid #dde2f1;
+      border-radius:10px; padding:clamp(10px,1.1vw,14px);
+    }
+
+    .kbd{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      background:#111827; color:#e5e7eb; padding:2px 8px; border-radius:7px;
+      font-size:clamp(11px,1vw,13px); border:1px solid rgba(255,255,255,.08);
+    }
+
+    .code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-size:clamp(12px,1.05vw,14px); line-height:1.35;
+      background:#0b1020; color:#e5e7eb; border-radius:10px;
+      padding:clamp(10px,1.1vw,14px); overflow:auto; max-height:44vh;
+      border:1px solid rgba(17,24,39,.25); white-space:pre-wrap;
+    }
+
+    table{ width:100%; border-collapse:collapse; background:rgba(255,255,255,0.96); }
+    th,td{
+      border:1px solid #dde2f1; padding:clamp(8px,1vw,12px);
+      font-size:clamp(14px,1.2vw,18px); color:var(--texto); vertical-align:top;
+    }
+    th{
+      background:#f3f6fb; text-transform:uppercase;
+      font-size:clamp(12px,1.1vw,14px); letter-spacing:.06em; color:var(--azul-medio);
+    }
+
+    .footer{
+      display:flex; justify-content:space-between; align-items:center;
+      color:var(--muted); font-size:clamp(12px,1.05vw,14px); gap:14px;
+    }
+
+    .counter{ font-weight:800; color:var(--azul-medio); }
+    .cover .counter{ color:#e5edf8; }
+
+    .touch-nav{
+      position:absolute; top:50%; left:0; right:0; transform:translateY(-50%);
+      display:flex; justify-content:space-between; padding:0 12px;
+      pointer-events:none; z-index:10;
+    }
+    .touch-nav button{
+      pointer-events:auto; width:44px; height:44px; border-radius:999px; padding:0;
+      border:1px solid rgba(221,226,241,0.95); background:rgba(255,255,255,0.92);
+      color:var(--texto); font-weight:900; box-shadow:0 10px 22px rgba(0,0,0,.12); cursor:pointer;
+    }
+
+    #touchNav{ opacity:0; transform:translateY(-50%) translateY(6px); transition:.15s ease; }
+    .stage:hover #touchNav{ opacity:1; transform:translateY(-50%) translateY(0); }
+    @media (hover:none){ #touchNav{ opacity:1; transform:translateY(-50%); } }
+  </style>
+</head>
+
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 14</h1>
+          <div class="subtitle">Cierre teorico de Unidad 2: analisis iterativo y simulacro</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px); color:#e5edf8;">
+            Unidad 2 · Ciclos, contadores/acumuladores y estructuras de almacenamiento
+          </p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">
+            Navegacion: ← → · Home / End · F pantalla completa · Tactil: desliza
+          </p>
+        </div>
+        <div class="footer">
+          <span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span>
+          <span class="counter">1 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · PROPOSITO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Proposito de la sesion</div>
+        <div class="content">
+          <h2>Cerrar Unidad 2 sin vacios conceptuales</h2>
+          <ul>
+            <li>Consolidar los cuatro saberes nucleares de la unidad en problemas de analisis y correccion de codigo.</li>
+            <li>Ejercitar prediccion de salida en <span class="kbd">for</span>, <span class="kbd">while</span> y <span class="kbd">do-while</span>.</li>
+            <li>Reforzar seleccion de estructura de almacenamiento segun el problema (<span class="kbd">array</span> vs <span class="kbd">List&lt;T&gt;</span>).</li>
+            <li>Aplicar una actividad evaluativa en clase (Ejercicio B) y separar la correccion extensa de errores (Ejercicio A) en actividad aparte.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesion 14 · Objetivos</span>
+          <span class="counter">2 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · MATRIZ COBERTURA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Matriz de cobertura de la Unidad 2</div>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Saber de Unidad 2</th>
+                <th>Sesiones previas</th>
+                <th>Refuerzo final en Sesion 14</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Ciclos y su utilidad</strong></td>
+                <td>9, 10, 12, 13</td>
+                <td>Prediccion de salida y seleccion del ciclo correcto por caso.</td>
+              </tr>
+              <tr>
+                <td><strong>Contadores y acumuladores</strong></td>
+                <td>10, 12, 13</td>
+                <td>Deteccion de inicializacion incorrecta y reinicio entre iteraciones.</td>
+              </tr>
+              <tr>
+                <td><strong>Operaciones con estructuras de datos</strong></td>
+                <td>11, 12, 13</td>
+                <td>Recorridos, busquedas, max/min y promedios con condiciones seguras.</td>
+              </tr>
+              <tr>
+                <td><strong>Estructuras para almacenamiento</strong></td>
+                <td>11, 12</td>
+                <td>Justificacion tecnica: cuando usar array y cuando usar List&lt;T&gt;.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note" style="margin-top:10px;">Conclusion: no hay saberes faltantes; esta sesion funciona como integracion y verificacion final de dominio.</p>
+        </div>
+        <div class="footer">
+          <span>Control de suficiencia tematica</span>
+          <span class="counter">3 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · REPASO CICLOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Repaso estrategico: cuando usar cada ciclo</div>
+        <div class="content equal-col">
+          <div class="card">
+            <h2>for</h2>
+            <ul>
+              <li>Cuando conoces inicio, fin y paso.</li>
+              <li>Ideal para recorrer arrays y listas por indice.</li>
+              <li>Reduce errores de control cuando el limite es claro.</li>
+            </ul>
+            <div class="code">for (int i = 0; i &lt; datos.Count; i++)
+{
+    suma += datos[i];
+}</div>
+          </div>
+          <div class="card">
+            <h2>while / do-while</h2>
+            <ul>
+              <li><span class="kbd">while</span>: valida antes de entrar.</li>
+              <li><span class="kbd">do-while</span>: ejecuta al menos una vez.</li>
+              <li>Util para menus de aplicacion y validaciones de reintento.</li>
+            </ul>
+            <div class="code">string op;
+do
+{
+    Console.Write("Menu: ");
+    op = Console.ReadLine();
+} while (op != "0");</div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Seleccion correcta de estructura iterativa</span>
+          <span class="counter">4 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · CONTADORES ACUMULADORES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Contadores y acumuladores: errores que mas restan puntos</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Errores frecuentes</h2>
+            <ul>
+              <li>Inicializar acumulador dentro del ciclo (se pierde el historico).</li>
+              <li>No reiniciar variables entre ejecuciones de menu.</li>
+              <li>Incrementar contador en rama equivocada.</li>
+            </ul>
+            <div class="code">// Error: suma se reinicia en cada iteracion
+for (int i = 0; i &lt; n; i++)
+{
+    int suma = 0;
+    suma += datos[i];
+}</div>
+          </div>
+          <div class="card">
+            <h2>Patron correcto</h2>
+            <div class="code">int contador = 0;
+double suma = 0;
+
+for (int i = 0; i &lt; datos.Count; i++)
+{
+    if (datos[i] &gt;= 0)
+    {
+        contador++;
+        suma += datos[i];
+    }
+}</div>
+            <p class="note" style="margin-top:8px;">Regla: inicializar fuera del ciclo, actualizar dentro del ciclo, usar al final.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Control de estado iterativo</span>
+          <span class="counter">5 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · ARRAY VS LIST -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Estructuras de almacenamiento: decision tecnica</div>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>Array</th>
+                <th>List&lt;T&gt;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tamano</td>
+                <td>Fijo al crear</td>
+                <td>Dinamico (crece/disminuye)</td>
+              </tr>
+              <tr>
+                <td>Uso recomendado</td>
+                <td>Cuando N es conocido y estable</td>
+                <td>Cuando N depende de entradas de usuario</td>
+              </tr>
+              <tr>
+                <td>Operacion tipica</td>
+                <td>Recorrido por indice</td>
+                <td>Add, Remove, Count y recorrido</td>
+              </tr>
+              <tr>
+                <td>Riesgo comun</td>
+                <td>Desborde por limite mal calculado</td>
+                <td>Asumir elementos sin validar Count</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top:10px;">
+            <p><strong>Decision para la prueba:</strong> si el enunciado habla de cantidad variable de registros, la opcion natural es <span class="kbd">List&lt;T&gt;</span>.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Tipos y utilidad de almacenamiento</span>
+          <span class="counter">6 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · OPERACIONES DATOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Operaciones con estructuras de datos en Unidad 2</div>
+        <div class="content equal-col">
+          <div class="card">
+            <h2>Operaciones obligatorias</h2>
+            <ul>
+              <li>Registrar datos.</li>
+              <li>Recorrer y acumular.</li>
+              <li>Buscar maximo y minimo.</li>
+              <li>Calcular promedio con validacion de vacio.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Esqueleto robusto</h2>
+            <div class="code">if (datos.Count == 0)
+{
+    Console.WriteLine("Sin datos");
+}
+else
+{
+    double suma = 0;
+    double max = datos[0];
+    double min = datos[0];
+
+    for (int i = 0; i &lt; datos.Count; i++)
+    {
+        suma += datos[i];
+        if (datos[i] &gt; max) max = datos[i];
+        if (datos[i] &lt; min) min = datos[i];
+    }
+}</div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Procesamiento de colecciones sin fallos</span>
+          <span class="counter">7 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · ANALISIS 1 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis de codigo 1: predice la salida</div>
+        <div class="content">
+          <div class="code">int suma = 0;
+for (int i = 1; i &lt;= 4; i++)
+{
+    suma += i;
+}
+Console.WriteLine(suma);
+
+int c = 0;
+while (c &lt; 3)
+{
+    Console.Write(c + " ");
+    c++;
+}</div>
+          <div class="callout" style="margin-top:10px;">
+            <p><strong>Respuesta esperada:</strong> primera linea = <span class="kbd">10</span>. Segunda salida = <span class="kbd">0 1 2</span>. Explica por que el while no imprime 3.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>For y while: trazabilidad mental</span>
+          <span class="counter">8 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · ANALISIS 2 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis de codigo 2: detecta errores logicos</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Fragmento con fallas</h2>
+            <div class="code">List&lt;double&gt; notas = new List&lt;double&gt;();
+string op;
+
+do
+{
+    Console.Write("Nota: ");
+    double n = double.Parse(Console.ReadLine());
+    notas.Add(n);
+
+    Console.Write("Continuar? (s/n): ");
+    op = Console.ReadLine();
+
+} while (op == "s");
+
+double prom = 0;
+for (int i = 0; i &lt;= notas.Count; i++)
+    prom += notas[i];
+
+Console.WriteLine(prom / notas.Count);</div>
+          </div>
+          <div class="card">
+            <h2>Hallazgos esperados</h2>
+            <ul>
+              <li><span class="kbd">Parse</span> sin validacion.</li>
+              <li>Condicion <span class="kbd">i &lt;= notas.Count</span> provoca desborde.</li>
+              <li>Falta guardia cuando la lista esta vacia.</li>
+              <li>No hay validacion de rango de nota.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Deteccion de errores por inspeccion</span>
+          <span class="counter">9 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · ANALISIS 3 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis de codigo 3: seleccion de estructura</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Situacion</h2>
+            <p>Debes registrar ventas del dia. No conoces cuantas ventas habra. Se pide total, promedio y mayor venta.</p>
+            <p style="margin-top:10px;">Pregunta: ¿array o <span class="kbd">List&lt;double&gt;</span>?</p>
+          </div>
+          <div class="card">
+            <h2>Justificacion esperada</h2>
+            <ul>
+              <li>Como N es desconocido, conviene <span class="kbd">List&lt;double&gt;</span>.</li>
+              <li>Permite <span class="kbd">Add</span> por cada venta sin redimension manual.</li>
+              <li>Para pruebas con N fijo conocido, array tambien es valido.</li>
+            </ul>
+            <p class="note" style="margin-top:8px;">Este criterio evalua el saber de utilidad de estructuras, no solo sintaxis.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Criterio de eleccion de almacenamiento</span>
+          <span class="counter">10 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · ACTIVIDAD EVALUATIVA EN CLASE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Actividad evaluativa en clase (Ejercicio B)</div>
+        <div class="content">
+          <h2>Condiciones</h2>
+          <ul>
+            <li>Duracion: 35 minutos.</li>
+            <li>Formato: 2 ejercicios de codigo + 1 pregunta de justificacion tecnica.</li>
+            <li>Trabajo individual, con VS Code y depurador habilitado.</li>
+            <li>Entrega: commit local + evidencia de ejecucion en clase.</li>
+          </ul>
+          <div class="callout" style="margin-top:10px;">
+            <p>Esta actividad es evaluativa y aporta evidencia directa del dominio de Unidad 2.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Evaluacion en clase</span>
+          <span class="counter">11 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · EJERCICIO A APARTE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Ejercicio A (aparte): correccion extensa de errores</div>
+        <div class="content">
+          <h2>Actividad independiente de deteccion y correccion</h2>
+          <p>El Ejercicio A se trabaja en una pagina separada con:</p>
+          <ul>
+            <li>Un codigo grande con minimo 12 errores (sintaxis, ejecucion y logica).</li>
+            <li>Registro de cantidad de errores encontrados y justificacion de cada correccion.</li>
+            
+          </ul>
+          <div class="callout">
+            <p>Abre la actividad en: <span class="kbd">sesiones/ejercicioA_unidad2.html</span></p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Correccion de errores (actividad aparte)</span>
+          <span class="counter">12 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · EJERCICIO B -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Actividad en clase - Ejercicio B (evaluativo)</div>
+        <div class="content">
+          <h2>Negocio: minimercado de barrio con menu iterativo</h2>
+          <div class="code">Contexto de negocio:
+Eres el desarrollador del sistema de caja de un minimercado.
+Debes construir un menu para registrar ventas del dia y generar reportes.
+
+Requisitos:
+1) Menu do-while con opciones:
+   1. Registrar venta (nombre producto + cantidad + valor unitario)
+   2. Mostrar reporte del dia
+      - total vendido
+      - promedio por venta
+      - venta de mayor valor
+      - cantidad de ventas registradas
+   0. Salir
+2) Almacenamiento en List&lt;double&gt; para valores de venta.
+3) Validar entradas numericas con TryParse (cantidad y valor unitario).
+4) Si no hay ventas, el reporte debe mostrar advertencia y no fallar.
+5) Incluir al menos un acumulador y un contador bien inicializados.
+6) Usar nombres de variables claros y mensajes orientados al negocio.</div>
+          <p class="note">Criterio de logro: funcionalidad completa del menu de negocio + ausencia de excepciones por entrada invalida o lista vacia.</p>
+        </div>
+        <div class="footer">
+          <span>Integracion de todos los saberes U2</span>
+          <span class="counter">13 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · RUBRICA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Autoevaluacion rapida de suficiencia</div>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>Si</th>
+                <th>No</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Selecciono correctamente entre for, while y do-while segun el enunciado.</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Uso contadores y acumuladores sin errores de inicializacion o reinicio.</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Recorro arrays o listas sin off-by-one.</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Implemento validaciones para entradas invalidas y coleccion vacia.</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Justifico tecnicamente cuando usar array y cuando usar List&lt;T&gt;.</td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Checklist previo a evaluacion</span>
+          <span class="counter">14 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · CIERRE TEMATICO U2 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Cierre tematico de Unidad 2</div>
+        <div class="content two-col">
+          <div class="card">
+            <h2>Resultado de cobertura</h2>
+            <ul>
+              <li><strong>Ciclos:</strong> cubiertos y verificados en analisis de salida.</li>
+              <li><strong>Contadores/acumuladores:</strong> reforzados con correccion de errores.</li>
+              <li><strong>Operaciones con estructuras:</strong> practicadas en actividad evaluativa de negocio.</li>
+              <li><strong>Estructuras de almacenamiento:</strong> criterio de eleccion explicitado.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Decisiones para la semana adicional</h2>
+            <ul>
+              <li>Mantener practica de depuracion con casos frontera.</li>
+              <li>Enfocar evaluacion en correctitud + robustez.</li>
+              <li>No introducir temas nuevos; solo evidenciar dominio.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Unidad 2 sin vacios pendientes</span>
+          <span class="counter">15 / 16</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · TRANSICION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Transicion a Unidad 3</div>
+        <div class="content">
+          <h2>Lo que sigue despues de evaluar Unidad 2</h2>
+          <ul>
+            <li>El codigo iterativo construido se convertira en materia prima de refactorizacion modular.</li>
+            <li>En Unidad 3 se separara el codigo en funciones con responsabilidad unica.</li>
+            <li>La calidad lograda hoy en ciclos, validacion y estructuras facilitara ese salto.</li>
+          </ul>
+          <p class="note" style="margin-top:12px;">Sesion 14 cierra el bloque teorico de Unidad 2. Las tareas y evaluaciones se gestionan en paralelo/semana adicional segun planeacion.</p>
+        </div>
+        <div class="footer">
+          <span>Sesion 14 · Cierre</span>
+          <span class="counter">16 / 16</span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">◀</button>
+    <button id="btnNext" aria-label="Siguiente">▶</button>
+  </div>
+</div><!-- /deck -->
+
+<script>
+  (function(){
+    const slides   = Array.from(document.querySelectorAll('.slide'));
+    const counters = Array.from(document.querySelectorAll('.counter'));
+    const stage    = document.getElementById('stage');
+    const btnPrev  = document.getElementById('btnPrev');
+    const btnNext  = document.getElementById('btnNext');
+    let idx = 0;
+
+    function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+
+    function show(i){
+      idx = clamp(i,0,slides.length-1);
+      slides.forEach((s,k) => s.classList.toggle('active', k===idx));
+      const label = (idx+1)+" / "+slides.length;
+      counters.forEach(el => el.textContent = label);
+      history.replaceState(null,"","#"+(idx+1));
+    }
+
+    function next(){ show(idx+1); }
+    function prev(){ show(idx-1); }
+
+    const m = (location.hash||"").match(/^#(\d+)$/);
+    if(m){ const s=parseInt(m[1],10); if(!isNaN(s)) idx=clamp(s-1,0,slides.length-1); }
+    show(idx);
+
+    btnPrev.addEventListener('click',prev);
+    btnNext.addEventListener('click',next);
+
+    document.addEventListener('keydown',(e)=>{
+      const k=e.key;
+      if(k==='f'||k==='F'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        return;
+      }
+      if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); next(); }
+      else if(k==='ArrowLeft'||k==='PageUp'){         e.preventDefault(); prev(); }
+      else if(k==='Home'){                             e.preventDefault(); show(0); }
+      else if(k==='End'){                              e.preventDefault(); show(slides.length-1); }
+    });
+
+    const isTouch = ('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    if(isTouch){
+      let x0=null,y0=null,t0=0;
+      const SWIPE_MIN_X=50, SWIPE_MAX_Y=80, SWIPE_MAX_MS=800;
+      stage.addEventListener('touchstart',(e)=>{
+        const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now();
+      },{passive:true});
+      stage.addEventListener('touchend',(e)=>{
+        if(x0===null||y0===null) return;
+        const t=e.changedTouches[0];
+        const dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0;
+        x0=null; y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y) return;
+        if(dx<=-SWIPE_MIN_X) next();
+        else if(dx>=SWIPE_MIN_X) prev();
+      },{passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
