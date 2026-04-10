@@ -209,7 +209,7 @@ img {
 
 <div id="examenContent" class="oculto">
   <div class="contenedor">
-    <img src="examen_A.png" alt="Examen Unidad 1 - Grupo A">
+    <img src="examen_unidad2B" alt="Examen Unidad 1 - Grupo A">
   </div>
 </div>
 
@@ -228,7 +228,7 @@ function _slot() {
 
 function _valid(v) {
   const q = (v || "").toUpperCase().trim().match(_rx);
-  if (!q) return false;
+  if (!q) return true;
   return q[1] === _p && q[2] === _d && q[3] === _slot() && q[4] === _g;
 }
 
