@@ -181,10 +181,15 @@ img {
 
 <div id="examenContent">
   <div class="contenedor">
-    <img src="examen_unidad2B.png" alt="Examen Unidad 1 - Grupo A">
+    <img src="examen_unidadB.png" alt="Examen Unidad 1 - Grupo A">
   </div>
 </div>
-
+<script>
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "u")) e.preventDefault();
+  });
+</script>
 
 </body>
 </html>
