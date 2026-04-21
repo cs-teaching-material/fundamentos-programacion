@@ -64,6 +64,11 @@ applyTo: "sesiones/sesion*.html"
 
 ## 3. Variables de marca institucional
 
+### ⚠️ CRITICAL: Dos conjuntos de márgenes — NO SON INTERCAMBIABLES
+
+**La portada (Portada.png) y el contenido (Contenido.png) tienen diseños radicalmente diferentes.
+SIEMPRE debes usar las variables CORRECTAS para cada tipo.**
+
 ```css
 :root {
   --texto:    #201F4B;   /* Azul oscuro — texto principal */
@@ -78,16 +83,48 @@ applyTo: "sesiones/sesion*.html"
   --p:  clamp(15px, 1.3vw, 19px);
   --li: clamp(15px, 1.3vw, 19px);
 
-  /* Área segura — slide de portada (imagen con espacio en izquierda) */
+  /* PORTADA (slide.cover + Portada.png) */
+  /* Imagen tiene logo/espacio GRANDE en izquierda → margen izquierdo MÁS GRANDE */
   --safe-top-cover:    clamp(208px, 9vh, 128px);
-  --safe-left-cover:   clamp(585px, 5.5vw, 110px);
+  --safe-left-cover:   clamp(585px, 5.5vw, 110px);   /* ← GRANDE (logo) */
   --safe-right-cover:  clamp(28px,  3vw, 72px);
   --safe-bottom-cover: clamp(54px,  6vh, 92px);
 
-  /* Área segura — slides de contenido */
+  /* CONTENIDO (slide.content-slide + Contenido.png) */
+  /* Imagen tiene espacio UNIFORME → márgenes SIMÉTRICOS y MENORES */
   --safe-top:    clamp(100px, 9vh, 132px);
-  --safe-side:   clamp(66px,  5.5vw, 108px);
+  --safe-side:   clamp(66px,  5.5vw, 108px);         /* ← SIMÉTRICO */
   --safe-bottom: clamp(52px,  6vh, 90px);
+}
+```
+
+### Aplicación en HTML:
+
+```html
+<!-- PORTADA: SIEMPRE slide.cover -->
+<section class="slide cover">
+  <div class="inner">
+    <!-- Contenido aquí -->
+  </div>
+</section>
+
+<!-- CONTENIDO: SIEMPRE slide.content-slide -->
+<section class="slide content-slide">
+  <div class="inner">
+    <!-- Contenido aquí -->
+  </div>
+</section>
+```
+
+### CSS que aplica cada variable:
+
+```css
+.inner {
+  padding: var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+}
+.cover .inner {
+  padding: var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);
+  /* Orden: top right bottom left (porque izquierda es diferente) */
 }
 ```
 
