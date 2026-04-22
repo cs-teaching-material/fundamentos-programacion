@@ -15,8 +15,8 @@
       --h2:clamp(22px,2.3vw,34px);
       --p:clamp(15px,1.3vw,19px);
       --li:clamp(15px,1.3vw,19px);
-      --safe-top-cover:clamp(128px,9vh,208px);
-      --safe-left-cover:clamp(110px,5.5vw,585px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
       --safe-right-cover:clamp(28px,3vw,72px);
       --safe-bottom-cover:clamp(54px,6vh,92px);
       --safe-top:clamp(100px,9vh,132px);
@@ -317,12 +317,13 @@
         <div class="content">
           <h2>Al terminar esta sesion puedes...</h2>
           <ul>
-            <li>Tomar un problema de comercio y dividirlo en subproblemas claros.</li>
-            <li>Diseñar una jerarquia de funciones con niveles y responsabilidades definidas.</li>
-            <li>Identificar funciones de entrada/salida, calculo y coordinacion.</li>
-            <li>Proponer firmas coherentes para cada funcion del arbol.</li>
-            <li>Preparar un esqueleto modular listo para ser implementado en C#.</li>
+            <li>Explicar por que programar no es solo escribir codigo, sino modelar una solucion paso a paso.</li>
+            <li>Tomar un problema de comercio y dividirlo en subproblemas pequenos, claros y verificables.</li>
+            <li>Diseñar una jerarquia de funciones con niveles y responsabilidades bien separadas.</li>
+            <li>Diferenciar funciones de entrada/salida, de proceso y de coordinacion.</li>
+            <li>Proponer firmas coherentes como contratos entre partes del programa.</li>
           </ul>
+          <p class="note">C# es la herramienta de implementacion, pero el objetivo central es desarrollar pensamiento de programacion transferible a cualquier lenguaje.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Proposito</span>
@@ -351,11 +352,13 @@
               <h2>Lo que agregamos hoy</h2>
               <ul>
                 <li>Tomar un problema grande de comercio (ventas y descuentos).</li>
-                <li>Descomponerlo en subproblemas relacionados.</li>
-                <li>Diseñar un arbol de funciones para resolverlo paso a paso.</li>
+                <li>Descomponerlo en subproblemas relacionados y ordenados por nivel de abstraccion.</li>
+                <li>Diseñar un arbol de funciones para resolverlo paso a paso sin mezclar responsabilidades.</li>
+                <li>Rastrear como viajan los datos entre funciones (flujo de informacion).</li>
               </ul>
             </div>
           </div>
+          <p class="note">La meta es razonar la arquitectura de la solucion antes de programar detalles.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Conexion</span>
@@ -373,15 +376,17 @@
           <div class="two-col">
             <div class="card">
               <h2>Idea clave</h2>
-              <p>Descomponer es tomar un problema grande y separarlo en tareas mas pequenas que se puedan resolver con funciones.</p>
+              <p>Descomponer es convertir una meta general en decisiones pequenas que el programa pueda ejecutar en orden.</p>
               <ul style="margin-top:8px;">
                 <li>Cada subproblema responde una pregunta concreta.</li>
                 <li>Las funciones nacen de esas preguntas.</li>
                 <li>Un buen diseño reduce las dependencias entre subproblemas.</li>
+                <li>Mientras mas claro sea cada bloque, mas facil sera probar y corregir errores.</li>
               </ul>
             </div>
             <div class="callout">
               <p><strong>Regla practica:</strong> si una funcion responde a mas de una pregunta importante del enunciado, probablemente debe dividirse en varias funciones.</p>
+              <p style="margin-top:8px;"><strong>Criterio de calidad:</strong> una funcion bien definida tiene un objetivo unico, entradas claras y una salida comprensible.</p>
             </div>
           </div>
         </div>
@@ -403,7 +408,7 @@
               <tr>
                 <th>Nivel</th>
                 <th>Ejemplo</th>
-                <th>Responsabilidad</th>
+                <th>Responsabilidad de programacion</th>
               </tr>
             </thead>
             <tbody>
@@ -415,20 +420,21 @@
               <tr>
                 <td>1 &mdash; Alto nivel</td>
                 <td><span class="kbd">RegistrarVenta</span>, <span class="kbd">ProcesarPedido</span></td>
-                <td>Agrupar pasos principales: entrada, calculo y salida de un proceso de comercio.</td>
+                <td>Traducir el problema al flujo principal: entrada, proceso y salida.</td>
               </tr>
               <tr>
                 <td>2 &mdash; Calculo</td>
                 <td><span class="kbd">CalcularSubtotal</span>, <span class="kbd">CalcularIVA</span>, <span class="kbd">CalcularDescuento</span></td>
-                <td>Realizar operaciones numericas concretas con datos ya validados.</td>
+                <td>Aplicar reglas de negocio concretas sobre datos ya validados.</td>
               </tr>
               <tr>
                 <td>3 &mdash; Helpers</td>
                 <td><span class="kbd">EsMayorista</span>, <span class="kbd">ValidarCantidad</span></td>
-                <td>Resolver decisiones simples o validaciones especificas.</td>
+                <td>Resolver decisiones simples y reusable helpers que reducen repeticion.</td>
               </tr>
             </tbody>
           </table>
+          <p class="note">Esta organizacion mejora la abstraccion: cada nivel se concentra en una escala distinta del problema.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Niveles</span>
@@ -477,7 +483,7 @@
             <rect x="240" y="160" width="80" height="30" rx="6" fill="#f3f6fb" stroke="#dde2f1"></rect>
             <text x="280" y="179" text-anchor="middle" fill="#201F4B" font-family="Arial" font-size="10">CalcularIVA</text>
           </svg>
-          <p class="note">Cada flecha indica una llamada de una funcion a otra. Las funciones de abajo no deberian saber detalles de la interfaz de usuario.</p>
+          <p class="note">Cada flecha indica una llamada de una funcion a otra. Las funciones de abajo no deberian saber detalles de la interfaz de usuario. Asi se protege el nucleo logico del programa.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Jerarquia</span>
@@ -500,10 +506,12 @@
                 <li><span class="kbd">CalcularTotales</span> delega calculos a funciones de nivel 2.</li>
                 <li><span class="kbd">IngresarPedido</span> y <span class="kbd">MostrarResumen</span> se encargan de la interfaz de consola.</li>
                 <li>Las funciones de calculo no dependen de <span class="kbd">Console</span>.</li>
+                <li>El resultado de una funcion se convierte en entrada de otra (encadenamiento de datos).</li>
               </ul>
             </div>
             <div class="callout-warn">
               <p><strong>Advertencia:</strong> si una funcion conoce demasiados detalles de otras capas (por ejemplo, leer y escribir en consola y ademas calcular), la jerarquia se debilita y el programa se vuelve dificil de mantener.</p>
+              <p style="margin-top:8px;"><strong>Traduccion conceptual:</strong> baja cohesion + alto acoplamiento = codigo fragil.</p>
             </div>
           </div>
         </div>
@@ -530,12 +538,13 @@
           </div>
           <div class="step callout">
             <strong>Paso 3:</strong>
-            Proponer nombres de funciones para cada grupo, indicando parametros y retorno.
+            Proponer nombres de funciones para cada grupo, indicando parametros, retorno y que datos consume/produce.
           </div>
           <div class="step callout">
             <strong>Paso 4:</strong>
-            Dibujar el arbol de llamadas: quien llama a quien y en que orden.
+            Dibujar el arbol de llamadas: quien llama a quien, en que orden y en que momento se transforma cada dato.
           </div>
+          <p class="note">Este patron tambien sirve para problemas de inventario, nomina, reservas o cualquier dominio de software.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Patron</span>
@@ -560,7 +569,7 @@
               <li>Mostrar un resumen claro de la venta.</li>
             </ul>
           </div>
-          <p class="note">Por ahora nos enfocamos en descomponer el problema, no en escribir todos los cuerpos de las funciones.</p>
+          <p class="note">Por ahora nos enfocamos en el diseño de la solucion: que hace cada parte, como se conecta y que datos intercambia.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Practica 1</span>
@@ -581,6 +590,7 @@
                 <th>Fragmento del enunciado</th>
                 <th>Verbo clave</th>
                 <th>Posible funcion</th>
+                <th>Tipo de tarea</th>
               </tr>
             </thead>
             <tbody>
@@ -588,29 +598,35 @@
                 <td>Leer producto, cantidad y precio unitario</td>
                 <td>Leer</td>
                 <td><span class="kbd">IngresarPedido</span></td>
+                <td>Entrada</td>
               </tr>
               <tr>
                 <td>Calcular subtotal de la venta</td>
                 <td>Calcular</td>
                 <td><span class="kbd">CalcularSubtotal</span></td>
+                <td>Proceso</td>
               </tr>
               <tr>
                 <td>Aplicar descuento por cantidad</td>
                 <td>Aplicar</td>
                 <td><span class="kbd">CalcularDescuento</span></td>
+                <td>Proceso</td>
               </tr>
               <tr>
                 <td>Calcular IVA y total a pagar</td>
                 <td>Calcular</td>
                 <td><span class="kbd">CalcularIVA</span>, <span class="kbd">CalcularTotal</span></td>
+                <td>Proceso</td>
               </tr>
               <tr>
                 <td>Mostrar un resumen claro de la venta</td>
                 <td>Mostrar</td>
                 <td><span class="kbd">MostrarResumen</span></td>
+                <td>Salida</td>
               </tr>
             </tbody>
           </table>
+          <p class="note">Clasificar por tipo de tarea ayuda a prevenir mezclas innecesarias dentro de una sola funcion.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Subproblemas</span>
@@ -651,6 +667,7 @@
                   </ul>
                 </li>
                 <li>Las funciones de calculo no deben leer ni escribir en consola.</li>
+                <li>Cada salida intermedia (subtotal, descuento, iva) debe tener un destino claro en el flujo.</li>
               </ul>
             </div>
           </div>
@@ -691,7 +708,7 @@
     <span class="fn">RegistrarVenta</span>();
 }
           </div>
-          <p class="note">En clase se pueden ir completando los cuerpos a partir de esta jerarquia.</p>
+          <p class="note">Las firmas representan contratos: antes de codificar el cuerpo, define con precision entradas, salidas y responsabilidad.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Esqueleto</span>
@@ -731,6 +748,7 @@
           </div>
           <div class="callout-warn" style="margin-top:8px;">
             <p><strong>Problemas:</strong> mezcla entrada, calculos y salida; no se puede reutilizar facilmente y es dificil de probar por partes.</p>
+            <p style="margin-top:8px;"><strong>Efecto en fundamentos:</strong> cuando no hay descomposicion, se pierde trazabilidad logica y aumenta el riesgo de errores ocultos.</p>
           </div>
         </div>
         <div class="footer">
@@ -846,8 +864,8 @@
             </thead>
             <tbody>
               <tr>
-                <td>Compilacion</td>
-                <td>El proyecto se compila y ejecuta sin errores de sintaxis.</td>
+                <td>Correccion logica</td>
+                <td>La descomposicion responde de forma coherente al problema planteado.</td>
                 <td>20%</td>
               </tr>
               <tr>
@@ -867,11 +885,12 @@
               </tr>
               <tr>
                 <td>Documentacion</td>
-                <td>README con explicacion del arbol de funciones y breve descripcion del sistema.</td>
+                <td>README con explicacion del arbol de funciones, flujo de datos y decisiones de diseño.</td>
                 <td>10%</td>
               </tr>
             </tbody>
           </table>
+          <p class="note">El lenguaje importa para implementar, pero la evaluacion prioriza el razonamiento de programacion y el diseño modular.</p>
         </div>
         <div class="footer">
           <span>Sesion 18 &middot; Evaluacion</span>
@@ -937,7 +956,7 @@
               <ul>
                 <li>Una estrategia para descomponer problemas de comercio.</li>
                 <li>Una jerarquia de funciones clara con niveles 0 a 3.</li>
-                <li>Un esqueleto modular listo para implementarse en C#.</li>
+                <li>Un marco de pensamiento aplicable a C# y a cualquier otro lenguaje.</li>
               </ul>
             </div>
             <div class="card">

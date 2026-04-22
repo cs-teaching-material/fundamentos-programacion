@@ -1,0 +1,1085 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 16_1</title>
+  <style>
+    :root{
+      --texto:#201F4B; --azul-medio:#015583; --turquesa:#05ADBC;
+      --muted:#6b7280; --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px); --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px); --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{ margin:0; font-family:Arial,Helvetica,sans-serif; background:#fff; }
+    .deck{ min-height:100vh; display:flex; align-items:center; justify-content:center;
+           padding:clamp(10px,2vw,22px); box-sizing:border-box; background:#fff; }
+    .stage{ width:min(96vw,calc(92vh*(16/9))); aspect-ratio:16/9; position:relative; }
+    .slide{ position:absolute; inset:0; display:none;
+            box-shadow:0 14px 40px rgba(0,0,0,.35); overflow:hidden; }
+    .slide.active{ display:block; }
+    .slide.cover{ background:url("./Portada.png") center/cover no-repeat; color:#fff; }
+    .slide.content-slide{
+      background:url("./Contenido.png") top left/contain no-repeat, #fff;
+      color:var(--texto);
+    }
+    .inner{ height:100%; box-sizing:border-box;
+            padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+            display:flex; flex-direction:column; gap:clamp(10px,1.1vw,18px); }
+    .cover .inner{
+      padding:var(--safe-top-cover) var(--safe-right-cover)
+              var(--safe-bottom-cover) var(--safe-left-cover);
+    }
+    .content{ flex:1; display:flex; flex-direction:column;
+              gap:clamp(10px,1.1vw,16px); min-height:0; }
+    .header{ color:var(--azul-medio); font-size:clamp(18px,1.6vw,22px);
+             font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    h1{ margin:0; font-size:var(--h1); line-height:1.08; color:var(--texto); }
+    h2{ margin:0; font-size:var(--h2); line-height:1.15; color:var(--azul-medio); }
+    p{ margin:0; font-size:var(--p); line-height:1.4; color:var(--texto); }
+    li{ font-size:var(--li); line-height:1.4; color:var(--texto); }
+    ul,ol{ margin:0; padding-left:1.2em; }
+    .subtitle{ color:var(--turquesa); font-weight:800;
+               font-size:clamp(18px,1.8vw,24px); margin-top:clamp(6px,1vw,10px); }
+    .cover h1{ color:#fff; }
+    .cover p{ color:#e5edf8; }
+    .cover .subtitle{ color:#f7df00; }
+    .note{ color:var(--muted); font-size:clamp(12px,1.05vw,14px); line-height:1.35; }
+    .callout{ background:rgba(255,255,255,0.94); border-left:6px solid var(--turquesa);
+              padding:clamp(10px,1.1vw,14px); border-radius:6px; }
+    .callout-warn{ background:#fff8f0; border-left:6px solid #f59e0b;
+                   padding:clamp(10px,1.1vw,14px); border-radius:6px; }
+    .two-col{ display:grid; grid-template-columns:1.15fr 0.9fr;
+              gap:clamp(12px,1.6vw,22px); align-items:flex-start; min-height:0; }
+    .equal-col{ display:grid; grid-template-columns:1fr 1fr;
+                gap:clamp(12px,1.6vw,22px); align-items:flex-start; min-height:0; }
+    .flow-list{ display:grid; grid-template-columns:repeat(5,1fr);
+          gap:clamp(8px,1.1vw,14px); align-items:stretch; }
+    .flow-step{ background:rgba(255,255,255,0.97); border:1px solid #dbe4f4;
+          border-radius:10px; padding:clamp(8px,1vw,12px); }
+    .flow-step h3{ margin:0 0 6px 0; color:var(--azul-medio);
+             font-size:clamp(13px,1.2vw,16px); }
+    .flow-step p{ font-size:clamp(12px,1.05vw,14px); line-height:1.35; }
+    .card{ background:rgba(255,255,255,0.96); border:1px solid #dde2f1;
+           border-radius:10px; padding:clamp(10px,1.1vw,14px); }
+    .kbd{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+          background:#111827; color:#e5e7eb; padding:2px 8px; border-radius:7px;
+          font-size:clamp(11px,1vw,13px); border:1px solid rgba(255,255,255,.08); }
+    .code{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+           font-size:clamp(12px,1.05vw,14px); line-height:1.35;
+           background:#0b1020; color:#e5e7eb; border-radius:10px;
+           padding:clamp(10px,1.1vw,14px); overflow:auto; max-height:44vh;
+           border:1px solid rgba(17,24,39,.25); white-space:pre-wrap; }
+    .kw{ color:#7dd3fc; }
+    .ty{ color:#86efac; }
+    .fn{ color:#fde68a; }
+    .cm{ color:#6b7280; font-style:italic; }
+    .st{ color:#f9a8d4; }
+    .xml{ color:#a5b4fc; }
+    table{ width:100%; border-collapse:collapse; background:rgba(255,255,255,0.96); }
+    th,td{ border:1px solid #dde2f1; padding:clamp(8px,1vw,12px);
+           font-size:clamp(13px,1.2vw,16px); color:var(--texto); vertical-align:top; }
+    th{ background:#f3f6fb; text-transform:uppercase;
+        font-size:clamp(11px,1.1vw,13px); letter-spacing:.06em; color:var(--azul-medio); }
+    .footer{ display:flex; justify-content:space-between; align-items:center;
+             color:var(--muted); font-size:clamp(12px,1.05vw,14px); gap:14px; }
+    .counter{ font-weight:800; color:var(--azul-medio); }
+    .cover .counter{ color:#e5edf8; }
+    /* stack de llamadas animado */
+    @keyframes slideIn{
+      from{ opacity:0; transform:translateX(-18px); }
+      to  { opacity:1; transform:translateX(0); }
+    }
+    .frame-item{ animation:slideIn .35s ease forwards; border-radius:8px;
+                 padding:8px 16px; text-align:center; font-family:monospace;
+                 font-size:clamp(12px,1.1vw,15px); color:#fff; }
+    /* fadeUp steps */
+    @keyframes fadeUp{
+      from{ opacity:0; transform:translateY(10px); }
+      to  { opacity:1; transform:translateY(0); }
+    }
+    .step{ opacity:0; animation:fadeUp .45s ease forwards; }
+    .step:nth-child(1){ animation-delay:.2s; }
+    .step:nth-child(2){ animation-delay:.65s; }
+    .step:nth-child(3){ animation-delay:1.1s; }
+    .step:nth-child(4){ animation-delay:1.55s; }
+    /* touch nav */
+    .touch-nav{ position:absolute; top:50%; left:0; right:0;
+                transform:translateY(-50%); display:flex;
+                justify-content:space-between; padding:0 12px;
+                pointer-events:none; z-index:10; }
+    .touch-nav button{ pointer-events:auto; width:44px; height:44px;
+      border-radius:999px; padding:0; border:1px solid rgba(221,226,241,.95);
+      background:rgba(255,255,255,.92); color:var(--texto); font-weight:900;
+      box-shadow:0 10px 22px rgba(0,0,0,.12); cursor:pointer; }
+    #touchNav{ opacity:0; transform:translateY(-50%) translateY(6px); transition:.15s ease; }
+    .stage:hover #touchNav{ opacity:1; transform:translateY(-50%) translateY(0); }
+    @media(max-width:980px){
+      .two-col,.equal-col,.flow-list{ grid-template-columns:1fr; }
+      .code{ max-height:36vh; }
+    }
+    @media(hover:none){ #touchNav{ opacity:1; transform:translateY(-50%); } }
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 16_1</h1>
+          <div class="subtitle">Sesion 16: firma, parametros, retorno y separacion UI/logica</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">
+            Unidad 3 &middot; Programacion modular en C#
+          </p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">
+            Navegacion: &#8592; &#8594; &middot; Home / End &middot; F pantalla completa &middot; Tactil: desliza
+          </p>
+        </div>
+        <div class="footer">
+          <span style="color:#e5edf8;">Logica de Programacion &middot; Grupos 810 / 811</span>
+          <span class="counter">1 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · PROPOSITO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Proposito de la sesion</div>
+        <div class="content">
+          <h2>Al terminar esta sesion puedes...</h2>
+          <ul>
+            <li>Decidir que datos deben llegar como parametros y que debe retornar la funcion.</li>
+            <li>Distinguir entre paso por valor y paso por referencia (<span class="kbd">ref</span> / <span class="kbd">out</span>).</li>
+            <li>Documentar funciones con comentarios XML (<span class="kbd">/// &lt;summary&gt;</span>).</li>
+            <li>Escribir funciones que llaman otras funciones (composicion simple).</li>
+            <li>Leer el tooltip de IntelliSense generado por la documentacion XML en VS Code.</li>
+          </ul>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Proposito</span>
+          <span class="counter">2 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · CONEXION S15 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Conexion con sesion 15</div>
+        <div class="content">
+          <h2>Lo que traemos de la sesion anterior</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Ya sabemos</h2>
+              <ul>
+                <li>Leer y escribir la firma basica de una funcion.</li>
+                <li>Aplicar DRY: extraer logica repetida a una funcion.</li>
+                <li>Separar UI (entrada/salida) de logica de calculo.</li>
+                <li>Nombrar funciones con verbos descriptivos.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Pregunta de activacion</h2>
+              <div class="callout">
+                <p>En tu actividad de sesion 15: ¿tu funcion <span class="kbd">CalcularArea</span> recibe la base y la altura como parametros, o los lee con <span class="kbd">Console.ReadLine</span>?</p>
+                <p class="note">Respuesta esperada: los recibe como parametros &mdash; la UI queda en <span class="kbd">Main</span>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Conexion S15</span>
+          <span class="counter">3 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · RUTA DE APRENDIZAJE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Ruta de aprendizaje de la sesion</div>
+        <div class="content">
+          <h2>Orden logico que seguiremos en clase</h2>
+          <div class="flow-list">
+            <div class="flow-step">
+              <h3>1. Recordar base</h3>
+              <p>Partimos de lo aprendido en sesion 15: firma basica, DRY y separacion entre UI y logica.</p>
+            </div>
+            <div class="flow-step">
+              <h3>2. Afinar firma</h3>
+              <p>Decidimos con criterio que entra como parametro, que retorna y cuando no usar <span class="kbd">void</span>.</p>
+            </div>
+            <div class="flow-step">
+              <h3>3. Contrato claro</h3>
+              <p>Documentamos con XML para que el contrato de cada funcion sea visible y reutilizable.</p>
+            </div>
+            <div class="flow-step">
+              <h3>4. Integrar funciones</h3>
+              <p>Conectamos funciones entre si y analizamos el flujo de ejecucion con pila de llamadas.</p>
+            </div>
+            <div class="flow-step">
+              <h3>5. Aplicar y consolidar</h3>
+              <p>Resolvemos una practica guiada con formulas, demostracion completa y explicacion paso a paso.</p>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Idea guia:</strong> primero entendemos la firma y el contrato; despues codificamos y finalmente consolidamos con una demostracion completa.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Ruta logica</span>
+          <span class="counter">4 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · CRITERIOS PARA PARAMETROS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto A &mdash; Criterios para parametros</div>
+        <div class="content">
+          <h2>¿Que va como parametro?</h2>
+          <div class="two-col">
+            <div>
+              <div class="callout" style="margin-bottom:10px;">
+                <p><strong>Va como parametro</strong> todo dato que la funcion necesita para hacer su trabajo y que no puede ni debe obtener por si misma: valores numericos, textos, banderas booleanas, listas.</p>
+              </div>
+              <div class="callout-warn">
+                <p><strong>No va como parametro</strong> (ni debe leerse dentro de la funcion): la entrada del usuario, la configuracion global que todavia no existe, ni constantes que la funcion puede declarar internamente.</p>
+              </div>
+            </div>
+            <div class="card">
+              <h2>Regla practica</h2>
+              <p style="margin-bottom:8px;">Preguntate: <em>"Si usara esta funcion en otro programa, ¿que informacion necesitaria pasarle?"</em></p>
+              <ul>
+                <li>Calculo de impuesto &rarr; parametro: el monto base.</li>
+                <li>Validacion de rango &rarr; parametros: el valor, min, max.</li>
+                <li>Formato de salida &rarr; parametros: el dato ya calculado.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Criterios parametros</span>
+          <span class="counter">5 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · PASO POR VALOR -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto A &mdash; Paso por valor</div>
+        <div class="content">
+          <h2>El comportamiento predeterminado: copia</h2>
+          <div class="two-col">
+            <div class="code"><span class="kw">static void</span> <span class="fn">Duplicar</span>(<span class="ty">int</span> n) {
+    n = n * 2;   <span class="cm">// modifica la copia local</span>
+    Console.WriteLine(<span class="st">$"Dentro: {n}"</span>);
+}
+
+<span class="kw">static void</span> <span class="fn">Main</span>() {
+    <span class="ty">int</span> valor = 5;
+    <span class="fn">Duplicar</span>(valor);
+    Console.WriteLine(<span class="st">$"Fuera : {valor}"</span>);
+    <span class="cm">// Fuera : 5  ← valor no cambia</span>
+}</div>
+            <div class="card">
+              <h2>Que ocurre</h2>
+              <ul>
+                <li>C# copia el valor al parametro <span class="kbd">n</span>.</li>
+                <li>Cualquier cambio a <span class="kbd">n</span> dentro de la funcion no afecta la variable original.</li>
+                <li>Es el comportamiento por defecto para tipos de valor (<span class="kbd">int</span>, <span class="kbd">double</span>, <span class="kbd">bool</span>, <span class="kbd">char</span>).</li>
+              </ul>
+              <div class="callout" style="margin-top:8px;">
+                <p>En la mayoria de funciones de calculo, el paso por valor es lo correcto.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Paso por valor</span>
+          <span class="counter">6 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · PASO POR REFERENCIA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto A &mdash; Paso por referencia</div>
+        <div class="content">
+          <h2><span class="kbd">ref</span> y <span class="kbd">out</span>: cuando la funcion debe modificar la variable</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2><span class="kbd">ref</span> &mdash; leer y modificar</h2>
+              <div class="code" style="max-height:20vh;"><span class="kw">static void</span> <span class="fn">Incrementar</span>(<span class="kw">ref</span> <span class="ty">int</span> n) {
+    n++;
+}
+<span class="ty">int</span> x = 3;
+<span class="fn">Incrementar</span>(<span class="kw">ref</span> x);
+<span class="cm">// x es ahora 4</span></div>
+              <p class="note" style="margin-top:6px;">La variable debe estar inicializada antes de pasarla con <span class="kbd">ref</span>.</p>
+            </div>
+            <div class="card">
+              <h2><span class="kbd">out</span> &mdash; solo escribir</h2>
+              <div class="code" style="max-height:20vh;"><span class="kw">static bool</span> <span class="fn">TryParsearNota</span>(
+    <span class="ty">string</span> entrada, <span class="kw">out</span> <span class="ty">double</span> nota) {
+    <span class="kw">return</span> <span class="ty">double</span>.TryParse(entrada, <span class="kw">out</span> nota);
+}
+<span class="kw">if</span> (<span class="fn">TryParsearNota</span>(Console.ReadLine(), <span class="kw">out</span> <span class="ty">double</span> n))
+    Console.WriteLine(<span class="st">$"Nota: {n}"</span>);</div>
+              <p class="note" style="margin-top:6px;"><span class="kbd">out</span>: no requiere inicializacion previa; la funcion asigna el valor.</p>
+            </div>
+          </div>
+          <div class="callout-warn">
+            <p><strong>Regla de uso:</strong> evita <span class="kbd">ref</span> / <span class="kbd">out</span> por defecto. Usalos solo cuando la firma con valor de retorno normal no es suficiente (ej. retornar dos resultados distintos).</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; ref y out</span>
+          <span class="counter">7 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · DOCUMENTACION XML -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto B &mdash; Documentacion XML</div>
+        <div class="content">
+          <h2>Comentarios XML: el contrato de la funcion</h2>
+          <div class="two-col">
+            <div class="code"><span class="xml">/// &lt;summary&gt;</span>
+<span class="xml">/// Calcula el promedio de tres notas.</span>
+<span class="xml">/// &lt;/summary&gt;</span>
+<span class="xml">/// &lt;param name="a"&gt;Primera nota (0.0 - 5.0).&lt;/param&gt;</span>
+<span class="xml">/// &lt;param name="b"&gt;Segunda nota (0.0 - 5.0).&lt;/param&gt;</span>
+<span class="xml">/// &lt;param name="c"&gt;Tercera nota (0.0 - 5.0).&lt;/param&gt;</span>
+<span class="xml">/// &lt;returns&gt;Promedio de las tres notas.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">CalcularPromedio</span>(<span class="ty">double</span> a, <span class="ty">double</span> b, <span class="ty">double</span> c)
+{
+  <span class="kw">return</span> (a + b + c) / 3;
+}</div>
+            <div class="card">
+              <h2>Por que documentar</h2>
+              <ul>
+                <li>VS Code muestra el tooltip de IntelliSense al escribir el nombre de la funcion.</li>
+                <li>El equipo (o tu futuro yo) entiende el contrato sin leer la implementacion.</li>
+                <li>Herramientas como DocFX generan documentacion HTML automaticamente.</li>
+              </ul>
+              <div class="callout" style="margin-top:8px;">
+                <p>Escribe <span class="kbd">///</span> sobre cualquier funcion en VS Code: genera el esqueleto automaticamente.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Documentacion XML</span>
+          <span class="counter">8 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · COMPOSICION DE FUNCIONES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto B &mdash; Funciones que llaman funciones</div>
+        <div class="content">
+          <h2>Composicion simple</h2>
+          <div class="two-col">
+            <div>
+                <div class="code"><span class="kw">static double</span> <span class="fn">CalcularPromedio</span>(<span class="ty">double</span> a, <span class="ty">double</span> b, <span class="ty">double</span> c)
+        {
+          <span class="kw">return</span> (a + b + c) / 3;
+        }
+
+        <span class="kw">static bool</span> <span class="fn">EsAprobado</span>(<span class="ty">double</span> prom)
+        {
+          <span class="kw">return</span> prom >= 3.0;
+        }
+
+        <span class="kw">static string</span> <span class="fn">GenerarMensaje</span>(<span class="ty">double</span> a, <span class="ty">double</span> b, <span class="ty">double</span> c) {
+          <span class="ty">double</span> p = <span class="fn">CalcularPromedio</span>(a, b, c); <span class="cm">// llama otra funcion</span>
+          <span class="ty">bool</span>   ok = <span class="fn">EsAprobado</span>(p);            <span class="cm">// llama otra funcion</span>
+          <span class="kw">if</span> (ok) {
+            <span class="kw">return</span> <span class="st">"Aprobado con "</span> + p;
+          }
+          <span class="kw">return</span> <span class="st">"Reprobado con "</span> + p;
+        }</div>
+            </div>
+            <div class="card">
+              <h2> Flujo de composicion</h2>
+              <svg viewBox="0 0 240 160" style="width:100%;max-height:22vh;"
+                   aria-label="GenerarMensaje llama a CalcularPromedio y EsAprobado">
+                <rect x="55" y="5"  width="130" height="34" rx="7" fill="#015583"/>
+                <text x="120" y="27" text-anchor="middle" fill="#fff" font-family="Arial" font-size="12" font-weight="bold">GenerarMensaje()</text>
+                <line x1="80"  y1="39" x2="50"  y2="80" stroke="#05ADBC" stroke-width="2"/>
+                <line x1="160" y1="39" x2="190" y2="80" stroke="#05ADBC" stroke-width="2"/>
+                <rect x="5"   y="80" width="90" height="32" rx="7" fill="#05ADBC"/>
+                <text x="50"  y="96"  text-anchor="middle" fill="#fff" font-family="Arial" font-size="11">CalcularPromedio</text>
+                <text x="50"  y="108" text-anchor="middle" fill="#fff" font-family="Arial" font-size="10">(a,b,c) → double</text>
+                <rect x="140" y="80" width="90" height="32" rx="7" fill="#05ADBC"/>
+                <text x="185" y="96"  text-anchor="middle" fill="#fff" font-family="Arial" font-size="11">EsAprobado</text>
+                <text x="185" y="108" text-anchor="middle" fill="#fff" font-family="Arial" font-size="10">(prom) → bool</text>
+                <!-- retorno -->
+                <line x1="80"  y1="112" x2="100" y2="140" stroke="#6b7280" stroke-dasharray="4" stroke-width="1.5"/>
+                <line x1="185" y1="112" x2="140" y2="140" stroke="#6b7280" stroke-dasharray="4" stroke-width="1.5"/>
+                <text x="120" y="155" text-anchor="middle" fill="#6b7280" font-family="Arial" font-size="11">string resultado</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Composicion</span>
+          <span class="counter">9 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · FLUJO DE EJECUCION ANIMADO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada &mdash; Flujo de ejecucion</div>
+        <div class="content">
+          <h2>Que hace C# cuando llamas una funcion</h2>
+          <div class="two-col">
+            <div>
+              <div class="step callout">
+                <strong>Paso 1:</strong> <span class="kbd">Main</span> lee las notas del usuario y las almacena en variables locales.
+              </div>
+              <div class="step callout">
+                <strong>Paso 2:</strong> <span class="kbd">Main</span> llama a <span class="kbd">CalcularPromedio(n1,n2,n3)</span>. C# copia los valores a los parametros <span class="kbd">a</span>, <span class="kbd">b</span>, <span class="kbd">c</span>.
+              </div>
+              <div class="step callout">
+                <strong>Paso 3:</strong> <span class="kbd">CalcularPromedio</span> ejecuta su logica y retorna el <span class="kbd">double</span>. El control vuelve a <span class="kbd">Main</span>.
+              </div>
+              <div class="step callout">
+                <strong>Paso 4:</strong> <span class="kbd">Main</span> recibe el resultado, llama <span class="kbd">EsAprobado</span> y finalmente <span class="kbd">MostrarReporte</span>.
+              </div>
+            </div>
+            <!-- stack visual interactivo -->
+            <div>
+              <p style="font-size:clamp(12px,1.1vw,14px);margin-bottom:6px;color:var(--azul-medio);font-weight:800;">Pila de llamadas (call stack)</p>
+              <div id="callstack" style="display:flex;flex-direction:column-reverse;gap:6px;min-height:80px;"></div>
+              <button onclick="pushFrame()" style="margin-top:10px;cursor:pointer;
+                padding:6px 14px;border-radius:8px;border:1px solid #dde2f1;
+                background:#f3f6fb;color:var(--azul-medio);font-weight:800;
+                font-size:clamp(11px,1vw,13px);">
+                Llamar siguiente &#9654;
+              </button>
+              <p class="note" style="margin-top:6px;">Cada llamada agrega un marco. Al retornar, el marco desaparece.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Flujo de ejecucion</span>
+          <span class="counter">10 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · EJEMPLO GUIADO COMPLETO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada &mdash; Ejemplo completo documentado</div>
+        <div class="content">
+          <h2>Conversor de temperatura con XML docs</h2>
+            <div class="code"><span class="xml">/// &lt;summary&gt;Convierte grados Celsius a Fahrenheit.&lt;/summary&gt;</span>
+      <span class="xml">/// &lt;param name="celsius"&gt;Temperatura en Celsius.&lt;/param&gt;</span>
+      <span class="xml">/// &lt;returns&gt;Temperatura en Fahrenheit.&lt;/returns&gt;</span>
+      <span class="kw">static double</span> <span class="fn">CelsiusAFahrenheit</span>(<span class="ty">double</span> celsius)
+      {
+        <span class="kw">return</span> celsius * 9.0 / 5.0 + 32;
+      }
+
+      <span class="xml">/// &lt;summary&gt;Determina si una temperatura es apta para conservar alimentos.&lt;/summary&gt;</span>
+      <span class="xml">/// &lt;param name="tempC"&gt;Temperatura en Celsius.&lt;/param&gt;</span>
+      <span class="xml">/// &lt;returns&gt;true si esta en rango seguro (0 a 4 grados).&lt;/returns&gt;</span>
+      <span class="kw">static bool</span> <span class="fn">EsTemperaturaSegura</span>(<span class="ty">double</span> tempC)
+      {
+        <span class="kw">return</span> tempC >= 0 &amp;&amp; tempC &lt;= 4;
+      }
+
+      <span class="kw">static void</span> <span class="fn">Main</span>() {
+    Console.Write(<span class="st">"Temperatura en Celsius: "</span>);
+    <span class="ty">double</span> c  = <span class="ty">double</span>.Parse(Console.ReadLine());
+    <span class="ty">double</span> f  = <span class="fn">CelsiusAFahrenheit</span>(c);
+    <span class="ty">bool</span>   ok = <span class="fn">EsTemperaturaSegura</span>(c);
+    Console.WriteLine(<span class="st">$"{c} C = {f:F1} F  |  Segura: {ok}"</span>);
+}</div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Ejemplo documentado</span>
+          <span class="counter">11 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · TABLA CRITERIOS PARAMETROS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Sintesis &mdash; Criterios de firma</div>
+        <div class="content">
+          <h2>Guia de decision para cada funcion</h2>
+          <table>
+            <thead>
+              <tr><th>Pregunta</th><th>Respuesta</th><th>Decision</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>¿La funcion necesita un dato externo?</td><td>Si</td><td>Agregar parametro con tipo y nombre descriptivo.</td></tr>
+              <tr><td>¿Debe producir un valor que usa el llamador?</td><td>Si</td><td>Usar tipo de retorno concreto (no <span class="kbd">void</span>).</td></tr>
+              <tr><td>¿Solo muestra informacion?</td><td>Si</td><td>Tipo de retorno <span class="kbd">void</span>; parametros son los datos a mostrar.</td></tr>
+              <tr><td>¿Debe modificar la variable original?</td><td>Solo si es necesario</td><td>Usar <span class="kbd">ref</span>; documentar por que no basta un retorno normal.</td></tr>
+              <tr><td>¿Necesita retornar dos valores distintos?</td><td>Si</td><td>Usar <span class="kbd">out</span> o encapsular en objeto/tupla <span class="kbd">(T1, T2)</span>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Guia de decision</span>
+          <span class="counter">12 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · ERRORES COMUNES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis &mdash; Errores de firma frecuentes</div>
+        <div class="content">
+          <h2>Lo que suele salir mal en parametros y retornos</h2>
+          <table>
+            <thead>
+              <tr><th>Error</th><th>Consecuencia</th><th>Correccion</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Demasiados parametros (&gt;4)</td><td>Firma dificil de leer y recordar.</td><td>Agrupa datos relacionados en una clase o struct simple.</td></tr>
+              <tr><td>Funcion retorna <span class="kbd">void</span> y modifica variable global</td><td>Efectos ocultos; dificil de depurar.</td><td>Pasar el dato como parametro y retornar el nuevo valor.</td></tr>
+              <tr><td>Tipo de retorno no coincide con el <span class="kbd">return</span></td><td>Error de compilacion.</td><td>Verificar que todos los caminos del <span class="kbd">if/else</span> retornan el tipo declarado.</td></tr>
+              <tr><td>Nombre del parametro igual al de la variable de Main</td><td>Confusion al leer; no causa error pero si confunde.</td><td>Usar nombres cortos y descriptivos dentro de la funcion.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Errores comunes</span>
+          <span class="counter">13 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · REFLEXION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Reflexion &mdash; Preguntas de comprension</div>
+        <div class="content">
+          <h2>Verifica tu entendimiento</h2>
+          <div class="callout" style="margin-bottom:10px;">
+            <p><strong>Pregunta 1:</strong> Una funcion <span class="kbd">CalcularDescuento(double precio)</span> retorna el precio final despues del 10 % de descuento. ¿El precio original en <span class="kbd">Main</span> cambia despues de llamarla?</p>
+            <p class="note">Respuesta: No. Es paso por valor; la variable de Main no cambia.</p>
+          </div>
+          <div class="callout" style="margin-bottom:10px;">
+            <p><strong>Pregunta 2:</strong> ¿Cuando usarias <span class="kbd">out</span> en lugar de un <span class="kbd">return</span> normal?</p>
+            <p class="note">Respuesta: cuando la funcion necesita "devolver" mas de un resultado distinto, o para seguir el patron de <span class="kbd">TryParse</span>.</p>
+          </div>
+          <div class="callout">
+            <p><strong>Pregunta 3:</strong> ¿Que ventaja inmediata obtienes al escribir <span class="kbd">///</span> sobre una funcion en VS Code?</p>
+            <p class="note">Respuesta: IntelliSense muestra el tooltip con resumen, parametros y retorno al escribir el nombre de la funcion en cualquier lugar del codigo.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Reflexion</span>
+          <span class="counter">14 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · PRACTICA GUIADA DEMOSTRATIVA - CONTEXTO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada demostrativa</div>
+        <div class="content">
+          <h2>Caso: consumo electrico modular y documentado</h2>
+          <div class="callout">
+            <p><strong>Meta de demostracion:</strong> construir en vivo un programa en C# que reciba watts, horas y tarifa; luego calcule consumo diario, consumo mensual y costo mensual usando funciones con firma clara y documentacion XML.</p>
+          </div>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Entradas y salidas</h2>
+              <ul>
+                <li>Entradas: <span class="kbd">watts</span>, <span class="kbd">horasDia</span>, <span class="kbd">precioKWh</span>.</li>
+                <li>Salida 1: consumo diario (kWh).</li>
+                <li>Salida 2: consumo mensual (kWh).</li>
+                <li>Salida 3: costo mensual ($).</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Regla didactica</h2>
+              <ul>
+                <li><span class="kbd">Main</span> solo coordina entrada, llamadas y salida.</li>
+                <li>Las formulas viven en funciones de calculo.</li>
+                <li>Primero firmamos y documentamos, luego implementamos.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Practica guiada</span>
+          <span class="counter">15 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · PRACTICA GUIADA - PASO 1 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Paso 1 &mdash; Diseñar firma y contrato</div>
+        <div class="content">
+          <h2>Decisiones antes de escribir formulas</h2>
+          <table>
+            <thead>
+              <tr><th>Funcion</th><th>Firma propuesta</th><th>Justificacion</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Consumo diario</td><td><span class="kbd">double ConsumoDiario(double watts, double horasDia)</span></td><td>Recibe dos datos externos y retorna un valor numerico.</td></tr>
+              <tr><td>Consumo mensual</td><td><span class="kbd">double ConsumoMensual(double consumoDiario)</span></td><td>Reusa el resultado anterior; evita duplicar formulas.</td></tr>
+              <tr><td>Costo mensual</td><td><span class="kbd">double CostoMensual(double consumoMes, double precioKWh)</span></td><td>Separa calculo economico de captura de datos.</td></tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Decision clave:</strong> no usamos <span class="kbd">ref</span> ni <span class="kbd">out</span> porque cada funcion devuelve un resultado unico con <span class="kbd">return</span>.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Paso 1</span>
+          <span class="counter">16 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 · PRACTICA GUIADA - PASO 2 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Paso 2 &mdash; Escribir XML y esqueleto</div>
+        <div class="content">
+          <h2>Primero contrato, despues implementacion</h2>
+          <div class="code"><span class="xml">/// &lt;summary&gt;Calcula consumo diario en kWh a partir de potencia y horas.&lt;/summary&gt;</span>
+<span class="xml">/// &lt;param name="watts"&gt;Potencia del dispositivo en watts.&lt;/param&gt;</span>
+<span class="xml">/// &lt;param name="horasDia"&gt;Horas de uso por dia.&lt;/param&gt;</span>
+<span class="xml">/// &lt;returns&gt;Consumo diario en kWh.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">ConsumoDiario</span>(<span class="ty">double</span> watts, <span class="ty">double</span> horasDia);
+
+<span class="xml">/// &lt;summary&gt;Proyecta consumo mensual con base en 30 dias.&lt;/summary&gt;</span>
+<span class="xml">/// &lt;param name="consumoDiario"&gt;Consumo diario en kWh.&lt;/param&gt;</span>
+<span class="xml">/// &lt;returns&gt;Consumo mensual en kWh.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">ConsumoMensual</span>(<span class="ty">double</span> consumoDiario);
+
+<span class="xml">/// &lt;summary&gt;Calcula costo mensual del consumo electrico.&lt;/summary&gt;</span>
+<span class="xml">/// &lt;param name="consumoMes"&gt;Consumo mensual en kWh.&lt;/param&gt;</span>
+<span class="xml">/// &lt;param name="precioKWh"&gt;Tarifa por cada kWh.&lt;/param&gt;</span>
+<span class="xml">/// &lt;returns&gt;Costo mensual estimado.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">CostoMensual</span>(<span class="ty">double</span> consumoMes, <span class="ty">double</span> precioKWh);</div>
+          <p class="note">Este orden evita escribir funciones sin proposito claro o con parametros innecesarios.</p>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Paso 2</span>
+          <span class="counter">17 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 · PRACTICA GUIADA - PASO 3 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Paso 3 &mdash; Implementar funciones de calculo</div>
+        <div class="content">
+          <h2>Logica pura: sin lectura ni impresiones</h2>
+          <div class="code"><span class="xml">/// &lt;summary&gt;Calcula consumo diario en kWh.&lt;/summary&gt;</span>
+<span class="xml">/// &lt;param name="watts"&gt;Potencia en watts.&lt;/param&gt;</span>
+<span class="xml">/// &lt;param name="horasDia"&gt;Horas de uso diario.&lt;/param&gt;</span>
+<span class="xml">/// &lt;returns&gt;Consumo diario en kWh.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">ConsumoDiario</span>(<span class="ty">double</span> watts, <span class="ty">double</span> horasDia)
+{
+  <span class="kw">return</span> watts * horasDia / 1000.0;
+}
+
+<span class="xml">/// &lt;summary&gt;Calcula consumo mensual suponiendo 30 dias.&lt;/summary&gt;</span>
+<span class="xml">/// &lt;param name="consumoDiario"&gt;Consumo diario en kWh.&lt;/param&gt;</span>
+<span class="xml">/// &lt;returns&gt;Consumo mensual en kWh.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">ConsumoMensual</span>(<span class="ty">double</span> consumoDiario)
+{
+  <span class="kw">return</span> consumoDiario * 30.0;
+}
+
+<span class="xml">/// &lt;summary&gt;Calcula costo mensual.&lt;/summary&gt;</span>
+<span class="xml">/// &lt;returns&gt;Costo total en moneda local.&lt;/returns&gt;</span>
+<span class="kw">static double</span> <span class="fn">CostoMensual</span>(<span class="ty">double</span> consumoMes, <span class="ty">double</span> precioKWh)
+{
+  <span class="kw">return</span> consumoMes * precioKWh;
+}</div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Chequeo rapido:</strong> para 1200 W y 5 h/dia, <span class="kbd">ConsumoDiario</span> debe retornar <span class="kbd">6.0</span>.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Paso 3</span>
+          <span class="counter">18 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 · PRACTICA GUIADA - PASO 4 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Paso 4 &mdash; Captura segura en Main</div>
+        <div class="content">
+          <h2>Validar entrada sin ensuciar la logica de calculo</h2>
+          <div class="two-col">
+            <div class="code"><span class="kw">static bool</span> <span class="fn">LeerDouble</span>(<span class="ty">string</span> mensaje, <span class="kw">out</span> <span class="ty">double</span> valor)
+{
+    Console.Write(mensaje);
+    <span class="kw">return</span> <span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> valor);
+}
+
+<span class="kw">static void</span> <span class="fn">Main</span>()
+{
+    <span class="kw">if</span> (!<span class="fn">LeerDouble</span>(<span class="st">"Watts: "</span>, <span class="kw">out</span> <span class="ty">double</span> watts) ||
+        !<span class="fn">LeerDouble</span>(<span class="st">"Horas por dia: "</span>, <span class="kw">out</span> <span class="ty">double</span> horas) ||
+        !<span class="fn">LeerDouble</span>(<span class="st">"Precio por kWh: "</span>, <span class="kw">out</span> <span class="ty">double</span> tarifa))
+    {
+        Console.WriteLine(<span class="st">"Entrada invalida. Usa numeros."</span>);
+        <span class="kw">return</span>;
+    }
+    <span class="cm">// siguiente paso: llamar funciones de calculo</span>
+}</div>
+            <div class="card">
+              <h2>Por que si usamos <span class="kbd">out</span> aqui</h2>
+              <ul>
+                <li>El metodo retorna dos cosas: exito (<span class="kbd">bool</span>) y valor leido (<span class="kbd">double</span>).</li>
+                <li>Replica el patron <span class="kbd">TryParse</span> del framework.</li>
+                <li>Mantenemos el manejo de entrada concentrado en una sola funcion.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Paso 4</span>
+          <span class="counter">19 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 · PRACTICA GUIADA - PASO 5 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Paso 5 &mdash; Integrar llamadas y salida</div>
+        <div class="content">
+          <h2>Orquestacion final desde Main</h2>
+          <div class="code"><span class="kw">double</span> diario  = <span class="fn">ConsumoDiario</span>(watts, horas);
+<span class="kw">double</span> mensual = <span class="fn">ConsumoMensual</span>(diario);
+<span class="kw">double</span> costo   = <span class="fn">CostoMensual</span>(mensual, tarifa);
+
+Console.WriteLine(<span class="st">"--- Reporte de consumo ---"</span>);
+Console.WriteLine(<span class="st">"Consumo diario : "</span> + diario + <span class="st">" kWh"</span>);
+Console.WriteLine(<span class="st">"Consumo mensual: "</span> + mensual + <span class="st">" kWh"</span>);
+Console.WriteLine(<span class="st">"Costo mensual  : $"</span> + costo);</div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Lectura didactica:</strong> el flujo queda visible como cadena de funciones: datos &rarr; calculo diario &rarr; mensual &rarr; costo.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Paso 5</span>
+          <span class="counter">20 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 · PRACTICA GUIADA - SOLUCION COMPLETA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Demostracion &mdash; Solucion completa</div>
+        <div class="content">
+          <h2>Programa final integrado</h2>
+          <div class="code"><span class="kw">using</span> System;
+
+<span class="kw">class</span> Program
+{
+    <span class="xml">/// &lt;summary&gt;Calcula consumo diario en kWh.&lt;/summary&gt;</span>
+    <span class="kw">static double</span> <span class="fn">ConsumoDiario</span>(<span class="ty">double</span> watts, <span class="ty">double</span> horasDia)
+    {
+      <span class="kw">return</span> watts * horasDia / 1000.0;
+    }
+
+    <span class="xml">/// &lt;summary&gt;Calcula consumo mensual suponiendo 30 dias.&lt;/summary&gt;</span>
+    <span class="kw">static double</span> <span class="fn">ConsumoMensual</span>(<span class="ty">double</span> consumoDiario)
+    {
+      <span class="kw">return</span> consumoDiario * 30.0;
+    }
+
+    <span class="xml">/// &lt;summary&gt;Calcula costo mensual.&lt;/summary&gt;</span>
+    <span class="kw">static double</span> <span class="fn">CostoMensual</span>(<span class="ty">double</span> consumoMes, <span class="ty">double</span> precioKWh)
+    {
+      <span class="kw">return</span> consumoMes * precioKWh;
+    }
+
+    <span class="kw">static bool</span> <span class="fn">LeerDouble</span>(<span class="ty">string</span> mensaje, <span class="kw">out</span> <span class="ty">double</span> valor)
+    {
+        Console.Write(mensaje);
+        <span class="kw">return</span> <span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> valor);
+    }
+
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="kw">if</span> (!<span class="fn">LeerDouble</span>(<span class="st">"Watts: "</span>, <span class="kw">out</span> <span class="ty">double</span> watts) ||
+            !<span class="fn">LeerDouble</span>(<span class="st">"Horas por dia: "</span>, <span class="kw">out</span> <span class="ty">double</span> horas) ||
+            !<span class="fn">LeerDouble</span>(<span class="st">"Precio por kWh: "</span>, <span class="kw">out</span> <span class="ty">double</span> tarifa))
+        {
+            Console.WriteLine(<span class="st">"Entrada invalida. Usa numeros."</span>);
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">double</span> diario = <span class="fn">ConsumoDiario</span>(watts, horas);
+        <span class="kw">double</span> mensual = <span class="fn">ConsumoMensual</span>(diario);
+        <span class="kw">double</span> costo = <span class="fn">CostoMensual</span>(mensual, tarifa);
+
+        Console.WriteLine(<span class="st">"Diario: "</span> + diario + <span class="st">" kWh | Mensual: "</span> + mensual + <span class="st">" kWh | Costo: $"</span> + costo);
+    }
+}</div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Solucion completa</span>
+          <span class="counter">21 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 · PRACTICA GUIADA - TRAZA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Demostracion &mdash; Traza paso a paso</div>
+        <div class="content">
+          <h2>Seguimiento manual con caso de prueba</h2>
+          <table>
+            <thead>
+              <tr><th>Paso</th><th>Llamada o accion</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Entradas: 1200 W, 5 h/dia, $850/kWh</td><td>Datos validos para el flujo.</td></tr>
+              <tr><td>2</td><td><span class="kbd">ConsumoDiario(1200, 5)</span></td><td><span class="kbd">6.00</span> kWh</td></tr>
+              <tr><td>3</td><td><span class="kbd">ConsumoMensual(6.00)</span></td><td><span class="kbd">180.00</span> kWh</td></tr>
+              <tr><td>4</td><td><span class="kbd">CostoMensual(180.00, 850)</span></td><td><span class="kbd">153000</span></td></tr>
+              <tr><td>5</td><td>Impresion en <span class="kbd">Main</span></td><td>Reporte final claro para usuario.</td></tr>
+            </tbody>
+          </table>
+          <p class="note">Esta traza permite depurar rapido: si un valor falla, se identifica en que funcion se introdujo el error.</p>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Traza</span>
+          <span class="counter">22 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 · PRACTICA GUIADA - EXTENSIONES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Demostracion &mdash; Ajustes y extensiones</div>
+        <div class="content">
+          <h2>Como ampliar sin romper la firma</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Mejora 1: redondeo y formato</h2>
+              <ul>
+                <li>Si quieres menos decimales, primero muestra el valor tal como sale del calculo.</li>
+                <li>El redondeo puede explicarse despues como tema aparte de biblioteca estandar.</li>
+                <li>Evitar convertir a <span class="kbd">int</span> antes de terminar calculos.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Mejora 2: mas de un dispositivo</h2>
+              <ul>
+                <li>Crear una funcion acumuladora para sumar consumos diarios.</li>
+                <li>Reusar <span class="kbd">ConsumoMensual</span> y <span class="kbd">CostoMensual</span> sin cambios.</li>
+                <li>Ejemplo de modularidad: se agrega funcionalidad sin reescribir todo.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Mensaje clave:</strong> una firma bien pensada facilita mantenimiento, pruebas y extensiones.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Extensiones</span>
+          <span class="counter">23 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 · INTELLISENSE DEMO NOTE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Herramienta &mdash; VS Code + IntelliSense</div>
+        <div class="content">
+          <h2>Como ver el tooltip XML en VS Code</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Pasos</h2>
+              <ol>
+                <li>Escribe <span class="kbd">///</span> encima de tu funcion &rarr; VS Code genera el esqueleto XML.</li>
+                <li>Completa <span class="kbd">&lt;summary&gt;</span>, <span class="kbd">&lt;param&gt;</span> y <span class="kbd">&lt;returns&gt;</span>.</li>
+                <li>En otro lugar del codigo, escribe el nombre de la funcion.</li>
+                <li>IntelliSense muestra el tooltip con toda la documentacion.</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h2>Extension requerida</h2>
+              <p>Extension: <span class="kbd">ms-dotnettools.csharp</span></p>
+              <p style="margin-top:8px;">Verificar que esta instalada en VS Code: <em>Extensions</em> &rarr; buscar "C#" &rarr; publicada por Microsoft.</p>
+              <div class="callout" style="margin-top:10px;">
+                <p>La documentacion XML tambien funciona con <span class="kbd">dotnet doc</span> y DocFX para generar sitios de documentacion.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; VS Code IntelliSense</span>
+          <span class="counter">24 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 25 · CIERRE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Cierre de sesion</div>
+        <div class="content">
+          <h2>Fundamentos consolidados en una sesion unificada</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Lo que construimos hoy</h2>
+              <ul>
+                <li>Criterios para decidir parametros y tipo de retorno.</li>
+                <li>Paso por valor vs <span class="kbd">ref</span> / <span class="kbd">out</span>.</li>
+                <li>Documentacion XML con <span class="kbd">summary</span>, <span class="kbd">param</span> y <span class="kbd">returns</span>.</li>
+                <li>Funciones que componen otras funciones.</li>
+                <li>Separacion clara entre interfaz de consola y logica de programacion.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Siguiente paso</h2>
+              <ul>
+                <li>Sesion 18: descomposicion en subproblemas y jerarquia de funciones.</li>
+                <li>Aplicar este mismo enfoque en problemas mas grandes de comercio.</li>
+                <li>Pasar de firmas sueltas a diseño modular por niveles.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note" style="margin-top:10px;">
+            Como practica de refuerzo, replica la demostracion en tu entorno y prueba al menos dos juegos de datos.
+          </p>
+        </div>
+        <div class="footer">
+          <span>Sesion 16_1 &middot; Cierre</span>
+          <span class="counter">25 / 25</span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div><!-- /deck -->
+
+<script>
+  /* call stack interactivo */
+  const frames = [
+    { name:"Main()",                  bg:"#015583" },
+    { name:"CalcularPromedio(a,b,c)", bg:"#05ADBC" },
+    { name:"EsAprobado(prom)",        bg:"#2563eb" },
+    { name:"MostrarReporte(...)",     bg:"#7c3aed" },
+  ];
+  let fi = 0;
+  function pushFrame(){
+    const stack = document.getElementById('callstack');
+    if(!stack) return;
+    if(fi >= frames.length){ stack.innerHTML=""; fi=0; return; }
+    const f = frames[fi++];
+    const el = document.createElement('div');
+    el.className = 'frame-item';
+    el.textContent = f.name;
+    el.style.background = f.bg;
+    stack.appendChild(el);
+  }
+
+  /* navegacion */
+  (function(){
+    const slides   = Array.from(document.querySelectorAll('.slide'));
+    const counters = Array.from(document.querySelectorAll('.counter'));
+    const stage    = document.getElementById('stage');
+    const btnPrev  = document.getElementById('btnPrev');
+    const btnNext  = document.getElementById('btnNext');
+    let idx = 0;
+    function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+    function show(i){
+      idx = clamp(i,0,slides.length-1);
+      slides.forEach((s,k) => s.classList.toggle('active', k===idx));
+      const label = (idx+1)+" / "+slides.length;
+      counters.forEach(el => el.textContent = label);
+      history.replaceState(null,"","#"+(idx+1));
+    }
+    function next(){ show(idx+1); }
+    function prev(){ show(idx-1); }
+    const m = (location.hash||"").match(/^#(\d+)$/);
+    if(m){ const s=parseInt(m[1],10); if(!isNaN(s)) idx=clamp(s-1,0,slides.length-1); }
+    show(idx);
+    btnPrev.addEventListener('click',prev);
+    btnNext.addEventListener('click',next);
+    document.addEventListener('keydown',(e)=>{
+      const k=e.key;
+      if(k==='f'||k==='F'){
+        if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+        return;
+      }
+      if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); next(); }
+      else if(k==='ArrowLeft'||k==='PageUp'){         e.preventDefault(); prev(); }
+      else if(k==='Home'){                             e.preventDefault(); show(0); }
+      else if(k==='End'){                              e.preventDefault(); show(slides.length-1); }
+    });
+    const isTouch = ('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    if(isTouch){
+      let x0=null,y0=null,t0=0;
+      const SWIPE_MIN_X=50,SWIPE_MAX_Y=80,SWIPE_MAX_MS=800;
+      stage.addEventListener('touchstart',(e)=>{
+        const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now();
+      },{passive:true});
+      stage.addEventListener('touchend',(e)=>{
+        if(x0===null||y0===null) return;
+        const t=e.changedTouches[0];
+        const dx=t.clientX-x0, dy=t.clientY-y0, dt=Date.now()-t0;
+        x0=null; y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y) return;
+        if(dx<=-SWIPE_MIN_X) next();
+        else if(dx>=SWIPE_MIN_X) prev();
+      },{passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
+
+
+
