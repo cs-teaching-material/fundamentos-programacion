@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Logica de Programacion - Sesion 18</title>
+  <title>Logica de Programacion - Sesion 17_1</title>
   <style>
     :root{
       --texto:#201F4B;
@@ -294,7 +294,7 @@
     <section class="slide cover active">
       <div class="inner">
         <div class="content" style="justify-content:center;">
-          <h1>Sesion 18</h1>
+          <h1>Sesion 17_1</h1>
           <div class="subtitle">Descomposicion en subproblemas y jerarquia de funciones</div>
           <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">
             Unidad 3 &middot; Diseno modular aplicado a comercio
@@ -319,14 +319,14 @@
           <ul>
             <li>Explicar por que programar no es solo escribir codigo, sino modelar una solucion paso a paso.</li>
             <li>Tomar un problema de comercio y dividirlo en subproblemas pequenos, claros y verificables.</li>
-            <li>Diseñar una jerarquia de funciones con niveles y responsabilidades bien separadas.</li>
+            <li>Disenar una jerarquia de funciones con niveles y responsabilidades bien separadas.</li>
             <li>Diferenciar funciones de entrada/salida, de proceso y de coordinacion.</li>
             <li>Proponer firmas coherentes como contratos entre partes del programa.</li>
           </ul>
           <p class="note">C# es la herramienta de implementacion, pero el objetivo central es desarrollar pensamiento de programacion transferible a cualquier lenguaje.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Proposito</span>
+          <span>Sesion 17_1 &middot; Proposito</span>
           <span class="counter">2 / 18</span>
         </div>
       </div>
@@ -353,7 +353,7 @@
               <ul>
                 <li>Tomar un problema grande de comercio (ventas y descuentos).</li>
                 <li>Descomponerlo en subproblemas relacionados y ordenados por nivel de abstraccion.</li>
-                <li>Diseñar un arbol de funciones para resolverlo paso a paso sin mezclar responsabilidades.</li>
+                <li>Disenar un arbol de funciones para resolverlo paso a paso sin mezclar responsabilidades.</li>
                 <li>Rastrear como viajan los datos entre funciones (flujo de informacion).</li>
               </ul>
             </div>
@@ -361,7 +361,7 @@
           <p class="note">La meta es razonar la arquitectura de la solucion antes de programar detalles.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Conexion</span>
+          <span>Sesion 17_1 &middot; Conexion</span>
           <span class="counter">3 / 18</span>
         </div>
       </div>
@@ -380,7 +380,7 @@
               <ul style="margin-top:8px;">
                 <li>Cada subproblema responde una pregunta concreta.</li>
                 <li>Las funciones nacen de esas preguntas.</li>
-                <li>Un buen diseño reduce las dependencias entre subproblemas.</li>
+                <li>Un buen diseno reduce las dependencias entre subproblemas.</li>
                 <li>Mientras mas claro sea cada bloque, mas facil sera probar y corregir errores.</li>
               </ul>
             </div>
@@ -391,7 +391,7 @@
           </div>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Descomposicion</span>
+          <span>Sesion 17_1 &middot; Descomposicion</span>
           <span class="counter">4 / 18</span>
         </div>
       </div>
@@ -437,7 +437,7 @@
           <p class="note">Esta organizacion mejora la abstraccion: cada nivel se concentra en una escala distinta del problema.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Niveles</span>
+          <span>Sesion 17_1 &middot; Niveles</span>
           <span class="counter">5 / 18</span>
         </div>
       </div>
@@ -486,7 +486,7 @@
           <p class="note">Cada flecha indica una llamada de una funcion a otra. Las funciones de abajo no deberian saber detalles de la interfaz de usuario. Asi se protege el nucleo logico del programa.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Jerarquia</span>
+          <span>Sesion 17_1 &middot; Jerarquia</span>
           <span class="counter">6 / 18</span>
         </div>
       </div>
@@ -516,7 +516,7 @@
           </div>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Lectura</span>
+          <span>Sesion 17_1 &middot; Lectura</span>
           <span class="counter">7 / 18</span>
         </div>
       </div>
@@ -525,7 +525,7 @@
     <!-- 8 CONCEPTO C: PATRON PASOS -->
     <section class="slide content-slide">
       <div class="inner">
-        <div class="header">Concepto C &mdash; Patrón de diseño</div>
+        <div class="header">Concepto C &mdash; Patron de diseno</div>
         <div class="content">
           <h2>Cuatro pasos para descomponer un problema de comercio</h2>
           <div class="step callout">
@@ -547,7 +547,7 @@
           <p class="note">Este patron tambien sirve para problemas de inventario, nomina, reservas o cualquier dominio de software.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Patron</span>
+          <span>Sesion 17_1 &middot; Patron</span>
           <span class="counter">8 / 18</span>
         </div>
       </div>
@@ -569,10 +569,10 @@
               <li>Mostrar un resumen claro de la venta.</li>
             </ul>
           </div>
-          <p class="note">Por ahora nos enfocamos en el diseño de la solucion: que hace cada parte, como se conecta y que datos intercambia.</p>
+          <p class="note">Por ahora nos enfocamos en el diseno de la solucion: que hace cada parte, como se conecta y que datos intercambia.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Practica 1</span>
+          <span>Sesion 17_1 &middot; Practica 1</span>
           <span class="counter">9 / 18</span>
         </div>
       </div>
@@ -629,7 +629,7 @@
           <p class="note">Clasificar por tipo de tarea ayuda a prevenir mezclas innecesarias dentro de una sola funcion.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Subproblemas</span>
+          <span>Sesion 17_1 &middot; Subproblemas</span>
           <span class="counter">10 / 18</span>
         </div>
       </div>
@@ -649,6 +649,7 @@
                 <li><span class="kbd">RegistrarVenta</span></li>
                 <li><span class="kbd">IngresarPedido</span></li>
                 <li><span class="kbd">CalcularSubtotal</span></li>
+                <li><span class="kbd">EsCantidadMayorista</span> <span class="note">(helper)</span></li>
                 <li><span class="kbd">CalcularDescuento</span></li>
                 <li><span class="kbd">CalcularIVA</span></li>
                 <li><span class="kbd">CalcularTotal</span></li>
@@ -662,7 +663,7 @@
                 <li><span class="kbd">RegistrarVenta</span> llama a:
                   <ul>
                     <li><span class="kbd">IngresarPedido</span></li>
-                    <li><span class="kbd">CalcularSubtotal</span>, <span class="kbd">CalcularDescuento</span>, <span class="kbd">CalcularIVA</span>, <span class="kbd">CalcularTotal</span></li>
+                    <li><span class="kbd">CalcularSubtotal</span>, <span class="kbd">EsCantidadMayorista</span>, <span class="kbd">CalcularDescuento</span>, <span class="kbd">CalcularIVA</span>, <span class="kbd">CalcularTotal</span></li>
                     <li><span class="kbd">MostrarResumen</span></li>
                   </ul>
                 </li>
@@ -673,7 +674,7 @@
           </div>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Jerarquia texto</span>
+          <span>Sesion 17_1 &middot; Jerarquia texto</span>
           <span class="counter">11 / 18</span>
         </div>
       </div>
@@ -689,6 +690,8 @@
 <span class="kw">static void</span> <span class="fn">IngresarPedido</span>() { <span class="cm">/* Leer datos de la venta */</span> }
 
 <span class="kw">static double</span> <span class="fn">CalcularSubtotal</span>(<span class="ty">int</span> cantidad, <span class="ty">double</span> precioUnitario) { <span class="cm">/* ... */</span> }
+
+<span class="kw">static bool</span> <span class="fn">EsCantidadMayorista</span>(<span class="ty">int</span> cantidad) { <span class="cm">/* ... */</span> }
 
 <span class="kw">static double</span> <span class="fn">CalcularDescuento</span>(<span class="ty">int</span> cantidad, <span class="ty">double</span> subtotal) { <span class="cm">/* ... */</span> }
 
@@ -711,7 +714,7 @@
           <p class="note">Las firmas representan contratos: antes de codificar el cuerpo, define con precision entradas, salidas y responsabilidad.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Esqueleto</span>
+          <span>Sesion 17_1 &middot; Esqueleto</span>
           <span class="counter">12 / 18</span>
         </div>
       </div>
@@ -720,7 +723,7 @@
     <!-- 13 ANTI EJEMPLO -->
     <section class="slide content-slide">
       <div class="inner">
-        <div class="header">Analisis de mal diseño</div>
+        <div class="header">Analisis de mal diseno</div>
         <div class="content">
           <h2>Cuando todo queda en una funcion gigante</h2>
           <div class="code">
@@ -752,7 +755,7 @@
           </div>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Anti ejemplo</span>
+          <span>Sesion 17_1 &middot; Anti ejemplo</span>
           <span class="counter">13 / 18</span>
         </div>
       </div>
@@ -765,7 +768,7 @@
         <div class="content">
           <h2>Diseno modular de un sistema de pedidos</h2>
           <div class="callout">
-            <p><strong>Enunciado:</strong> Diseñar la estructura de funciones para un sistema de pedidos de comercio:</p>
+            <p><strong>Enunciado:</strong> Disenar la estructura de funciones para un sistema de pedidos de comercio:</p>
             <ul>
               <li>Leer datos del cliente y del pedido.</li>
               <li>Calcular subtotal, descuento por tipo de cliente y cantidad.</li>
@@ -774,10 +777,10 @@
             </ul>
             <p>Debes definir al menos una funcion de nivel 0, dos de nivel 1 y varias de niveles 2 y 3.</p>
           </div>
-          <p class="note">Entrega: diagrama de jerarquia y esqueleto de funciones en C# en la carpeta <span class="kbd">sesion18</span> del repositorio.</p>
+          <p class="note">Entrega: diagrama de jerarquia y esqueleto de funciones en C# en la carpeta <span class="kbd">sesion17_1</span> del repositorio.</p>
         </div>
         <div class="footer">
-          <span>Actividad sesion 18 &middot; Enunciado</span>
+          <span>Actividad sesion 17_1 &middot; Enunciado</span>
           <span class="counter">14 / 18</span>
         </div>
       </div>
@@ -824,6 +827,11 @@
                 <td>2</td>
               </tr>
               <tr>
+                <td><span class="kbd">EsCantidadMayorista</span></td>
+                <td>Determinar si aplica regla de mayorista segun cantidad.</td>
+                <td>3</td>
+              </tr>
+              <tr>
                 <td><span class="kbd">CalcularDescuentoCliente</span></td>
                 <td>Decidir descuento segun tipo de cliente y cantidad.</td>
                 <td>2</td>
@@ -842,58 +850,58 @@
           </table>
         </div>
         <div class="footer">
-          <span>Actividad sesion 18 &middot; Jerarquia</span>
+          <span>Actividad sesion 17_1 &middot; Jerarquia</span>
           <span class="counter">15 / 18</span>
         </div>
       </div>
     </section>
 
-    <!-- 16 CRITERIOS EVALUACION -->
+    <!-- 16 VERIFICACION FORMATIVA -->
     <section class="slide content-slide">
       <div class="inner">
-        <div class="header">Criterios de evaluacion</div>
+        <div class="header">Verificacion formativa (sin evaluacion)</div>
         <div class="content">
-          <h2>Como se valora la actividad de comercio</h2>
+          <h2>Checklist de calidad para retroalimentacion en clase</h2>
           <table>
             <thead>
               <tr>
-                <th>Criterio</th>
-                <th>Descripcion</th>
-                <th>Puntaje</th>
+                <th>Aspecto a revisar</th>
+                <th>Pregunta de verificacion</th>
+                <th>Evidencia rapida</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Correccion logica</td>
-                <td>La descomposicion responde de forma coherente al problema planteado.</td>
-                <td>20%</td>
+                <td>Descomposicion</td>
+                <td>¿El problema esta dividido en bloques pequenos y con sentido?</td>
+                <td>Arbol de funciones entendible en menos de 1 minuto.</td>
               </tr>
               <tr>
-                <td>Diseno de jerarquia</td>
-                <td>El arbol de funciones es claro, coherente y respeta niveles.</td>
-                <td>30%</td>
+                <td>Jerarquia</td>
+                <td>¿Cada nivel llama al nivel adecuado sin saltos innecesarios?</td>
+                <td>Flujo Main -> nivel 1 -> nivel 2/3 consistente.</td>
               </tr>
               <tr>
-                <td>Separacion UI / logica</td>
-                <td>Las funciones de calculo no hacen entrada/salida por consola.</td>
-                <td>25%</td>
+                <td>Separacion UI/logica</td>
+                <td>¿Las funciones de calculo estan libres de Console?</td>
+                <td>Calculo probado con datos directos, sin lectura de teclado.</td>
+              </tr>
+              <tr>
+                <td>Uso de helper</td>
+                <td>¿Existe al menos un helper que evite repetir decisiones simples?</td>
+                <td>Funcion <span class="kbd">EsCantidadMayorista</span> integrada al flujo.</td>
               </tr>
               <tr>
                 <td>Legibilidad</td>
-                <td>Nombres descriptivos, indentacion correcta y comentarios minimos.</td>
-                <td>15%</td>
-              </tr>
-              <tr>
-                <td>Documentacion</td>
-                <td>README con explicacion del arbol de funciones, flujo de datos y decisiones de diseño.</td>
-                <td>10%</td>
+                <td>¿Los nombres, firmas y orden de llamadas explican la solucion?</td>
+                <td>Lectura lineal del codigo sin ambiguedades.</td>
               </tr>
             </tbody>
           </table>
-          <p class="note">El lenguaje importa para implementar, pero la evaluacion prioriza el razonamiento de programacion y el diseño modular.</p>
+          <p class="note">Esta diapositiva es para retroalimentacion durante la clase, no para calificacion.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Evaluacion</span>
+          <span>Sesion 17_1 &middot; Verificacion</span>
           <span class="counter">16 / 18</span>
         </div>
       </div>
@@ -904,7 +912,7 @@
       <div class="inner">
         <div class="header">Errores frecuentes</div>
         <div class="content">
-          <h2>Patrones de mal diseño a evitar</h2>
+          <h2>Patrones de mal diseno a evitar</h2>
           <table>
             <thead>
               <tr>
@@ -938,13 +946,295 @@
           </table>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Errores</span>
+          <span>Sesion 17_1 &middot; Errores</span>
           <span class="counter">17 / 18</span>
         </div>
       </div>
     </section>
 
-    <!-- 18 CIERRE -->
+    <!-- 18 PROFUNDIZACION: CONTRATOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Profundizacion &mdash; Contrato de funciones</div>
+        <div class="content">
+          <h2>Precondiciones, postcondiciones e invariantes</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Precondicion</h2>
+              <p>Lo que debe cumplirse <strong>antes</strong> de ejecutar la funcion.</p>
+              <ul>
+                <li>La cantidad no puede ser negativa.</li>
+                <li>El precio unitario debe ser mayor que 0.</li>
+                <li>El tipo de cliente debe estar en un conjunto valido.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Postcondicion</h2>
+              <p>Lo que la funcion garantiza <strong>despues</strong> de ejecutarse.</p>
+              <ul>
+                <li>El subtotal retornado es cantidad x precio.</li>
+                <li>El descuento nunca supera el subtotal.</li>
+                <li>El total final es base imponible + IVA.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Idea de fundamentos:</strong> pensar en contratos evita ambiguedades y hace que el diseno sea verificable antes de programar.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Contratos</span>
+          <span class="counter">18 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 PROFUNDIZACION: FIRMA CON INTENCION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Profundizacion &mdash; Firma con intencion</div>
+        <div class="content">
+          <h2>Comparar firmas debiles vs firmas robustas</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Firma debil</th>
+                <th>Problema</th>
+                <th>Firma robusta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="kbd">double Calcular(double a, double b)</span></td>
+                <td>No comunica que representa cada dato.</td>
+                <td><span class="kbd">double CalcularSubtotal(int cantidad, double precioUnitario)</span></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">void Procesar()</span></td>
+                <td>Oculta entradas, salidas y efectos.</td>
+                <td><span class="kbd">double CalcularIVA(double baseImponible)</span></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">double HacerTodo(...)</span></td>
+                <td>Mezcla responsabilidades y rompe cohesion.</td>
+                <td><span class="kbd">void MostrarResumen(...)</span> + funciones de calculo separadas</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">Una firma bien escrita ya explica gran parte del algoritmo, incluso antes de ver el cuerpo.</p>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Firma robusta</span>
+          <span class="counter">19 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 PROFUNDIZACION: TRAZABILIDAD -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Profundizacion &mdash; Trazabilidad de datos</div>
+        <div class="content">
+          <h2>Seguir cada dato desde la entrada hasta la salida</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Dato</th>
+                <th>Donde nace</th>
+                <th>Funciones que lo transforman</th>
+                <th>Donde termina</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="kbd">cantidad</span></td>
+                <td><span class="kbd">IngresarPedido</span></td>
+                <td><span class="kbd">CalcularSubtotal</span>, <span class="kbd">CalcularDescuento</span></td>
+                <td><span class="kbd">MostrarResumen</span></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">precioUnitario</span></td>
+                <td><span class="kbd">IngresarPedido</span></td>
+                <td><span class="kbd">CalcularSubtotal</span></td>
+                <td><span class="kbd">MostrarResumen</span></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">subtotal</span></td>
+                <td><span class="kbd">CalcularSubtotal</span></td>
+                <td><span class="kbd">CalcularDescuento</span>, <span class="kbd">CalcularIVA</span></td>
+                <td><span class="kbd">CalcularTotal</span></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">total</span></td>
+                <td><span class="kbd">CalcularTotal</span></td>
+                <td>No se transforma; solo se presenta.</td>
+                <td><span class="kbd">MostrarResumen</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">Cuando puedes rastrear datos sin saltos, el diseno modular esta bien construido.</p>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Trazabilidad</span>
+          <span class="counter">20 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 PROFUNDIZACION: PRUEBAS POR FUNCION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Profundizacion &mdash; Pruebas por funcion</div>
+        <div class="content">
+          <h2>Probar por bloques antes de integrar todo</h2>
+          <div class="two-col">
+            <div class="card">
+              <h2>Casos minimos para cada funcion</h2>
+              <ul>
+                <li><span class="kbd">CalcularSubtotal</span>: caso normal, cero y limite alto.</li>
+                <li><span class="kbd">CalcularDescuento</span>: sin descuento, con descuento y borde.</li>
+                <li><span class="kbd">CalcularIVA</span>: base valida y base cero.</li>
+                <li><span class="kbd">CalcularTotal</span>: coherencia con subtotal - descuento + IVA.</li>
+              </ul>
+            </div>
+            <div class="code">
+<span class="kw">double</span> s1 = <span class="fn">CalcularSubtotal</span>(5, 2000);   <span class="cm">// 10000</span>
+<span class="kw">double</span> d1 = <span class="fn">CalcularDescuento</span>(5, s1);   <span class="cm">// 0</span>
+<span class="kw">double</span> d2 = <span class="fn">CalcularDescuento</span>(10, s1);  <span class="cm">// esperado > 0</span>
+<span class="kw">double</span> i1 = <span class="fn">CalcularIVA</span>(s1 - d1);      <span class="cm">// impuesto</span>
+<span class="kw">double</span> t1 = <span class="fn">CalcularTotal</span>(s1 - d1, i1); <span class="cm">// total final</span>
+
+Console.WriteLine(s1);
+Console.WriteLine(d1);
+Console.WriteLine(d2);
+Console.WriteLine(i1);
+Console.WriteLine(t1);
+            </div>
+          </div>
+          <p class="note">Probar funciones aisladas reduce errores de integracion y fortalece la comprension del algoritmo.</p>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Pruebas</span>
+          <span class="counter">21 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 PROFUNDIZACION: REFACTORIZACION GUIADA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Profundizacion &mdash; Refactorizacion guiada</div>
+        <div class="content">
+          <h2>De monolito a modular en 5 decisiones</h2>
+          <div class="step callout">
+            <strong>Decision 1:</strong>
+            Marcar en el codigo original que lineas son entrada, proceso y salida.
+          </div>
+          <div class="step callout">
+            <strong>Decision 2:</strong>
+            Extraer primero funciones de calculo puro, porque son las mas faciles de probar.
+          </div>
+          <div class="step callout">
+            <strong>Decision 3:</strong>
+            Dejar <span class="kbd">Main</span> como coordinador de alto nivel.
+          </div>
+          <div class="step callout">
+            <strong>Decision 4:</strong>
+            Renombrar funciones con verbo + dominio para que el flujo se lea como historia.
+          </div>
+          <div class="step callout">
+            <strong>Decision 5:</strong>
+            Verificar trazabilidad: cada variable debe tener origen y destino definidos.
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Refactorizacion</span>
+          <span class="counter">22 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 PROFUNDIZACION: CASO ALTERNO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Aplicacion transferible &mdash; Caso alterno</div>
+        <div class="content">
+          <h2>El mismo patron en sistema de inventario</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Problema</h2>
+              <ul>
+                <li>Registrar entradas y salidas de unidades.</li>
+                <li>Actualizar stock disponible.</li>
+                <li>Calcular punto de reposicion.</li>
+                <li>Emitir alerta de compra.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Mapa de funciones</h2>
+              <ul>
+                <li><span class="kbd">IngresarMovimiento</span> (entrada)</li>
+                <li><span class="kbd">CalcularStockActual</span> (proceso)</li>
+                <li><span class="kbd">CalcularPuntoReposicion</span> (proceso)</li>
+                <li><span class="kbd">GenerarAlerta</span> (salida)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Conclusion:</strong> los fundamentos no dependen del dominio. Cambia el contexto, pero se conserva la descomposicion y la jerarquia.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Transferencia</span>
+          <span class="counter">23 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 ACTIVIDAD AVANZADA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Actividad de profundizacion</div>
+        <div class="content">
+          <h2>Reto: justificar diseno, no solo codificar</h2>
+          <div class="callout">
+            <p><strong>Consigna:</strong> ademas del arbol y las firmas, redacta una justificacion breve para cada nivel de funciones (0, 1, 2 y 3).</p>
+          </div>
+          <table style="margin-top:8px;">
+            <thead>
+              <tr>
+                <th>Evidencia</th>
+                <th>Que debe mostrar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Diagrama jerarquico</td>
+                <td>Orden de llamadas y separacion de responsabilidades.</td>
+              </tr>
+              <tr>
+                <td>Tabla de contratos</td>
+                <td>Precondiciones y postcondiciones de al menos 4 funciones.</td>
+              </tr>
+              <tr>
+                <td>Casos de prueba</td>
+                <td>Entradas, salida esperada y salida observada por funcion.</td>
+              </tr>
+              <tr>
+                <td>Codigo esqueleto</td>
+                <td>Firmas consistentes con el diagrama y la tabla de contratos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer">
+          <span>Sesion 17_1 &middot; Actividad avanzada</span>
+          <span class="counter">24 / 25</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 25 CIERRE -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Cierre de sesion</div>
@@ -962,7 +1252,7 @@
             <div class="card">
               <h2>Lo que viene</h2>
               <ul>
-                <li>Sesion 19: esqueleto modular completo y alcance de variables.</li>
+                <li>Sesion 18: esqueleto modular completo y alcance de variables.</li>
                 <li>Como el arbol de funciones afecta donde viven las variables.</li>
               </ul>
             </div>
@@ -970,8 +1260,8 @@
           <p class="note" style="margin-top:10px;">La proxima sesion conectara esta jerarquia con el concepto de alcance y vida de las variables.</p>
         </div>
         <div class="footer">
-          <span>Sesion 18 &middot; Cierre</span>
-          <span class="counter">18 / 18</span>
+          <span>Sesion 17_1 &middot; Cierre</span>
+          <span class="counter">25 / 25</span>
         </div>
       </div>
     </section>
@@ -1056,3 +1346,4 @@
 </script>
 </body>
 </html>
+

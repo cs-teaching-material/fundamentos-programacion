@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 18</title>
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px);
+      --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px);
+      --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#ffffff;}
+    .deck{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px);box-sizing:border-box;background:#ffffff;}
+    .stage{width:min(96vw,calc(92vh*(16/9)));aspect-ratio:16/9;position:relative;}
+    .slide{position:absolute;inset:0;display:none;box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;}
+    .slide.active{display:block;}
+    .slide.cover{background:url("./Portada.png") center/cover no-repeat;color:#ffffff;}
+    .slide.content-slide{background:url("./Contenido.png") top left/contain no-repeat,#ffffff;color:var(--texto);}
+    .inner{height:100%;box-sizing:border-box;padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);display:flex;flex-direction:column;gap:clamp(10px,1.1vw,18px);}
+    .cover .inner{padding:var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);}
+    .content{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.1vw,16px);min-height:0;}
+    .header{color:var(--azul-medio);font-size:clamp(18px,1.6vw,22px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    h1{margin:0;font-size:var(--h1);line-height:1.08;color:var(--texto);}
+    h2{margin:0;font-size:var(--h2);line-height:1.15;color:var(--azul-medio);}
+    p{margin:0;font-size:var(--p);line-height:1.4;color:var(--texto);}
+    li{font-size:var(--li);line-height:1.4;color:var(--texto);}
+    ul,ol{margin:0;padding-left:1.2em;}
+    .subtitle{color:var(--turquesa);font-weight:800;font-size:clamp(18px,1.8vw,24px);margin-top:clamp(6px,1vw,10px);}
+    .cover h1{color:#ffffff;}
+    .cover p{color:#e5edf8;}
+    .cover .subtitle{color:#f7df00;}
+    .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
+    .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .callout-warn{background:#fff8f0;border-left:6px solid #f59e0b;padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .two-col{display:grid;grid-template-columns:1.15fr .9fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dde2f1;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#111827;color:#e5e7eb;padding:2px 8px;border-radius:7px;font-size:clamp(11px,1vw,13px);border:1px solid rgba(255,255,255,.08);}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.05vw,14px);line-height:1.35;background:#0b1020;color:#e5e7eb;border-radius:10px;padding:clamp(10px,1.1vw,14px);overflow:auto;max-height:44vh;border:1px solid rgba(17,24,39,.25);white-space:pre-wrap;}
+    .kw{color:#7dd3fc;}
+    .ty{color:#86efac;}
+    .fn{color:#fde68a;}
+    .cm{color:#6b7280;font-style:italic;}
+    .st{color:#f9a8d4;}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
+    th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
+    th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
+    .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
+    .counter{font-weight:800;color:var(--azul-medio);}
+    .cover .counter{color:#e5edf8;}
+    .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
+    .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
+    #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
+    .stage:hover #touchNav{opacity:1;transform:translateY(-50%) translateY(0);}
+    @media (hover:none){#touchNav{opacity:1;transform:translateY(-50%);}}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 18</h1>
+          <div class="subtitle">Implementacion completa de solucion modular</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 &middot; Fundamentos de programacion modular en practica</p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; &middot; Home / End &middot; F pantalla completa &middot; Tactil: desliza</p>
+        </div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion &middot; Grupos 810 / 811</span><span class="counter">1 / 23</span></div>
+      </div>
+    </section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Proposito</div><div class="content"><h2>Meta de la sesion</h2><ul><li>Pasar de arquitectura modular a programa funcional.</li><li>Conservar separacion UI, logica y coordinacion.</li><li>Implementar funciones con trazabilidad de datos.</li><li>Comprobar funcionamiento con ejemplos concretos.</li><li>Explicar decisiones de codigo desde fundamentos.</li></ul></div><div class="footer"><span>Sesion 18 &middot; Proposito</span><span class="counter">2 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Conexion</div><div class="content"><h2>Lo ya construido</h2><div class="equal-col"><div class="card"><h2>Base previa</h2><ul><li>Jerarquia de funciones.</li><li>Firmas y contratos.</li><li>Alcance de variables.</li></ul></div><div class="card"><h2>Hoy completamos</h2><ul><li>Cuerpos de funciones.</li><li>Integracion total del flujo.</li><li>Ejemplos de depuracion y pruebas.</li></ul></div></div></div><div class="footer"><span>Sesion 18 &middot; Conexion</span><span class="counter">3 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Pipeline</div><div class="content"><h2>Ruta de implementacion</h2><ol><li>Confirmar contratos de funciones.</li><li>Implementar calculos puros.</li><li>Implementar validaciones de entrada.</li><li>Integrar orquestacion.</li><li>Probar con ejemplos de escritorio.</li><li>Depurar inconsistencias.</li></ol></div><div class="footer"><span>Sesion 18 &middot; Pipeline</span><span class="counter">4 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Caso</div><div class="content"><h2>Sistema de pedidos (comercio)</h2><div class="callout"><p>Entradas: producto, cantidad, precio unitario y tipo de cliente.</p><p>Salidas: subtotal, descuento, base, IVA y total.</p></div><table style="margin-top:8px;"><thead><tr><th>Bloque</th><th>Funcion</th><th>Responsabilidad</th></tr></thead><tbody><tr><td>Entrada</td><td><span class="kbd">IngresarPedido</span></td><td>Capturar datos validados.</td></tr><tr><td>Proceso</td><td><span class="kbd">CalcularTotales</span></td><td>Aplicar reglas de negocio.</td></tr><tr><td>Salida</td><td><span class="kbd">MostrarResumen</span></td><td>Comunicar resultados.</td></tr></tbody></table></div><div class="footer"><span>Sesion 18 &middot; Caso</span><span class="counter">5 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Jerarquia</div><div class="content"><h2>Llamadas principales</h2><div class="code">Main
+  -> RegistrarPedido()
+      -> IngresarPedido(...)
+      -> CalcularSubtotal(...)
+      -> EsCantidadMayorista(...)    // helper
+      -> CalcularDescuento(...)
+      -> CalcularIVA(...)
+      -> CalcularTotal(...)
+      -> MostrarResumen(...)</div></div><div class="footer"><span>Sesion 18 &middot; Jerarquia</span><span class="counter">6 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Contratos</div><div class="content"><h2>Contratos minimos</h2><table><thead><tr><th>Funcion</th><th>Precondicion</th><th>Postcondicion</th></tr></thead><tbody><tr><td>CalcularSubtotal</td><td>cantidad >= 0 y precio > 0</td><td>retorna cantidad * precio</td></tr><tr><td>CalcularDescuento</td><td>subtotal >= 0</td><td>retorna valor entre 0 y subtotal</td></tr><tr><td>CalcularIVA</td><td>base >= 0</td><td>retorna base * tasa</td></tr><tr><td>CalcularTotal</td><td>base >= 0 e iva >= 0</td><td>retorna base + iva</td></tr></tbody></table></div><div class="footer"><span>Sesion 18 &middot; Contratos</span><span class="counter">7 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Helper</div><div class="content"><h2>Decision simple reusable</h2><div class="two-col"><div class="code"><span class="kw">static bool</span> <span class="fn">EsCantidadMayorista</span>(<span class="ty">int</span> cantidad)
+{
+    <span class="kw">return</span> cantidad >= 10;
+}</div><div class="card"><h2>Por que helper</h2><ul><li>Evita repetir condicion en varios lugares.</li><li>Hace el codigo mas legible.</li><li>Permite cambiar regla sin tocar todo.</li></ul></div></div></div><div class="footer"><span>Sesion 18 &middot; Helper</span><span class="counter">8 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Calculo</div><div class="content"><h2>Subtotal y descuento</h2><div class="code"><span class="kw">static double</span> <span class="fn">CalcularSubtotal</span>(<span class="ty">int</span> cantidad, <span class="ty">double</span> precioUnitario)
+{
+    <span class="kw">return</span> cantidad * precioUnitario;
+}
+
+<span class="kw">static double</span> <span class="fn">CalcularDescuento</span>(<span class="ty">int</span> cantidad, <span class="ty">double</span> subtotal)
+{
+    <span class="kw">if</span> (<span class="fn">EsCantidadMayorista</span>(cantidad)) <span class="kw">return</span> subtotal * 0.10;
+    <span class="kw">return</span> 0;
+}</div></div><div class="footer"><span>Sesion 18 &middot; Calculo 1</span><span class="counter">9 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Calculo</div><div class="content"><h2>Impuesto y total</h2><div class="code"><span class="kw">static double</span> <span class="fn">CalcularIVA</span>(<span class="ty">double</span> baseImponible)
+{
+    <span class="kw">return</span> baseImponible * 0.19;
+}
+
+<span class="kw">static double</span> <span class="fn">CalcularTotal</span>(<span class="ty">double</span> baseImponible, <span class="ty">double</span> iva)
+{
+    <span class="kw">return</span> baseImponible + iva;
+}</div></div><div class="footer"><span>Sesion 18 &middot; Calculo 2</span><span class="counter">10 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Entrada robusta</div><div class="content"><h2>Ejemplo de validacion</h2><div class="code"><span class="kw">static bool</span> <span class="fn">LeerEnteroPositivo</span>(<span class="ty">string</span> mensaje, <span class="kw">out</span> <span class="ty">int</span> valor)
+{
+    Console.Write(mensaje);
+    <span class="kw">if</span> (!<span class="ty">int</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> valor)) <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">return</span> valor > 0;
+}
+
+<span class="kw">static bool</span> <span class="fn">LeerDoublePositivo</span>(<span class="ty">string</span> mensaje, <span class="kw">out</span> <span class="ty">double</span> valor)
+{
+    Console.Write(mensaje);
+    <span class="kw">if</span> (!<span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> valor)) <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">return</span> valor > 0;
+}</div></div><div class="footer"><span>Sesion 18 &middot; Validacion</span><span class="counter">11 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Orquestacion</div><div class="content"><h2>Flujo principal</h2><div class="code"><span class="kw">static void</span> <span class="fn">RegistrarPedido</span>()
+{
+    <span class="cm">// entrada</span>
+    <span class="cm">// calculos</span>
+    <span class="cm">// salida</span>
+}
+
+<span class="kw">static void</span> <span class="fn">Main</span>()
+{
+    <span class="fn">RegistrarPedido</span>();
+}</div><p class="note">Main coordina. Las funciones especializadas resuelven.</p></div><div class="footer"><span>Sesion 18 &middot; Orquestacion</span><span class="counter">12 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Trazabilidad</div><div class="content"><h2>Ruta de cada dato</h2><table><thead><tr><th>Dato</th><th>Origen</th><th>Transformaciones</th><th>Destino</th></tr></thead><tbody><tr><td>cantidad</td><td>Ingreso</td><td>Subtotal, descuento</td><td>Resumen</td></tr><tr><td>precio</td><td>Ingreso</td><td>Subtotal</td><td>Resumen</td></tr><tr><td>subtotal</td><td>CalcularSubtotal</td><td>Descuento, base</td><td>Resumen</td></tr><tr><td>total</td><td>CalcularTotal</td><td>sin cambios</td><td>Salida final</td></tr></tbody></table></div><div class="footer"><span>Sesion 18 &middot; Trazabilidad</span><span class="counter">13 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Ejemplo resuelto</div><div class="content"><h2>Caso numerico</h2><ul><li>cantidad: 12</li><li>precio unitario: 1500</li><li>subtotal: 18000</li><li>descuento (10%): 1800</li><li>base imponible: 16200</li><li>IVA (19%): 3078</li><li>total: 19278</li></ul></div><div class="footer"><span>Sesion 18 &middot; Ejemplo A</span><span class="counter">14 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Errores comunes</div><div class="content"><h2>Anti patrones</h2><div class="callout-warn"><ul><li>Leer en consola desde funcion de calculo.</li><li>Guardar resultados en variables globales sin necesidad.</li><li>Duplicar formulas en diferentes bloques.</li><li>No verificar entrada antes de operar.</li></ul></div></div><div class="footer"><span>Sesion 18 &middot; Errores</span><span class="counter">15 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Refactor</div><div class="content"><h2>Antes vs despues</h2><div class="equal-col"><div class="code"><span class="cm">// Monolitico</span>
+Main(){
+  <span class="cm">// leer + calcular + imprimir en bloque largo</span>
+}</div><div class="code"><span class="cm">// Modular</span>
+Main(){
+  RegistrarPedido();
+}</div></div></div><div class="footer"><span>Sesion 18 &middot; Refactor</span><span class="counter">16 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Pruebas por funcion</div><div class="content"><h2>Ejemplos rapidos</h2><table><thead><tr><th>Funcion</th><th>Entrada</th><th>Salida esperada</th></tr></thead><tbody><tr><td>CalcularSubtotal</td><td>(5, 2000)</td><td>10000</td></tr><tr><td>CalcularDescuento</td><td>(10, 10000)</td><td>1000</td></tr><tr><td>CalcularIVA</td><td>(9000)</td><td>1710</td></tr><tr><td>CalcularTotal</td><td>(9000, 1710)</td><td>10710</td></tr></tbody></table></div><div class="footer"><span>Sesion 18 &middot; Ejemplo B</span><span class="counter">17 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Integracion</div><div class="content"><h2>Dos escenarios completos</h2><div class="equal-col"><div class="card"><h2>Escenario sin descuento</h2><p>cantidad 3, precio 2000 -> subtotal 6000, descuento 0, total coherente.</p></div><div class="card"><h2>Escenario mayorista</h2><p>cantidad 12, precio 1500 -> descuento aplicado y total correcto.</p></div></div></div><div class="footer"><span>Sesion 18 &middot; Ejemplo C</span><span class="counter">18 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Depuracion</div><div class="content"><h2>Checklist de debugging</h2><ul><li>Breakpoint en entrada, subtotal, descuento, IVA y total.</li><li>Verificar tipo y valor de cada variable critica.</li><li>Comparar con resultados manuales esperados.</li><li>Corregir causa raiz, no sintomas.</li></ul></div><div class="footer"><span>Sesion 18 &middot; Depuracion</span><span class="counter">19 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Codigo completo final</div><div class="content"><h2>Programa funcional end-to-end</h2><div class="code"><span class="kw">using</span> System;
+
+<span class="kw">class</span> Program
+{
+    <span class="kw">static bool</span> <span class="fn">EsCantidadMayorista</span>(<span class="ty">int</span> cantidad)
+    {
+        <span class="kw">return</span> cantidad >= 10;
+    }
+
+    <span class="kw">static double</span> <span class="fn">CalcularSubtotal</span>(<span class="ty">int</span> cantidad, <span class="ty">double</span> precioUnitario)
+    {
+        <span class="kw">return</span> cantidad * precioUnitario;
+    }
+
+    <span class="kw">static double</span> <span class="fn">CalcularDescuento</span>(<span class="ty">int</span> cantidad, <span class="ty">double</span> subtotal)
+    {
+        <span class="kw">if</span> (<span class="fn">EsCantidadMayorista</span>(cantidad))
+        {
+            <span class="kw">return</span> subtotal * 0.10;
+        }
+        <span class="kw">return</span> 0;
+    }
+
+    <span class="kw">static double</span> <span class="fn">CalcularIVA</span>(<span class="ty">double</span> baseImponible)
+    {
+        <span class="kw">return</span> baseImponible * 0.19;
+    }
+
+    <span class="kw">static double</span> <span class="fn">CalcularTotal</span>(<span class="ty">double</span> baseImponible, <span class="ty">double</span> iva)
+    {
+        <span class="kw">return</span> baseImponible + iva;
+    }
+
+    <span class="kw">static bool</span> <span class="fn">LeerEnteroPositivo</span>(<span class="ty">string</span> mensaje, <span class="kw">out</span> <span class="ty">int</span> valor)
+    {
+        Console.Write(mensaje);
+        <span class="kw">if</span> (!<span class="ty">int</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> valor))
+        {
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+        <span class="kw">return</span> valor > 0;
+    }
+
+    <span class="kw">static bool</span> <span class="fn">LeerDoublePositivo</span>(<span class="ty">string</span> mensaje, <span class="kw">out</span> <span class="ty">double</span> valor)
+    {
+        Console.Write(mensaje);
+        <span class="kw">if</span> (!<span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> valor))
+        {
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+        <span class="kw">return</span> valor > 0;
+    }
+
+    <span class="kw">static void</span> <span class="fn">MostrarResumen</span>(<span class="ty">string</span> producto, <span class="ty">int</span> cantidad, <span class="ty">double</span> precio, <span class="ty">double</span> subtotal, <span class="ty">double</span> descuento, <span class="ty">double</span> iva, <span class="ty">double</span> total)
+    {
+        Console.WriteLine("--- Resumen de venta ---");
+        Console.WriteLine("Producto: " + producto);
+        Console.WriteLine("Cantidad: " + cantidad);
+        Console.WriteLine("Precio unitario: " + precio);
+        Console.WriteLine("Subtotal: " + subtotal);
+        Console.WriteLine("Descuento: " + descuento);
+        Console.WriteLine("IVA: " + iva);
+        Console.WriteLine("Total: " + total);
+    }
+
+    <span class="kw">static void</span> <span class="fn">RegistrarPedido</span>()
+    {
+        Console.Write("Producto: ");
+        <span class="ty">string</span> producto = Console.ReadLine();
+
+        <span class="kw">if</span> (!<span class="fn">LeerEnteroPositivo</span>("Cantidad: ", <span class="kw">out</span> <span class="ty">int</span> cantidad) ||
+            !<span class="fn">LeerDoublePositivo</span>("Precio unitario: ", <span class="kw">out</span> <span class="ty">double</span> precioUnitario))
+        {
+            Console.WriteLine("Entrada invalida. Verifica los datos.");
+            <span class="kw">return</span>;
+        }
+
+        <span class="ty">double</span> subtotal = <span class="fn">CalcularSubtotal</span>(cantidad, precioUnitario);
+        <span class="ty">double</span> descuento = <span class="fn">CalcularDescuento</span>(cantidad, subtotal);
+        <span class="ty">double</span> baseImponible = subtotal - descuento;
+        <span class="ty">double</span> iva = <span class="fn">CalcularIVA</span>(baseImponible);
+        <span class="ty">double</span> total = <span class="fn">CalcularTotal</span>(baseImponible, iva);
+
+        <span class="fn">MostrarResumen</span>(producto, cantidad, precioUnitario, subtotal, descuento, iva, total);
+    }
+
+    <span class="kw">static void</span> Main()
+    {
+        <span class="fn">RegistrarPedido</span>();
+    }
+}</div></div><div class="footer"><span>Sesion 18 &middot; Codigo final</span><span class="counter">20 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Extension</div><div class="content"><h2>Ejemplo transferible: inventario</h2><div class="equal-col"><div class="card"><h2>Funciones</h2><ul><li>CalcularStockActual</li><li>EsPuntoReposicion</li><li>CalcularPedidoSugerido</li></ul></div><div class="card"><h2>Fundamento reutilizado</h2><ul><li>Misma descomposicion.</li><li>Misma idea de helper.</li><li>Misma separacion UI/logica.</li></ul></div></div></div><div class="footer"><span>Sesion 18 &middot; Ejemplo D</span><span class="counter">21 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">IA como apoyo</div><div class="content"><h2>Ejemplos de uso responsable</h2><ul><li>Pedir a IA sugerencias de nombres de funciones.</li><li>Solicitar casos de prueba adicionales.</li><li>Pedir refactor de legibilidad y comparar con version propia.</li><li>Validar cada sugerencia con contratos y pruebas.</li></ul><p class="note">La IA acelera, pero el criterio de programacion y la validacion siguen siendo humanas.</p></div><div class="footer"><span>Sesion 18 &middot; Ejemplo con IA</span><span class="counter">22 / 23</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Cierre</div><div class="content"><h2>Que debe quedar claro</h2><ul><li>Implementar no es pegar codigo: es conservar arquitectura y contratos.</li><li>Los helpers reducen repeticion y errores de decision.</li><li>La calidad se demuestra con ejemplos verificables.</li><li>El codigo final debe ser legible, trazable y mantenible.</li></ul></div><div class="footer"><span>Sesion 18 &middot; Cierre</span><span class="counter">23 / 23</span></div></div></section>
+
+  </div>
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const counters = Array.from(document.querySelectorAll(".counter"));
+  const stage = document.getElementById("stage");
+  const btnPrev = document.getElementById("btnPrev");
+  const btnNext = document.getElementById("btnNext");
+  let idx = 0;
+  function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+  function show(i){
+    idx = clamp(i,0,slides.length-1);
+    slides.forEach((s,k)=>s.classList.toggle("active",k===idx));
+    const label = (idx+1) + " / " + slides.length;
+    counters.forEach(el=>el.textContent = label);
+    history.replaceState(null,"","#"+(idx+1));
+  }
+  function next(){ show(idx+1); }
+  function prev(){ show(idx-1); }
+  const m = (location.hash||"").match(/^#(\d+)$/);
+  if(m){
+    const s = parseInt(m[1],10);
+    if(!isNaN(s)) idx = clamp(s-1,0,slides.length-1);
+  }
+  show(idx);
+  btnPrev.addEventListener("click",prev);
+  btnNext.addEventListener("click",next);
+  document.addEventListener("keydown",e=>{
+    const k = e.key;
+    if(k==="f"||k==="F"){
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+      return;
+    }
+    if(k==="ArrowRight"||k==="PageDown"||k===" "){
+      e.preventDefault(); next();
+    }else if(k==="ArrowLeft"||k==="PageUp"){
+      e.preventDefault(); prev();
+    }else if(k==="Home"){
+      e.preventDefault(); show(0);
+    }else if(k==="End"){
+      e.preventDefault(); show(slides.length-1);
+    }
+  });
+  const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints>0);
+  if(isTouch){
+    let x0=null,y0=null,t0=0;
+    const SWIPE_MIN_X = 50;
+    const SWIPE_MAX_Y = 80;
+    const SWIPE_MAX_MS = 800;
+    stage.addEventListener("touchstart",e=>{
+      const t = e.changedTouches[0];
+      x0 = t.clientX;
+      y0 = t.clientY;
+      t0 = Date.now();
+    },{passive:true});
+    stage.addEventListener("touchend",e=>{
+      if(x0===null || y0===null) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      const dt = Date.now() - t0;
+      x0 = null;
+      y0 = null;
+      if(dt>SWIPE_MAX_MS || Math.abs(dy)>SWIPE_MAX_Y) return;
+      if(dx<=-SWIPE_MIN_X) next();
+      else if(dx>=SWIPE_MIN_X) prev();
+    },{passive:true});
+  }
+})();
+</script>
+</body>
+</html>
