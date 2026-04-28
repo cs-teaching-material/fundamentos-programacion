@@ -4,7 +4,7 @@ description: >
   Crea una nueva sesión HTML institucional (diapositivas 16/9, 4 horas de clase) y
   la guía Markdown para el profesor correspondiente, para el curso Fundamentos /
   Lógica de Programación. Genera: archivo sesiones/sesionN_0.html con explicaciones
-  detalladas, elementos visuales CSS/SVG/animaciones y actividad evaluativa integrada;
+  detalladas, elementos visuales CSS/SVG/animaciones y taller guiado integrado;
   y sesiones/guia_sesionN_0.md con respuestas esperadas, instrucciones de aula y
   formato de entrega de evidencias. NUNCA incluye duración ni agenda. Solo usa
   imágenes con licencia libre verificada; preferir SVG/CSS inline.
@@ -375,7 +375,7 @@ Una sesión de 4 horas debe tener **mínimo 16 y máximo 22 slides** estructurad
 | Concepto A | 2-3 | Teoría con ejemplo guiado + diagrama/animación |
 | Concepto B | 2-3 | Teoría con ejemplo guiado + código |
 | Práctica guiada | 2-3 | Paso a paso resuelto en clase |
-| Actividad evaluativa | 2-3 | Enunciado, criterios, entrega (ver §8) |
+| Taller guiado docente | 2-3 | Ejemplo completo paso a paso y evidencia de practica |
 | Análisis / errores comunes | 1-2 | Contraejemplos o detección de fallos |
 | Cierre | 1 | Síntesis de lo aprendido + qué viene |
 
@@ -622,63 +622,51 @@ flowchart TD
 
 ---
 
-## 8. Slide de actividad evaluativa
+## 8. Slides de taller guiado (NO evaluativo)
 
-Cada sesión debe incluir una actividad evaluativa práctica. Estructura sugerida:
+Cada sesion debe incluir taller guiado para desarrollo en clase. Estructura sugerida:
 
-### Slide de enunciado (slide N-2)
+### Slide de enunciado tecnico (slide N-2)
 ```html
 <section class="slide content-slide">
   <div class="inner">
-    <div class="header">Actividad de clase</div>
+    <div class="header">Taller guiado</div>
     <div class="content">
-      <h2>{{TITULO_ACTIVIDAD}}</h2>
+      <h2>{{TITULO_TALLER}}</h2>
       <div class="callout">
-        <p><strong>Enunciado:</strong> {{DESCRIPCION_CONCRETA}}</p>
+        <p><strong>Reto tecnico:</strong> {{DESCRIPCION_CONCRETA}}</p>
       </div>
       <ul>
-        <li>Criterio 1: …</li>
-        <li>Criterio 2: …</li>
-        <li>Criterio 3: …</li>
+        <li>Paso 1: …</li>
+        <li>Paso 2: …</li>
+        <li>Paso 3: …</li>
       </ul>
-      <p class="note">Entrega: archivo <span class="kbd">.cs</span>
-        en repositorio GitHub del estudiante, carpeta
+      <p class="note">Evidencia: archivo <span class="kbd">.cs</span>
+        en repositorio del estudiante, carpeta
         <span class="kbd">sesion{{N}}/</span>.</p>
     </div>
     <div class="footer">
-      <span>Actividad sesion {{N}}</span>
+      <span>Taller sesion {{N}}</span>
       <span class="counter">{{SLIDE_N}} / {{TOTAL}}</span>
     </div>
   </div>
 </section>
 ```
 
-### Slide de criterios de evaluación (slide N-1)
+### Slide de ejemplo completo para desarrollo del profesor (slide N-1)
 ```html
 <section class="slide content-slide">
   <div class="inner">
-    <div class="header">Criterios de evaluacion</div>
+    <div class="header">Desarrollo guiado del profesor</div>
     <div class="content">
-      <table>
-        <thead>
-          <tr><th>Criterio</th><th>Descripcion</th><th>Puntaje</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Compilacion</td><td>El programa compila sin errores</td><td>20 %</td></tr>
-          <tr><td>Logica</td>
-              <td>Produce el resultado correcto para los casos de prueba</td>
-              <td>40 %</td></tr>
-          <tr><td>Modularidad</td>
-              <td>Usa funciones correctamente separadas</td>
-              <td>30 %</td></tr>
-          <tr><td>Legibilidad</td>
-              <td>Nombres descriptivos, identacion correcta</td>
-              <td>10 %</td></tr>
-        </tbody>
-      </table>
+      <div class="code">// Pegar codigo C# completo
+// que el docente desarrolla en vivo
+{{CODIGO_COMPLETO_DOCENTE}}</div>
+      <p class="note">Recomendacion: dividir explicacion en bloques cortos
+      (entrada, proceso, salida) con compilacion intermedia.</p>
     </div>
     <div class="footer">
-      <span>Evaluacion sesion {{N}}</span>
+      <span>Desarrollo en clase sesion {{N}}</span>
       <span class="counter">{{SLIDE_N}} / {{TOTAL}}</span>
     </div>
   </div>
@@ -762,7 +750,7 @@ Crear el archivo `sesiones/guia_sesionN_0.md` con la siguiente estructura:
 
 ---
 
-## Actividad evaluativa — respuestas esperadas
+## Taller guiado en clase — respuestas esperadas
 
 ### Enunciado
 {{ENUNCIADO_ACTIVIDAD}}
@@ -858,7 +846,7 @@ Insertar en orden numérico dentro de `<div class="grid">`.
 - [ ] Slide 2 es "Propósito" (sin agenda, sin duración).
 - [ ] Al menos un diagrama SVG inline o animación CSS.
 - [ ] Al menos un bloque `.code` con ejemplo C# funcional.
-- [ ] Actividad evaluativa con enunciado y criterios.
+- [ ] Taller guiado con ejemplo completo para desarrollo del profesor.
 - [ ] Slide de cierre con lo aprendido y lo que sigue.
 - [ ] Contadores `N / {{TOTAL}}` actualizados en cada footer.
 - [ ] JS de navegación completo e intacto (btnPrev, btnNext, teclado, touch).

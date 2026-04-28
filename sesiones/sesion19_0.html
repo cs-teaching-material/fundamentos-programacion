@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 19</title>
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px);
+      --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px);
+      --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#ffffff;}
+    .deck{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px);box-sizing:border-box;background:#ffffff;}
+    .stage{width:min(96vw,calc(92vh*(16/9)));aspect-ratio:16/9;position:relative;}
+    .slide{position:absolute;inset:0;display:none;box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;}
+    .slide.active{display:block;}
+    .slide.cover{background:url("./Portada.png") center/cover no-repeat;color:#ffffff;}
+    .slide.content-slide{background:url("./Contenido.png") top left/contain no-repeat,#ffffff;color:var(--texto);}
+    .inner{height:100%;box-sizing:border-box;padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);display:flex;flex-direction:column;gap:clamp(10px,1.1vw,18px);}
+    .cover .inner{padding:var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);}
+    .content{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.1vw,16px);min-height:0;}
+    .header{color:var(--azul-medio);font-size:clamp(18px,1.6vw,22px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    h1{margin:0;font-size:var(--h1);line-height:1.08;color:var(--texto);}
+    h2{margin:0;font-size:var(--h2);line-height:1.15;color:var(--azul-medio);}
+    p{margin:0;font-size:var(--p);line-height:1.4;color:var(--texto);}
+    li{font-size:var(--li);line-height:1.4;color:var(--texto);}
+    ul,ol{margin:0;padding-left:1.2em;}
+    .subtitle{color:var(--turquesa);font-weight:800;font-size:clamp(18px,1.8vw,24px);margin-top:clamp(6px,1vw,10px);}
+    .cover h1{color:#ffffff;}
+    .cover p{color:#e5edf8;}
+    .cover .subtitle{color:#f7df00;}
+    .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
+    .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .callout-warn{background:#fff8f0;border-left:6px solid #f59e0b;padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .two-col{display:grid;grid-template-columns:1.1fr .95fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dde2f1;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#111827;color:#e5e7eb;padding:2px 8px;border-radius:7px;font-size:clamp(11px,1vw,13px);border:1px solid rgba(255,255,255,.08);}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.05vw,14px);line-height:1.35;background:#0b1020;color:#e5e7eb;border-radius:10px;padding:clamp(10px,1.1vw,14px);overflow:auto;max-height:44vh;border:1px solid rgba(17,24,39,.25);white-space:pre-wrap;}
+    .kw{color:#7dd3fc;}
+    .ty{color:#86efac;}
+    .fn{color:#fde68a;}
+    .cm{color:#94a3b8;font-style:italic;}
+    .st{color:#f9a8d4;}
+    .ok{color:#16a34a;font-weight:700;}
+    .bad{color:#dc2626;font-weight:700;}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
+    th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
+    th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
+    .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
+    .counter{font-weight:800;color:var(--azul-medio);}
+    .cover .counter{color:#e5edf8;}
+    .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
+    .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
+    #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
+    .stage:hover #touchNav{opacity:1;transform:translateY(-50%) translateY(0);}
+    @media (hover:none){#touchNav{opacity:1;transform:translateY(-50%);}}
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .step{opacity:0;animation:fadeIn .45s ease forwards;}
+    .step:nth-child(1){animation-delay:.15s;}
+    .step:nth-child(2){animation-delay:.55s;}
+    .step:nth-child(3){animation-delay:.95s;}
+    .step:nth-child(4){animation-delay:1.35s;}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 19</h1>
+          <div class="subtitle">Esqueleto modular y alcance de variables (nivel avanzado)</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 &middot; Diseno estructural con control de estado y trazabilidad</p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; &middot; Home / End &middot; F pantalla completa &middot; Tactil: desliza</p>
+        </div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion &middot; Grupos 810 / 811</span><span class="counter">1 / 26</span></div>
+      </div>
+    </section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Proposito de la sesion</div><div class="content"><h2>Que cambia respecto a 17 y 18</h2><ul><li>Pasamos de "separar funciones" a "gobernar estado y alcance".</li><li>Disenamos esqueleto por capas: entrada, dominio, salida y auditoria.</li><li>Decidimos cuando usar local, parametro, retorno o campo compartido.</li><li>Diagnosticamos errores de sombra y dependencia oculta.</li><li>Dejamos una base lista para implementacion completa en sesion 20.</li></ul></div><div class="footer"><span>Sesion 19 &middot; Proposito</span><span class="counter">2 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Planeacion U3</div><div class="content"><h2>Posicion real de esta sesion</h2><table><thead><tr><th>Sesion</th><th>Foco</th><th>Producto</th></tr></thead><tbody><tr><td>17</td><td>Parametros y retorno</td><td>Funciones sueltas correctas</td></tr><tr><td>18</td><td>Integracion funcional</td><td>Solucion modular funcionando</td></tr><tr><td><strong>19</strong></td><td><strong>Esqueleto y alcance avanzado</strong></td><td><strong>Arquitectura robusta + reglas de estado</strong></td></tr><tr><td>20</td><td>Implementacion completa</td><td>Sistema modular terminado</td></tr></tbody></table></div><div class="footer"><span>Sesion 19 &middot; Avance</span><span class="counter">3 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Concepto base</div><div class="content"><h2>Matriz de decision de alcance</h2><table><thead><tr><th>Necesidad</th><th>Elegir</th><th>Evitar</th></tr></thead><tbody><tr><td>Dato solo temporal en un paso</td><td class="ok">Variable local</td><td class="bad">Campo global</td></tr><tr><td>Dato requerido por otra funcion</td><td class="ok">Parametro / retorno</td><td class="bad">Lectura indirecta de estado externo</td></tr><tr><td>Dato que varias funciones deben compartir (auditoria)</td><td class="ok">Campo estatico con regla de uso</td><td class="bad">Multiples campos mutables sin regla</td></tr><tr><td>Actualizar varias salidas de validacion</td><td class="ok">out con contrato claro</td><td class="bad">ref sin justificacion</td></tr></tbody></table><p class="note">Introduccion natural de static: aparece cuando varias funciones necesitan el mismo dato; no para pasar resultados del calculo.</p></div><div class="footer"><span>Sesion 19 &middot; Matriz</span><span class="counter">4 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Diagrama</div><div class="content"><h2>Mapa de alcance en un modulo</h2><svg viewBox="0 0 520 250" style="width:100%;max-height:38vh;" aria-label="Niveles de alcance: clase, funcion y bloque"><rect x="15" y="15" width="490" height="220" rx="12" fill="#f8fbff" stroke="#c7d2fe"/><text x="30" y="38" fill="#1e3a8a" font-family="Arial" font-size="13" font-weight="bold">Clase Program (campo compartido)</text><rect x="40" y="50" width="440" height="165" rx="10" fill="#eef6ff" stroke="#93c5fd"/><text x="55" y="72" fill="#0c4a6e" font-family="Arial" font-size="12" font-weight="bold">Main() (alcance de funcion)</text><rect x="75" y="90" width="370" height="100" rx="8" fill="#ffffff" stroke="#5eead4"/><text x="88" y="112" fill="#134e4a" font-family="Arial" font-size="12" font-weight="bold">Bloque if(validacionOk) (alcance de bloque)</text><text x="90" y="135" fill="#201F4B" font-family="Arial" font-size="11">local: double neto</text><text x="90" y="154" fill="#201F4B" font-family="Arial" font-size="11">local: double descuento</text><text x="90" y="173" fill="#201F4B" font-family="Arial" font-size="11">local: double pagoFinal</text><text x="58" y="200" fill="#1d4ed8" font-family="Arial" font-size="11">parametros viven en su funcion y no salen de ella</text><text x="290" y="38" fill="#7c3aed" font-family="Arial" font-size="11">campo estatico permitido: contadorLlamadas</text></svg><p class="note">Caso real de esta sesion: contadorLlamadas solo cuenta acciones mientras corre el programa. El calculo de nomina sigue por parametros y retornos.</p><div class="callout"><p><strong>Lectura guiada:</strong> aqui static no aparece por moda tecnica; aparece porque necesitamos un mismo dato para todo el programa.</p></div></div><div class="footer"><span>Sesion 19 &middot; Diagrama alcance</span><span class="counter">5 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Caso critico</div><div class="content"><h2>Sombra de variables: ejemplo natural de auditoria</h2><p class="note">Contexto real: queremos saber cuantas acciones registra el programa. Por eso existe <span class="kbd">contadorLlamadas</span> como dato compartido sencillo.</p><div class="two-col"><div class="code"><span class="kw">static int</span> contadorLlamadas = 0;
+
+<span class="kw">static void</span> <span class="fn">RegistrarAuditoria</span>(<span class="ty">string</span> evento)
+{
+    <span class="kw">int</span> contadorLlamadas = 1; <span class="cm">// sombra: crea otro contador</span>
+    contadorLlamadas++;
+    Console.WriteLine(evento + " -> #" + contadorLlamadas);
+  }</div><div class="card"><h2>Que debe entenderse aqui</h2><ul><li><strong>Por que existe el campo:</strong> para llevar una cuenta general de acciones del programa.</li><li>La falla es la <strong>sombra</strong>: el contador local oculta el compartido.</li><li>Resultado: el log parece avanzar, pero el contador real nunca cambia.</li><li><strong>No falla static; falla la regla de uso.</strong> Solo la funcion de auditoria debe tocar el campo compartido sin redeclararlo.</li></ul><p class="note">Puente a la siguiente slide: definimos reglas simples para usar datos compartidos sin confusion.</p></div></div><div class="callout" style="margin-top:8px;"><p><strong>Idea de transicion:</strong> static tiene sentido cuando el dato se usa en todo el programa; para cada calculo individual, preferimos parametros y retornos.</p></div></div><div class="footer"><span>Sesion 19 &middot; Shadowing</span><span class="counter">6 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Decision de estado compartido</div><div class="content"><h2>Cuando compartir estado vale la pena</h2><p class="note">Continuidad del caso anterior: si el campo sirve para contar acciones generales, se conserva; si es un dato de cada trabajador, debe ir por parametros.</p><div class="equal-col"><div class="card"><h2>Uso valido (con regla)</h2><ul><li><strong>Contador de auditoria:</strong> una sola funcion lo incrementa.</li><li><strong>Configuracion global de solo lectura:</strong> no cambia en ejecucion.</li><li><strong>Tarifa por defecto institucional:</strong> valor inicial; luego manda la tarifa ingresada y validada.</li><li><strong>Cache controlada:</strong> politica clara de actualizacion e invalidez.</li></ul><p class="note">Clave: el dato compartido debe tener un responsable claro.</p></div><div class="card"><h2>Uso invalido (genera deuda)</h2><ul><li>Guardar entradas de usuario por comodidad.</li><li>Pasar resultados entre funciones sin parametros.</li><li>Acoplar calculos a estado oculto mutable.</li></ul><p class="note">Sintoma: "funciona a veces" y cuesta depurar causa raiz.</p></div></div><div class="two-col" style="margin-top:8px;"><div class="code"><span class="cm">// Caso correcto: estado compartido minimo</span>
+  <span class="kw">static int</span> contadorLlamadas = 0;
+
+  <span class="kw">static void</span> RegistrarAuditoria(<span class="ty">string</span> evento)
+  {
+    contadorLlamadas++;
+    Console.WriteLine(evento);
+  }
+
+  <span class="cm">// Dominio sin dependencia oculta</span>
+  <span class="kw">static double</span> CalcularNeto(<span class="ty">double</span> horas, <span class="ty">double</span> tarifa)
+  {
+    <span class="kw">return</span> horas * tarifa;
+    }</div><div class="card"><h2>Checklist de decision</h2><ol><li>Este dato lo usan varias funciones de verdad?</li><li>Es un valor general (por ejemplo, un valor por defecto) y no un dato de cada persona?</li><li>Si cambia, hay una sola funcion responsable?</li><li>Puedo probar el calculo sin depender de ese dato compartido?</li><li>Si la respuesta es "no", usa parametro o retorno.</li></ol></div></div><div class="callout" style="margin-top:8px;"><p><strong>Principio operativo:</strong> compartir pocos datos, que sean visibles y con motivo; el calculo principal debe funcionar con parametros.</p></div></div><div class="footer"><span>Sesion 19 &middot; Estado</span><span class="counter">7 / 26</span></div></div></section>
+
+      <section class="slide content-slide"><div class="inner"><div class="header">Analogia visual</div><div class="content"><h2>Tablero comun vs cuaderno personal</h2><div class="equal-col"><div class="card"><h2>Tablero comun</h2><svg viewBox="0 0 260 180" style="width:100%;max-height:28vh;" aria-label="Tablero comun representa estado compartido"><rect x="20" y="20" width="220" height="120" rx="10" fill="#ecfeff" stroke="#06b6d4" stroke-width="2"/><text x="130" y="48" text-anchor="middle" fill="#0f172a" font-family="Arial" font-size="14" font-weight="bold">Estado compartido</text><rect x="45" y="65" width="170" height="50" rx="8" fill="#06b6d4"/><text x="130" y="95" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="13">contadorLlamadas</text><text x="130" y="160" text-anchor="middle" fill="#334155" font-family="Arial" font-size="12">Todos lo ven, pero pocos deben cambiarlo</text></svg><p class="note">Sirve cuando toda la clase necesita mirar el mismo dato.</p></div><div class="card"><h2>Cuaderno personal</h2><svg viewBox="0 0 260 180" style="width:100%;max-height:28vh;" aria-label="Cuaderno personal representa variable local"><rect x="55" y="18" width="150" height="140" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/><line x1="85" y1="35" x2="85" y2="158" stroke="#cbd5e1" stroke-width="2"/><line x1="98" y1="55" x2="185" y2="55" stroke="#cbd5e1"/><line x1="98" y1="80" x2="185" y2="80" stroke="#cbd5e1"/><line x1="98" y1="105" x2="185" y2="105" stroke="#cbd5e1"/><text x="130" y="42" text-anchor="middle" fill="#0f172a" font-family="Arial" font-size="13" font-weight="bold">Variable local</text><text x="130" y="160" text-anchor="middle" fill="#334155" font-family="Arial" font-size="12">Solo la usa quien la escribio</text></svg><p class="note">Ideal para datos temporales que no deben salir de una funcion.</p></div></div><div class="callout"><p><strong>Idea docente:</strong> si el dato se parece a un cuaderno personal, debe ser local o parametro. Si se parece a un tablero comun, exige una regla estricta para saber quien lo actualiza.</p></div></div><div class="footer"><span>Sesion 19 &middot; Analogia</span><span class="counter">8 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Esqueleto por capas</div><div class="content"><h2>Arquitectura objetivo para el taller</h2><div class="code">Main()
+  -> LeerEntradaNomina()
+  -> ValidarRangoHoras(...)
+  -> CalcularNeto(...)
+  -> CalcularDescuentoSalud(...)
+  -> CalcularPagoFinal(...)
+  -> RegistrarAuditoria(...)   // estado compartido controlado
+  -> MostrarBoleta(...)</div><p class="note">La diferencia con sesion 18: aqui se gobierna que datos pueden vivir y donde.</p></div><div class="footer"><span>Sesion 19 &middot; Arquitectura</span><span class="counter">9 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Contrato</div><div class="content"><h2>Contrato de modulo (pre, post, invariante)</h2><table><thead><tr><th>Funcion</th><th>Precondicion</th><th>Postcondicion</th><th>Invariante</th></tr></thead><tbody><tr><td>CalcularNeto</td><td>horas > 0, tarifa > 0</td><td>retorna horas * tarifa</td><td>no modifica estado global</td></tr><tr><td>ValidarRangoHoras</td><td>dato parseado</td><td>retorna bool</td><td>solo lectura</td></tr><tr><td>RegistrarAuditoria</td><td>evento no vacio</td><td>aumenta contadorLlamadas</td><td>contador nunca decrece</td></tr></tbody></table></div><div class="footer"><span>Sesion 19 &middot; Contrato</span><span class="counter">10 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Comparacion tecnica</div><div class="content"><h2>value vs ref vs out</h2><table><thead><tr><th>Mecanismo</th><th>Uso tipico</th><th>Regla para esta sesion</th></tr></thead><tbody><tr><td>Por valor</td><td>calculos puros</td><td>default en funciones de dominio</td></tr><tr><td>ref</td><td>actualizar variable existente</td><td>usar solo si la mutacion es intencional y documentada</td></tr><tr><td>out</td><td>retornar dato adicional de validacion</td><td>ideal para TryParse y diagnostico</td></tr></tbody></table><p class="note">No usar ref/out como atajo para evitar disenar retornos claros.</p></div><div class="footer"><span>Sesion 19 &middot; Parametros avanzados</span><span class="counter">11 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Codigo base</div><div class="content"><h2>Plantilla robusta de esqueleto</h2><div class="code"><span class="kw">using</span> System;
+
+<span class="kw">class</span> Program
+{
+    <span class="kw">static int</span> contadorLlamadas = 0;
+
+    <span class="kw">static void</span> Main()
+    {
+        <span class="kw">if</span> (!LeerEntradaNomina(<span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa)) <span class="kw">return</span>;
+        <span class="ty">double</span> neto = CalcularNeto(horas, tarifa);
+        <span class="ty">double</span> descuento = CalcularDescuentoSalud(neto);
+        <span class="ty">double</span> pagoFinal = CalcularPagoFinal(neto, descuento);
+        RegistrarAuditoria(<span class="st">"nomina-procesada"</span>);
+        MostrarBoleta(horas, tarifa, neto, descuento, pagoFinal);
+    }
+
+    <span class="kw">static bool</span> LeerEntradaNomina(<span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa) { horas = 0; tarifa = 0; <span class="kw">return</span> <span class="kw">true</span>; }
+    <span class="kw">static double</span> CalcularNeto(<span class="ty">double</span> horas, <span class="ty">double</span> tarifa) { <span class="kw">return</span> horas * tarifa; }
+    <span class="kw">static double</span> CalcularDescuentoSalud(<span class="ty">double</span> neto) { <span class="kw">return</span> neto * 0.04; }
+    <span class="kw">static double</span> CalcularPagoFinal(<span class="ty">double</span> neto, <span class="ty">double</span> descuento) { <span class="kw">return</span> neto - descuento; }
+    <span class="kw">static void</span> RegistrarAuditoria(<span class="ty">string</span> evento) { contadorLlamadas++; }
+    <span class="kw">static void</span> MostrarBoleta(<span class="ty">double</span> h, <span class="ty">double</span> t, <span class="ty">double</span> n, <span class="ty">double</span> d, <span class="ty">double</span> p) { }
+}</div></div><div class="footer"><span>Sesion 19 &middot; Plantilla</span><span class="counter">12 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Animacion de flujo</div><div class="content"><h2>Ciclo de datos con estado controlado</h2><div class="step callout"><strong>1.</strong> Entrada valida datos y retorna por out.</div><div class="step callout"><strong>2.</strong> Dominio calcula por parametros (sin estado oculto).</div><div class="step callout"><strong>3.</strong> Auditoria actualiza solo contador compartido.</div><div class="step callout"><strong>4.</strong> Salida imprime resultado final sin recalcular.</div></div><div class="footer"><span>Sesion 19 &middot; Flujo</span><span class="counter">13 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Laboratorio guiado</div><div class="content"><h2>Diagnostico: encuentra 6 fallas de alcance</h2><div class="code"><span class="kw">static double</span> horas;
+<span class="kw">static double</span> tarifa;
+
+<span class="kw">static bool</span> Leer()
+{
+    <span class="kw">double</span> horas = 10; <span class="cm">// (1) sombra</span>
+    tarifa = -1000;          <span class="cm">// (2) estado invalido</span>
+    <span class="kw">return</span> <span class="kw">true</span>;
+}
+
+<span class="kw">static double</span> Calcular()
+{
+    <span class="kw">if</span> (tarifa &lt;= 0) { <span class="kw">double</span> neto = 0; }
+    <span class="kw">return</span> neto;         <span class="cm">// (3) fuera de alcance</span>
+}</div><p class="note">Completar en parejas: listar 6 fallas y proponer correccion puntual.</p></div><div class="footer"><span>Sesion 19 &middot; Diagnostico</span><span class="counter">14 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Laboratorio guiado</div><div class="content"><h2>Refactor del esqueleto defectuoso</h2><div class="equal-col"><div class="card"><h2>Paso A</h2><ul><li>Eliminar campos horas/tarifa.</li><li>Retornar datos por out.</li><li>Validar tarifa positiva.</li></ul></div><div class="card"><h2>Paso B</h2><ul><li>Calcular con parametros locales.</li><li>Agregar auditoria controlada.</li><li>Compilar cada ajuste.</li></ul></div></div><p class="note">Producto esperado: archivo que compila y tabla de fallas corregidas.</p></div><div class="footer"><span>Sesion 19 &middot; Refactor guiado</span><span class="counter">15 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Taller guiado</div><div class="content"><h2>Reto tecnico para desarrollo en clase</h2><div class="callout"><p><strong>Objetivo:</strong> construir un modulo de nomina semanal con alcance correcto y estado compartido minimo para auditoria.</p></div><ul><li>Paso 1: crear flujo principal en <span class="kbd">Main()</span>.</li><li>Paso 2: implementar entrada con <span class="kbd">out</span>.</li><li>Paso 3: implementar calculo y salida sin variables globales de dominio.</li><li>Paso 4: agregar auditoria controlada con un contador.</li></ul><p class="note">Este bloque es taller practico guiado, no evaluacion.</p></div><div class="footer"><span>Taller sesion 19</span><span class="counter">16 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 1: estructura base</h2><div class="code"><span class="kw">using</span> System;
+
+  <span class="kw">class</span> Program
+  {
+    <span class="kw">static int</span> contadorLlamadas = 0;
+
+    <span class="kw">static void</span> Main()
+    {
+      <span class="kw">if</span> (!LeerEntradaNomina(<span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa)) <span class="kw">return</span>;
+      <span class="ty">double</span> neto = CalcularNeto(horas, tarifa);
+      <span class="ty">double</span> descuento = CalcularDescuentoSalud(neto);
+      <span class="ty">double</span> pagoFinal = CalcularPagoFinal(neto, descuento);
+      RegistrarAuditoria(<span class="st">"nomina-semanal"</span>);
+      MostrarBoleta(horas, tarifa, neto, descuento, pagoFinal);
+    }
+  }</div></div><div class="footer"><span>Sesion 19 &middot; Paso 1</span><span class="counter">17 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 2: entrada y validacion</h2><div class="code"><span class="kw">static bool</span> LeerEntradaNomina(<span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa)
+  {
+    horas = 0;
+    tarifa = 0;
+
+    Console.Write(<span class="st">"Horas trabajadas: "</span>);
+    <span class="kw">if</span> (!<span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> horas) || horas &lt;= 0)
+    {
+      Console.WriteLine(<span class="st">"Horas invalidas"</span>);
+      <span class="kw">return</span> <span class="kw">false</span>;
+    }
+
+    Console.Write(<span class="st">"Tarifa por hora: "</span>);
+    <span class="kw">if</span> (!<span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> tarifa) || tarifa &lt;= 0)
+    {
+      Console.WriteLine(<span class="st">"Tarifa invalida"</span>);
+      <span class="kw">return</span> <span class="kw">false</span>;
+    }
+
+    <span class="kw">return</span> <span class="kw">true</span>;
+  }</div></div><div class="footer"><span>Sesion 19 &middot; Paso 2</span><span class="counter">18 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 3: dominio y salida</h2><div class="code"><span class="kw">static double</span> CalcularNeto(<span class="ty">double</span> horas, <span class="ty">double</span> tarifa) { <span class="kw">return</span> horas * tarifa; }
+  <span class="kw">static double</span> CalcularDescuentoSalud(<span class="ty">double</span> neto) { <span class="kw">return</span> neto * 0.04; }
+  <span class="kw">static double</span> CalcularPagoFinal(<span class="ty">double</span> neto, <span class="ty">double</span> descuento) { <span class="kw">return</span> neto - descuento; }
+
+  <span class="kw">static void</span> RegistrarAuditoria(<span class="ty">string</span> evento)
+  {
+    contadorLlamadas++;
+    Console.WriteLine($<span class="st">"[AUDIT] {contadorLlamadas}: {evento}"</span>);
+  }
+
+  <span class="kw">static void</span> MostrarBoleta(<span class="ty">double</span> horas, <span class="ty">double</span> tarifa, <span class="ty">double</span> neto, <span class="ty">double</span> descuento, <span class="ty">double</span> pagoFinal)
+  {
+    Console.WriteLine(<span class="st">"--- Boleta semanal ---"</span>);
+    Console.WriteLine($<span class="st">"Horas: {horas}"</span>);
+    Console.WriteLine($<span class="st">"Tarifa: {tarifa}"</span>);
+    Console.WriteLine($<span class="st">"Neto: {neto}"</span>);
+    Console.WriteLine($<span class="st">"Descuento salud: {descuento}"</span>);
+    Console.WriteLine($<span class="st">"Pago final: {pagoFinal}"</span>);
+  }</div></div><div class="footer"><span>Sesion 19 &middot; Paso 3</span><span class="counter">19 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada completa</div><div class="content"><h2>Diapositiva 19: codigo completo para desarrollar en clase</h2><div class="code"><span class="kw">using</span> System;
+
+  <span class="kw">class</span> Program
+  {
+    <span class="kw">static int</span> contadorLlamadas = 0;
+
+    <span class="kw">static void</span> Main()
+    {
+      <span class="kw">if</span> (!LeerEntradaNomina(<span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa))
+      {
+        <span class="kw">return</span>;
+      }
+
+      <span class="ty">double</span> neto = CalcularNeto(horas, tarifa);
+      <span class="ty">double</span> descuento = CalcularDescuentoSalud(neto);
+      <span class="ty">double</span> pagoFinal = CalcularPagoFinal(neto, descuento);
+
+      RegistrarAuditoria(<span class="st">"nomina-semanal"</span>);
+      MostrarBoleta(horas, tarifa, neto, descuento, pagoFinal);
+    }
+
+    <span class="kw">static bool</span> LeerEntradaNomina(<span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa)
+    {
+      horas = 0;
+      tarifa = 0;
+
+      Console.Write(<span class="st">"Horas trabajadas: "</span>);
+      <span class="kw">if</span> (!<span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> horas) || horas &lt;= 0) <span class="kw">return</span> <span class="kw">false</span>;
+
+      Console.Write(<span class="st">"Tarifa por hora: "</span>);
+      <span class="kw">if</span> (!<span class="ty">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> tarifa) || tarifa &lt;= 0) <span class="kw">return</span> <span class="kw">false</span>;
+
+      <span class="kw">return</span> <span class="kw">true</span>;
+    }
+
+    <span class="kw">static double</span> CalcularNeto(<span class="ty">double</span> horas, <span class="ty">double</span> tarifa) { <span class="kw">return</span> horas * tarifa; }
+    <span class="kw">static double</span> CalcularDescuentoSalud(<span class="ty">double</span> neto) { <span class="kw">return</span> neto * 0.04; }
+    <span class="kw">static double</span> CalcularPagoFinal(<span class="ty">double</span> neto, <span class="ty">double</span> descuento) { <span class="kw">return</span> neto - descuento; }
+
+    <span class="kw">static void</span> RegistrarAuditoria(<span class="ty">string</span> evento)
+    {
+      contadorLlamadas++;
+      Console.WriteLine($<span class="st">"[AUDIT] {contadorLlamadas}: {evento}"</span>);
+    }
+
+    <span class="kw">static void</span> MostrarBoleta(<span class="ty">double</span> horas, <span class="ty">double</span> tarifa, <span class="ty">double</span> neto, <span class="ty">double</span> descuento, <span class="ty">double</span> pagoFinal)
+    {
+      Console.WriteLine(<span class="st">"--- Boleta semanal ---"</span>);
+      Console.WriteLine($<span class="st">"Horas: {horas}"</span>);
+      Console.WriteLine($<span class="st">"Tarifa: {tarifa}"</span>);
+      Console.WriteLine($<span class="st">"Neto: {neto}"</span>);
+      Console.WriteLine($<span class="st">"Descuento salud: {descuento}"</span>);
+      Console.WriteLine($<span class="st">"Pago final: {pagoFinal}"</span>);
+    }
+  }</div></div><div class="footer"><span>Sesion 19 &middot; Ejemplo completo</span><span class="counter">20 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Prueba en vivo</div><div class="content"><h2>Corrida esperada del programa</h2><table><thead><tr><th>Entrada</th><th>Salida</th></tr></thead><tbody><tr><td>Horas=10, Tarifa=15000</td><td>Neto=150000, Desc=6000, Final=144000</td></tr><tr><td>Horas=8, Tarifa=20000</td><td>Neto=160000, Desc=6400, Final=153600</td></tr><tr><td>Horas=-2</td><td>retorna false y finaliza</td></tr></tbody></table><p class="note">El docente debe ejecutar los 3 casos en vivo y explicar por que no hay dependencias ocultas.</p></div><div class="footer"><span>Sesion 19 &middot; Pruebas</span><span class="counter">21 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Depuracion guiada</div><div class="content"><h2>Chequeo rapido de alcance</h2><ul><li>Breakpoint en lectura de horas y tarifa.</li><li>Verificar que <span class="kbd">horas</span> y <span class="kbd">tarifa</span> no son campos globales.</li><li>Confirmar que solo <span class="kbd">contadorLlamadas</span> es compartido.</li><li>Comprobar que funciones de dominio no escriben estado externo.</li><li>Validar salida final con calculo manual.</li></ul></div><div class="footer"><span>Sesion 19 &middot; Depuracion</span><span class="counter">22 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Extension</div><div class="content"><h2>Mejora opcional para el aula</h2><div class="two-col"><div class="card"><h2>Extension 1</h2><p>Agregar bonificacion de transporte si horas &gt;= 40.</p></div><div class="card"><h2>Extension 2</h2><p>Registrar tipo de evento en auditoria: ingreso, calculo, salida.</p></div></div><p class="note">Estas extensiones se usan si el grupo termina antes, sin convertirlo en evaluacion.</p></div><div class="footer"><span>Sesion 19 &middot; Extension</span><span class="counter">23 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Errores comunes</div><div class="content"><h2>Fallas que deben evitarse</h2><ul><li>Declarar horas y tarifa como campos compartidos.</li><li>Reusar nombres y crear sombra sin advertirlo.</li><li>Recalcular dominio dentro de la funcion de salida.</li><li>Usar <span class="kbd">ref</span> sin justificar necesidad de mutacion.</li><li>No validar entrada antes del calculo.</li></ul></div><div class="footer"><span>Sesion 19 &middot; Errores</span><span class="counter">24 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Sintesis tecnica</div><div class="content"><h2>Reglas que quedan instaladas</h2><ol><li>El alcance se decide por responsabilidad, no por conveniencia.</li><li>Estado compartido minimo y aislado.</li><li>Dominio con parametros y retornos claros.</li><li>Salida sin mutar reglas de negocio.</li></ol></div><div class="footer"><span>Sesion 19 &middot; Sintesis</span><span class="counter">25 / 26</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Cierre de sesion</div><div class="content"><h2>Puente a sesion 20</h2><div class="equal-col"><div class="card"><h2>Hoy</h2><ul><li>Se fijo un esqueleto robusto.</li><li>Se desarrollo un ejemplo completo en vivo.</li><li>Se controlo alcance y estado.</li></ul></div><div class="card"><h2>Siguiente sesion</h2><ul><li>Implementar solucion modular completa.</li><li>Agregar validaciones adicionales.</li><li>Consolidar pruebas por funcion.</li></ul></div></div></div><div class="footer"><span>Sesion 19 &middot; Cierre</span><span class="counter">26 / 26</span></div></div></section>
+
+  </div>
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const counters = Array.from(document.querySelectorAll(".counter"));
+  const stage = document.getElementById("stage");
+  const btnPrev = document.getElementById("btnPrev");
+  const btnNext = document.getElementById("btnNext");
+  let idx = 0;
+
+  function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+  function show(i){
+    idx = clamp(i,0,slides.length-1);
+    slides.forEach((s,k)=>s.classList.toggle("active",k===idx));
+    const label = (idx+1) + " / " + slides.length;
+    counters.forEach(el=>el.textContent = label);
+    history.replaceState(null,"","#"+(idx+1));
+  }
+  function next(){ show(idx+1); }
+  function prev(){ show(idx-1); }
+
+  const m = (location.hash||"").match(/^#(\d+)$/);
+  if(m){
+    const s = parseInt(m[1],10);
+    if(!isNaN(s)) idx = clamp(s-1,0,slides.length-1);
+  }
+  show(idx);
+
+  btnPrev.addEventListener("click",prev);
+  btnNext.addEventListener("click",next);
+
+  document.addEventListener("keydown",e=>{
+    const k = e.key;
+    if(k==="f"||k==="F"){
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+      return;
+    }
+    if(k==="ArrowRight"||k==="PageDown"||k===" "){ e.preventDefault(); next(); }
+    else if(k==="ArrowLeft"||k==="PageUp"){ e.preventDefault(); prev(); }
+    else if(k==="Home"){ e.preventDefault(); show(0); }
+    else if(k==="End"){ e.preventDefault(); show(slides.length-1); }
+  });
+
+  const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints>0);
+  if(isTouch){
+    let x0=null,y0=null,t0=0;
+    const SWIPE_MIN_X = 50;
+    const SWIPE_MAX_Y = 80;
+    const SWIPE_MAX_MS = 800;
+
+    stage.addEventListener("touchstart",e=>{
+      const t = e.changedTouches[0];
+      x0 = t.clientX;
+      y0 = t.clientY;
+      t0 = Date.now();
+    },{passive:true});
+
+    stage.addEventListener("touchend",e=>{
+      if(x0===null || y0===null) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      const dt = Date.now() - t0;
+      x0 = null;
+      y0 = null;
+      if(dt>SWIPE_MAX_MS || Math.abs(dy)>SWIPE_MAX_Y) return;
+      if(dx<=-SWIPE_MIN_X) next();
+      else if(dx>=SWIPE_MIN_X) prev();
+    },{passive:true});
+  }
+})();
+</script>
+</body>
+</html>
