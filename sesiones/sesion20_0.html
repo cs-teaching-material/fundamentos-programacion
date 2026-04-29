@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 20</title>
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px);
+      --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px);
+      --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#ffffff;}
+    .deck{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px);box-sizing:border-box;background:#ffffff;}
+    .stage{width:min(96vw,calc(92vh*(16/9)));aspect-ratio:16/9;position:relative;}
+    .slide{position:absolute;inset:0;display:none;box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;}
+    .slide.active{display:block;}
+    .slide.cover{background:url("./Portada.png") center/cover no-repeat;color:#ffffff;}
+    .slide.content-slide{background:url("./Contenido.png") top left/contain no-repeat,#ffffff;color:var(--texto);}
+    .inner{height:100%;box-sizing:border-box;padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);display:flex;flex-direction:column;gap:clamp(10px,1.1vw,18px);}
+    .cover .inner{padding:var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);}
+    .content{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.1vw,16px);min-height:0;}
+    .header{color:var(--azul-medio);font-size:clamp(18px,1.6vw,22px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    h1{margin:0;font-size:var(--h1);line-height:1.08;color:var(--texto);}
+    h2{margin:0;font-size:var(--h2);line-height:1.15;color:var(--azul-medio);}
+    p{margin:0;font-size:var(--p);line-height:1.4;color:var(--texto);}
+    li{font-size:var(--li);line-height:1.4;color:var(--texto);}
+    ul,ol{margin:0;padding-left:1.2em;}
+    .subtitle{color:var(--turquesa);font-weight:800;font-size:clamp(18px,1.8vw,24px);margin-top:clamp(6px,1vw,10px);}
+    .cover h1{color:#ffffff;}
+    .cover p{color:#e5edf8;}
+    .cover .subtitle{color:#f7df00;}
+    .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
+    .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .two-col{display:grid;grid-template-columns:1.15fr .9fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dde2f1;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#111827;color:#e5e7eb;padding:2px 8px;border-radius:7px;font-size:clamp(11px,1vw,13px);border:1px solid rgba(255,255,255,.08);}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.05vw,14px);line-height:1.35;background:#0b1020;color:#e5e7eb;border-radius:10px;padding:clamp(10px,1.1vw,14px);overflow:auto;max-height:44vh;border:1px solid rgba(17,24,39,.25);white-space:pre-wrap;}
+    .kw{color:#7dd3fc;}
+    .ty{color:#86efac;}
+    .fn{color:#fde68a;}
+    .cm{color:#94a3b8;font-style:italic;}
+    .st{color:#f9a8d4;}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
+    th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
+    th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
+    .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
+    .counter{font-weight:800;color:var(--azul-medio);}
+    .cover .counter{color:#e5edf8;}
+    .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
+    .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
+    #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
+    .stage:hover #touchNav{opacity:1;transform:translateY(-50%) translateY(0);}
+    @media (hover:none){#touchNav{opacity:1;transform:translateY(-50%);}}
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .step{opacity:0;animation:fadeIn .45s ease forwards;}
+    .step:nth-child(1){animation-delay:.15s;}
+    .step:nth-child(2){animation-delay:.55s;}
+    .step:nth-child(3){animation-delay:.95s;}
+    .step:nth-child(4){animation-delay:1.35s;}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 20</h1>
+          <div class="subtitle">Implementacion modular por lotes y resiliencia</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 · Integracion final de funciones con validacion y pruebas</p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; · Home / End · F pantalla completa · Tactil: desliza</p>
+        </div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 20</span></div>
+      </div>
+    </section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Proposito de la sesion</div><div class="content"><h2>Dar el salto: de caso unico a procesamiento por lotes</h2><ul><li>Implementar una solucion modular que procese varios empleados en una misma ejecucion.</li><li>Registrar fallos por cada registro sin detener todo el lote.</li><li>Construir acumuladores del proceso: total neto, total pago y tasa de error.</li><li>Emitir un resumen consolidado al finalizar.</li><li>Dejar base lista para refinamiento de calidad en sesion 21.</li></ul></div><div class="footer"><span>Sesion 20 · Proposito</span><span class="counter">2 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Problema real</div><div class="content"><h2>Enunciado exacto del problema</h2><div class="callout"><p><strong>Enunciado:</strong> Construir un programa en C# que procese la nomina de <strong>N empleados</strong> en una sola ejecucion; cada registro debe validarse de forma independiente, los errores deben reportarse sin detener el proceso general y, al finalizar, se debe mostrar un resumen consolidado con exitos, errores, total neto, total pagado y tasa de error.</p></div><div class="two-col"><div class="card"><h2>Condiciones clave</h2><ul><li>Si un registro falla, los demas se siguen procesando.</li><li>Cada error queda asociado al indice del registro.</li><li>El resumen final representa todo el lote.</li></ul></div><div class="card"><h2>Resultado esperado</h2><p>Un flujo robusto de procesamiento por lotes, trazable y con salida final clara para su analisis en clase.</p></div></div></div><div class="footer"><span>Sesion 20 · Problema</span><span class="counter">3 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Decision de diseno</div><div class="content"><h2>De donde sale ProcesarLote?</h2><div class="equal-col"><div class="card"><h2>Idea</h2><p>Si el problema es "procesar muchos", necesitamos una funcion que <strong>coordine el ciclo completo</strong>.</p><p class="note" style="margin-top:8px;">A esa funcion le ponemos un nombre intencional: <span class="kbd">ProcesarLote(n)</span>.</p></div><div class="code"><span class="kw">static void</span> Main()
+{
+  <span class="kw">int</span> n = LeerCantidad();
+  ProcesarLote(n);
+}
+
+<span class="cm">// Nace para resolver el problema de muchos registros</span>
+<span class="kw">static void</span> ProcesarLote(<span class="kw">int</span> n)
+{
+  <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= n; i++)
+  {
+    <span class="cm">// procesar registro i</span>
+  }
+}</div></div></div><div class="footer"><span>Sesion 20 · Decision</span><span class="counter">4 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Diseno modular</div><div class="content"><h2>Que hace exactamente ProcesarLote</h2><div class="two-col"><div class="card"><h2>Responsabilidad central</h2><ul><li>Recibe N registros a procesar.</li><li>Recorre cada registro (for).</li><li>Decide si suma a exitos o errores.</li><li>Al final llama al consolidado.</li></ul></div><div class="card"><h2>Que NO hace</h2><ul><li>No calcula formulas de negocio detalladas.</li><li>No valida todos los campos por si sola.</li><li>No imprime cada detalle de dominio.</li><li>No reemplaza a TryProcesarEmpleado.</li></ul></div></div><div class="callout"><p><strong>Resumen simple:</strong> ProcesarLote coordina el proceso; las otras funciones resuelven tareas especificas.</p></div></div><div class="footer"><span>Sesion 20 · Rol de ProcesarLote</span><span class="counter">5 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Diseno modular</div><div class="content"><h2>Patron Try por registro (sin romper el lote)</h2><div class="two-col"><div class="code"><span class="kw">static bool</span> <span class="fn">TryProcesarEmpleado</span>(
+  <span class="ty">int</span> idx,
+  <span class="kw">out</span> <span class="ty">double</span> neto,
+  <span class="kw">out</span> <span class="ty">double</span> pago,
+  <span class="kw">out</span> <span class="ty">string</span> error)
+{
+  neto = 0;
+  pago = 0;
+  error = <span class="st">""</span>;
+
+  <span class="kw">if</span> (!LeerEntradaRegistro(idx, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t))
+  {
+    error = <span class="st">"Entrada invalida"</span>;
+    <span class="kw">return</span> <span class="kw">false</span>;
+  }
+
+  <span class="kw">if</span> (!ValidarReglas(h, t, <span class="kw">out</span> error))
+    <span class="kw">return</span> <span class="kw">false</span>;
+
+  neto = CalcularNeto(h, t);
+  pago = CalcularPagoFinal(neto);
+  <span class="kw">return</span> <span class="kw">true</span>;
+}</div><div class="card"><h2>Clave didactica</h2><ul><li>Una falla no detiene todo el proceso.</li><li>Se conserva resultado parcial del lote.</li><li>El error queda asociado a indice de registro.</li><li>Habilita depuracion basada en datos.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Try por registro</span><span class="counter">6 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Implementacion</div><div class="content"><h2>Acumuladores del proceso</h2><div class="equal-col"><div class="card"><h2>Estado permitido</h2><ul><li><span class="kbd">int exitos</span></li><li><span class="kbd">int errores</span></li><li><span class="kbd">double totalNeto</span></li><li><span class="kbd">double totalPago</span></li></ul><p class="note">Son datos del proceso por lotes, no del calculo de cada empleado.</p></div><div class="card"><h2>Reglas</h2><ul><li>Solo ProcesarLote actualiza acumuladores.</li><li>Calculos unitarios siguen puros por parametro.</li><li>MostrarConsolidado no recalcula formulas.</li><li>Bitacora guarda errores por registro.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Acumuladores</span><span class="counter">7 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Implementacion</div><div class="content"><h2>Ruta de construccion: funcion por funcion</h2><div class="step callout"><strong>Paso 1 · Main()</strong>: problema inicial -> no sabemos cuantos registros procesar.</div><div class="step callout"><strong>Paso 2 · ProcesarLote()</strong>: problema -> un error podria detener todo el ciclo.</div><div class="step callout"><strong>Paso 3 · TryProcesarEmpleado()</strong>: problema -> entrada invalida y reglas incumplidas.</div><div class="step callout"><strong>Paso 4 · MostrarConsolidado()</strong>: problema -> resultados dispersos y poco claros.</div><p class="note">En cada paso implementamos una solucion puntual antes de avanzar al siguiente bloque.</p></div><div class="footer"><span>Sesion 20 · Ruta de construccion</span><span class="counter">8 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 1: Main() define el punto de entrada</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Sin una cantidad valida, no existe proceso de lote confiable.</p><h2 style="margin-top:10px;">Solucion</h2><p>Validar <span class="kbd">n</span> antes de llamar a <span class="kbd">ProcesarLote(n)</span>.</p></div><div class="code"><span class="kw">static void</span> Main()
+{
+  Console.Write(<span class="st">"Cantidad de registros: "</span>);
+  <span class="kw">if</span> (!<span class="ty">int</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> <span class="ty">int</span> n) || n &lt;= 0)
+  {
+    Console.WriteLine(<span class="st">"Cantidad invalida"</span>);
+    <span class="kw">return</span>;
+  }
+
+  ProcesarLote(n);
+}</div></div></div><div class="footer"><span>Sesion 20 · Paso 1</span><span class="counter">9 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 2: ProcesarLote() coordina sin detenerse</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Si un registro falla, se puede cortar todo el proceso y perder resultados validos.</p><h2 style="margin-top:10px;">Solucion</h2><p>Controlar cada registro con <span class="kbd">if/else</span>, acumular exitos y registrar errores.</p></div><div class="code"><span class="kw">static void</span> ProcesarLote(<span class="ty">int</span> n)
+{
+  <span class="ty">int</span> exitos = 0;
+  <span class="ty">int</span> errores = 0;
+  <span class="ty">double</span> totalNeto = 0;
+  <span class="ty">double</span> totalPago = 0;
+
+  <span class="kw">for</span> (<span class="ty">int</span> i = 1; i &lt;= n; i++)
+  {
+    <span class="kw">if</span> (TryProcesarEmpleado(i, <span class="kw">out</span> <span class="ty">double</span> neto, <span class="kw">out</span> <span class="ty">double</span> pago, <span class="kw">out</span> <span class="ty">string</span> err))
+    {
+      exitos++;
+      totalNeto += neto;
+      totalPago += pago;
+    }
+    <span class="kw">else</span> { errores++; RegistrarError(i, err); }
+  }
+}</div></div></div><div class="footer"><span>Sesion 20 · Paso 2</span><span class="counter">10 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 3: TryProcesarEmpleado() aisla fallas</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Entradas no numericas o reglas invalidas pueden contaminar el calculo.</p><h2 style="margin-top:10px;">Solucion</h2><p>Usar salidas anticipadas con <span class="kbd">return false</span> y mensaje de error por registro.</p></div><div class="code"><span class="kw">if</span> (!LeerEntradaRegistro(idx, <span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa))
+{
+  error = <span class="st">"Entrada no numerica"</span>;
+  <span class="kw">return</span> <span class="kw">false</span>;
+}
+
+<span class="kw">if</span> (!ValidarReglas(horas, tarifa, <span class="kw">out</span> error))
+  <span class="kw">return</span> <span class="kw">false</span>;
+
+neto = CalcularNeto(horas, tarifa);
+pago = CalcularPagoFinal(neto);
+RegistrarLog(idx, <span class="st">"ok"</span>);
+<span class="kw">return</span> <span class="kw">true</span>;</div></div><p class="note">Se observa la diferencia: aqui se controla exito/error por registro, no por caso unico.</p></div><div class="footer"><span>Sesion 20 · Paso 3</span><span class="counter">11 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 4: MostrarConsolidado() cierra el proceso</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Sin consolidado final, los resultados quedan dispersos y no se pueden interpretar.</p><h2 style="margin-top:10px;">Solucion</h2><p>Centralizar resumen de registros, exitos, errores, totales y tasa de error.</p></div><div class="code"><span class="kw">static void</span> MostrarConsolidado(
+  <span class="ty">int</span> n,
+  <span class="ty">int</span> exitos,
+  <span class="ty">int</span> errores,
+  <span class="ty">double</span> totalNeto,
+  <span class="ty">double</span> totalPago)
+{
+  <span class="ty">double</span> tasaError = (<span class="ty">double</span>)errores / n;
+  Console.WriteLine(<span class="st">"--- RESUMEN LOTE ---"</span>);
+  Console.WriteLine($<span class="st">"Registros: {n}"</span>);
+  Console.WriteLine($<span class="st">"Exitos: {exitos}"</span>);
+  Console.WriteLine($<span class="st">"Errores: {errores}"</span>);
+  Console.WriteLine($<span class="st">"Total neto: {totalNeto}"</span>);
+  Console.WriteLine($<span class="st">"Total pago: {totalPago}"</span>);
+  Console.WriteLine($<span class="st">"Tasa error: {tasaError:P1}"</span>);
+}</div></div></div><div class="footer"><span>Sesion 20 · Paso 4</span><span class="counter">12 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Analisis</div><div class="content"><h2>Problemas y soluciones validadas al final</h2><table><thead><tr><th>Funcion</th><th>Problema detectado</th><th>Solucion aplicada</th><th>Como se valida</th></tr></thead><tbody><tr><td>Main</td><td>n invalido</td><td>guard clause de entrada</td><td>si n=0, no inicia proceso</td></tr><tr><td>ProcesarLote</td><td>se corta por error individual</td><td>if/else por registro</td><td>lote mixto termina completo</td></tr><tr><td>TryProcesarEmpleado</td><td>entrada/regla invalida</td><td>return false + motivo</td><td>error queda trazado por indice</td></tr><tr><td>MostrarConsolidado</td><td>resultados dispersos</td><td>resumen final centralizado</td><td>totales y tasa de error coherentes</td></tr></tbody></table></div><div class="footer"><span>Sesion 20 · Validacion</span><span class="counter">13 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Analisis</div><div class="content"><h2>Errores frecuentes en lotes</h2><div class="equal-col"><div class="card"><h2>Fallas tipicas</h2><ul><li>Detener el for ante primer error.</li><li>No inicializar acumuladores.</li><li>Reusar variable error entre iteraciones.</li><li>No registrar indice de registro fallido.</li></ul></div><div class="card"><h2>Correcciones</h2><ul><li>Usar Try y continuar siguiente i.</li><li>Inicializar acumuladores antes del ciclo.</li><li>Resetear out en cada llamada Try.</li><li>RegistrarError(i, motivo) siempre.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Errores lote</span><span class="counter">14 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Taller guiado</div><div class="content"><h2>Reto tecnico: nomina por lotes resiliente</h2><div class="callout"><p><strong>Reto tecnico:</strong> procesar N empleados en una ejecucion y registrar fallos individuales sin detener el proceso completo.</p></div><ul><li>Paso 1: crear Main + ProcesarLote(n).</li><li>Paso 2: implementar TryProcesarEmpleado con out error.</li><li>Paso 3: acumular exitos/errores/totales.</li><li>Paso 4: imprimir consolidado y bitacora de errores.</li></ul><p class="note">Trabajo completamente guiado en clase: no hay entrega evaluativa en esta sesion.</p></div><div class="footer"><span>Taller sesion 20</span><span class="counter">15 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Desarrollo guiado del profesor</div><div class="content"><h2>Codigo completo (bloque 1 de 2)</h2><div class="code"><span class="kw">using</span> System;
+
+<span class="kw">class</span> Program
+{
+  <span class="kw">static void</span> Main()
+  {
+    Console.Write(<span class="st">"Cantidad de empleados: "</span>);
+    <span class="kw">if</span> (!<span class="ty">int</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> <span class="ty">int</span> n) || n &lt;= 0)
+    {
+      Console.WriteLine(<span class="st">"Cantidad invalida"</span>);
+      <span class="kw">return</span>;
+    }
+    ProcesarLote(n);
+  }
+
+  <span class="kw">static void</span> ProcesarLote(<span class="ty">int</span> n)
+  {
+    <span class="ty">int</span> exitos = 0, errores = 0;
+    <span class="ty">double</span> totalNeto = 0, totalPago = 0;
+
+    <span class="kw">for</span> (<span class="ty">int</span> i = 1; i &lt;= n; i++)
+    {
+      <span class="kw">if</span> (TryProcesarEmpleado(i, <span class="kw">out</span> <span class="ty">double</span> neto, <span class="kw">out</span> <span class="ty">double</span> pago, <span class="kw">out</span> <span class="ty">string</span> err))
+      { exitos++; totalNeto += neto; totalPago += pago; }
+      <span class="kw">else</span> { errores++; RegistrarError(i, err); }
+    }</div></div><div class="footer"><span>Sesion 20 · Desarrollo 1</span><span class="counter">16 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Desarrollo guiado del profesor</div><div class="content"><h2>Codigo completo (bloque 2 de 2)</h2><div class="code">    MostrarConsolidado(n, exitos, errores, totalNeto, totalPago);
+  }
+
+  <span class="kw">static bool</span> TryProcesarEmpleado(<span class="ty">int</span> i, <span class="kw">out</span> <span class="ty">double</span> neto, <span class="kw">out</span> <span class="ty">double</span> pago, <span class="kw">out</span> <span class="ty">string</span> err)
+  {
+    neto = 0; pago = 0; err = <span class="st">""</span>;
+    <span class="kw">if</span> (!LeerEntradaRegistro(i, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t)) { err = <span class="st">"Entrada invalida"</span>; <span class="kw">return</span> <span class="kw">false</span>; }
+    <span class="kw">if</span> (!ValidarReglas(h, t, <span class="kw">out</span> err)) <span class="kw">return</span> <span class="kw">false</span>;
+    neto = h * t; pago = neto - (neto * 0.04); <span class="kw">return</span> <span class="kw">true</span>;
+  }
+
+  <span class="kw">static bool</span> LeerEntradaRegistro(<span class="ty">int</span> i, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t) { h = 0; t = 0; <span class="kw">return</span> <span class="kw">true</span>; }
+  <span class="kw">static bool</span> ValidarReglas(<span class="ty">double</span> h, <span class="ty">double</span> t, <span class="kw">out</span> <span class="ty">string</span> e) { e = <span class="st">""</span>; <span class="kw">return</span> h &gt; 0 &amp;&amp; h &lt;= 60 &amp;&amp; t &gt;= 5000; }
+  <span class="kw">static void</span> RegistrarError(<span class="ty">int</span> i, <span class="ty">string</span> e) { Console.WriteLine($<span class="st">"[ERR] #{i}: {e}"</span>); }
+  <span class="kw">static void</span> MostrarConsolidado(<span class="ty">int</span> n, <span class="ty">int</span> x, <span class="ty">int</span> er, <span class="ty">double</span> tn, <span class="ty">double</span> tp) { Console.WriteLine($<span class="st">"{x}/{n} exitos"</span>); }
+}</div><p class="note">Este bloque se desarrolla por fases para visualizar el salto de un caso a un sistema por lotes.</p></div><div class="footer"><span>Sesion 20 · Desarrollo 2</span><span class="counter">17 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Consolidacion en clase</div><div class="content"><h2>Verificacion guiada del flujo completo</h2><div class="equal-col"><div class="card"><h2>Chequeos tecnicos</h2><ul><li>El ciclo procesa N registros sin detenerse.</li><li>Los errores quedan asociados a su indice.</li><li>Los acumuladores cambian solo en ProcesarLote.</li></ul></div><div class="card"><h2>Chequeos de salida</h2><ul><li>Se imprime resumen consolidado final.</li><li>La tasa de error coincide con el lote ejecutado.</li><li>El grupo explica por que el flujo es resiliente.</li></ul></div></div><p class="note">Cierre practico de aula: sin entrega de estudiantes y sin calificacion en esta sesion.</p></div><div class="footer"><span>Sesion 20 · Consolidacion</span><span class="counter">18 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Sintesis tecnica</div><div class="content"><h2>Checklist del salto de complejidad</h2><ol><li>El sistema procesa N registros en un ciclo.</li><li>Cada registro falla o pasa sin romper el lote.</li><li>Existen acumuladores para metricas del proceso.</li><li>Se genera reporte consolidado final.</li><li>La bitacora conserva trazabilidad de errores.</li><li>El dominio unitario sigue desacoplado de consola.</li></ol></div><div class="footer"><span>Sesion 20 · Sintesis</span><span class="counter">19 / 20</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Cierre de sesion</div><div class="content"><h2>Ahora si hay una diferencia clara</h2><div class="equal-col"><div class="card"><h2>Lo que construimos hoy</h2><ul><li>Sistema modular que procesa un lote completo.</li><li>Manejo de fallos por registro con continuidad.</li><li>Resumen consolidado para analisis de resultados.</li></ul></div><div class="card"><h2>Que sigue en sesion 21</h2><ul><li>Refinar firmas y sobrecargas utiles.</li><li>Mejorar legibilidad y deuda tecnica del lote.</li><li>Estandarizar calidad de codigo modular.</li></ul></div></div><p class="note" style="margin-top:12px;">Sesion 20 deja de ser "otro ejemplo" y se convierte en un sistema de procesamiento completo en clase.</p></div><div class="footer"><span>Sesion 20 · Cierre</span><span class="counter">20 / 20</span></div></div></section>
+
+  </div>
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const counters = Array.from(document.querySelectorAll(".counter"));
+  const stage = document.getElementById("stage");
+  const btnPrev = document.getElementById("btnPrev");
+  const btnNext = document.getElementById("btnNext");
+  let idx = 0;
+
+  function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+  function show(i){
+    idx = clamp(i,0,slides.length-1);
+    slides.forEach((s,k)=>s.classList.toggle("active",k===idx));
+    const label = (idx+1) + " / " + slides.length;
+    counters.forEach(el=>el.textContent = label);
+    history.replaceState(null,"","#"+(idx+1));
+  }
+  function next(){ show(idx+1); }
+  function prev(){ show(idx-1); }
+
+  const m = (location.hash||"").match(/^#(\d+)$/);
+  if(m){
+    const s = parseInt(m[1],10);
+    if(!isNaN(s)) idx = clamp(s-1,0,slides.length-1);
+  }
+  show(idx);
+
+  btnPrev.addEventListener("click",prev);
+  btnNext.addEventListener("click",next);
+
+  document.addEventListener("keydown",e=>{
+    const k = e.key;
+    if(k==="f"||k==="F"){
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+      return;
+    }
+    if(k==="ArrowRight"||k==="PageDown"||k===" "){ e.preventDefault(); next(); }
+    else if(k==="ArrowLeft"||k==="PageUp"){ e.preventDefault(); prev(); }
+    else if(k==="Home"){ e.preventDefault(); show(0); }
+    else if(k==="End"){ e.preventDefault(); show(slides.length-1); }
+  });
+
+  const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints>0);
+  if(isTouch){
+    let x0=null,y0=null,t0=0;
+    const SWIPE_MIN_X = 50;
+    const SWIPE_MAX_Y = 80;
+    const SWIPE_MAX_MS = 800;
+
+    stage.addEventListener("touchstart",e=>{
+      const t = e.changedTouches[0];
+      x0 = t.clientX;
+      y0 = t.clientY;
+      t0 = Date.now();
+    },{passive:true});
+
+    stage.addEventListener("touchend",e=>{
+      if(x0===null || y0===null) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      const dt = Date.now() - t0;
+      x0 = null;
+      y0 = null;
+      if(dt>SWIPE_MAX_MS || Math.abs(dy)>SWIPE_MAX_Y) return;
+      if(dx<=-SWIPE_MIN_X) next();
+      else if(dx>=SWIPE_MIN_X) prev();
+    },{passive:true});
+  }
+})();
+</script>
+</body>
+</html>
