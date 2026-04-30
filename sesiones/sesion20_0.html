@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -84,141 +84,139 @@
       <div class="inner">
         <div class="content" style="justify-content:center;">
           <h1>Sesion 20</h1>
-          <div class="subtitle">Implementacion modular por lotes y resiliencia</div>
-          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 · Integracion final de funciones con validacion y pruebas</p>
+          <div class="subtitle">Implementacion modular por lotes y resiliencia corporativa</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 · Integracion final de funciones con validaciones escalables y pruebas sistemicas</p>
           <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; · Home / End · F pantalla completa · Tactil: desliza</p>
         </div>
-        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 20</span></div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 25</span></div>
       </div>
     </section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Proposito de la sesion</div><div class="content"><h2>Dar el salto: de caso unico a procesamiento por lotes</h2><ul><li>Implementar una solucion modular que procese varios empleados en una misma ejecucion.</li><li>Registrar fallos por cada registro sin detener todo el lote.</li><li>Construir acumuladores del proceso: total neto, total pago y tasa de error.</li><li>Emitir un resumen consolidado al finalizar.</li><li>Dejar base lista para refinamiento de calidad en sesion 21.</li></ul></div><div class="footer"><span>Sesion 20 · Proposito</span><span class="counter">2 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Proposito de la sesion</div><div class="content"><h2>Dar el salto: de caso unico a procesamiento continuo</h2><ul><li>Implementar una solucion modular robusta que procese <strong>multiples empleados</strong> en una misma ejecucion (Batch Processing), simulando sistemas en el mundo real.</li><li>Aislar fallos: Registrar errores por cada registro sin detener ni corromper todo el flujo de ejecucion.</li><li>Construir acumuladores de estado globales: total neto, pagos procesados y tasa de exito/error.</li><li>Emitir un resumen consolidado final para auditoria y visibilidad del ciclo.</li><li>Dejar la base algoritmica preparada para incorporar buenas practicas y Clean Code en la proxima sesion.</li></ul><div class="callout"><p><strong>Tip del Profesional:</strong> En la industria, un script rara vez calcula un solo dato. Pensar en colecciones o "lotes" es el estandar para manejar nominas o transacciones bancarias. Estructurar para volumen es estructurar para calidad.</p></div></div><div class="footer"><span>Sesion 20 · Proposito</span><span class="counter">2 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Problema real</div><div class="content"><h2>Enunciado exacto del problema</h2><div class="callout"><p><strong>Enunciado:</strong> Construir un programa en C# que procese la nomina de <strong>N empleados</strong> en una sola ejecucion; cada registro debe validarse de forma independiente, los errores deben reportarse sin detener el proceso general y, al finalizar, se debe mostrar un resumen consolidado con exitos, errores, total neto, total pagado y tasa de error.</p></div><div class="two-col"><div class="card"><h2>Condiciones clave</h2><ul><li>Si un registro falla, los demas se siguen procesando.</li><li>Cada error queda asociado al indice del registro.</li><li>El resumen final representa todo el lote.</li></ul></div><div class="card"><h2>Resultado esperado</h2><p>Un flujo robusto de procesamiento por lotes, trazable y con salida final clara para su analisis en clase.</p></div></div></div><div class="footer"><span>Sesion 20 · Problema</span><span class="counter">3 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Problema real</div><div class="content"><h2>Enunciado exacto del problema a resolver</h2><div class="callout"><p><strong>Mision:</strong> Construir un programa en C# que procese la nomina de <strong>N cantidad de empleados</strong> en una unica sesion de uso. Cada registro se validara de forma aislada e independiente; si hay fallas, deben reportarse en una bitacora (consola) sin detener a los demas. Al culminar, el sistema emitira un reporte detallando exitos, fallos, montos absolutos netos y pagados, junto a su relacion porcentual de errores.</p></div><div class="two-col"><div class="card"><h2>Condiciones innegociables</h2><ul><li>Si un empleado tiene horas negativas (ej. -5), su error se notifica, pero el sistema <strong>continua</strong> con el siguiente.</li><li>Todo error debe incluir el "Numero de registro" (Indice i) para rapida ubicacion visual.</li><li>Los totales finales engloban solo casos validos.</li></ul></div><div class="card"><h2>Resultado y valor esperado</h2><p>Un sistema dotado de tolerancia a fallos de entrada (Resiliencia), donde el usuario experimentara la fluidez de no tener que reiniciar ante el minimo error tipografico. Este es el principio de los "Sistemas Tolerantes a Fallos".</p></div></div></div><div class="footer"><span>Sesion 20 · Problema</span><span class="counter">3 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Decision de diseno</div><div class="content"><h2>De donde sale ProcesarLote?</h2><div class="equal-col"><div class="card"><h2>Idea</h2><p>Si el problema es "procesar muchos", necesitamos una funcion que <strong>coordine el ciclo completo</strong>.</p><p class="note" style="margin-top:8px;">A esa funcion le ponemos un nombre intencional: <span class="kbd">ProcesarLote(n)</span>.</p></div><div class="code"><span class="kw">static void</span> Main()
+    <section class="slide content-slide"><div class="inner"><div class="header">Decision de diseno fundamental</div><div class="content"><h2>De donde sale la funcion ProcesarLote?</h2><div class="equal-col"><div class="card"><h2>Abstraccion de alto nivel</h2><p>Si el problema principal radica en "coordinar muchos registros", lo ideal es no ensuciar el metodo <span class="kbd">Main</span>. Necesitamos un director de orquesta que conozca el total de interacciones.</p><p class="note" style="margin-top:8px;">Nombrar intencionalmente: <span class="kbd">ProcesarLote(int n)</span> expresa claramente su proposito: gestionar un conjunto definido de datos de inicio a fin. No se llama "HacerTodo".</p></div><div class="code"><span class="kw">static void</span> Main()
 {
-  <span class="kw">int</span> n = LeerCantidad();
-  ProcesarLote(n);
+  <span class="cm">// Validamos entrada inicial para el total</span>
+  <span class="kw">int</span> totalEmpleados = LeerCantidad();
+  ProcesarLote(totalEmpleados);
 }
 
-<span class="cm">// Nace para resolver el problema de muchos registros</span>
+<span class="cm">// Delegado encargado exclusivamente del flujo continuo</span>
 <span class="kw">static void</span> ProcesarLote(<span class="kw">int</span> n)
 {
   <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= n; i++)
   {
-    <span class="cm">// procesar registro i</span>
+    <span class="cm">// Aca evaluaremos si el registro 'i' tiene exito o falla</span>
   }
-}</div></div></div><div class="footer"><span>Sesion 20 · Decision</span><span class="counter">4 / 20</span></div></div></section>
+}</div></div></div><div class="footer"><span>Sesion 20 · Decision</span><span class="counter">4 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Diseno modular</div><div class="content"><h2>Que hace exactamente ProcesarLote</h2><div class="two-col"><div class="card"><h2>Responsabilidad central</h2><ul><li>Recibe N registros a procesar.</li><li>Recorre cada registro (for).</li><li>Decide si suma a exitos o errores.</li><li>Al final llama al consolidado.</li></ul></div><div class="card"><h2>Que NO hace</h2><ul><li>No calcula formulas de negocio detalladas.</li><li>No valida todos los campos por si sola.</li><li>No imprime cada detalle de dominio.</li><li>No reemplaza a TryProcesarEmpleado.</li></ul></div></div><div class="callout"><p><strong>Resumen simple:</strong> ProcesarLote coordina el proceso; las otras funciones resuelven tareas especificas.</p></div></div><div class="footer"><span>Sesion 20 · Rol de ProcesarLote</span><span class="counter">5 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Diseno modular aplicado</div><div class="content"><h2>Que hace exactamente y unicamente ProcesarLote?</h2><div class="two-col"><div class="card"><h2>Su Gran Responsabilidad (Cohesion)</h2><ul><li>Atrapar el numero <span class="kbd">N</span> y asegurar la iteracion completa.</li><li>Vigilar los <strong>contadores de estado</strong> (variables globales del lote como exitos o acumulados).</li><li>Tomar decisiones de desvio: si es exitoso suma promedios, si falla, suma al error.</li><li>Culminar ordenando la impresion de resultados.</li></ul></div><div class="card"><h2>Lo que JAMAS debe intentar</h2><ul><li>No pregunta por consola el valor de horas de Pepito.</li><li>No calcula internamente multiplicaciones ni deducciones por ley.</li><li>Carece de `Console.ReadLine` en su cuerpo interno.</li><li>Delega toda la carga pesada al validante `TryProcesarEmpleado`.</li></ul></div></div><div class="callout"><p><strong>Tip Arquitectonico (SRP):</strong> Principio de Responsabilidad Unica. Si `ProcesarLote` conociera la tarifa por hora, habriamos acoplado fuertemente las capas, dificultando futuros mantenimientos (ej. cambios salariales).</p></div></div><div class="footer"><span>Sesion 20 · Rol de ProcesarLote</span><span class="counter">5 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Diseno modular</div><div class="content"><h2>Patron Try por registro (sin romper el lote)</h2><div class="two-col"><div class="code"><span class="kw">static bool</span> <span class="fn">TryProcesarEmpleado</span>(
+    <section class="slide content-slide"><div class="inner"><div class="header">Diseno modular aplicado</div><div class="content"><h2>Patron 'Try' por registro individual (Seguridad)</h2><div class="two-col"><div class="code"><span class="kw">static bool</span> <span class="fn">TryProcesarEmpleado</span>(
   <span class="ty">int</span> idx,
   <span class="kw">out</span> <span class="ty">double</span> neto,
   <span class="kw">out</span> <span class="ty">double</span> pago,
   <span class="kw">out</span> <span class="ty">string</span> error)
 {
-  neto = 0;
-  pago = 0;
-  error = <span class="st">""</span>;
+  <span class="cm">// Inicializar variables 'out' obligatoriamente</span>
+  neto = 0; pago = 0; error = "";
 
-  <span class="kw">if</span> (!LeerEntradaRegistro(idx, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t))
-  {
-    error = <span class="st">"Entrada invalida"</span>;
+  <span class="kw">if</span> (!LeerEntradaRegistro(idx, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t)) {
+    error = "Entrada invalida";
     <span class="kw">return</span> <span class="kw">false</span>;
   }
 
   <span class="kw">if</span> (!ValidarReglas(h, t, <span class="kw">out</span> error))
-    <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">return</span> <span class="kw">false</span>; <span class="cm">// Falla por contexto del negocio</span>
 
   neto = CalcularNeto(h, t);
   pago = CalcularPagoFinal(neto);
-  <span class="kw">return</span> <span class="kw">true</span>;
-}</div><div class="card"><h2>Clave didactica</h2><ul><li>Una falla no detiene todo el proceso.</li><li>Se conserva resultado parcial del lote.</li><li>El error queda asociado a indice de registro.</li><li>Habilita depuracion basada en datos.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Try por registro</span><span class="counter">6 / 20</span></div></div></section>
+  <span class="kw">return</span> <span class="kw">true</span>; <span class="cm">// Logro absoluto</span>
+}</div><div class="card"><h2>Por que devolver booleanos?</h2><ul><li>Evita Exception Handlers pesados para simples validaciones de control (Control de Flujo vs Excepciones).</li><li>Los parametros <span class="kbd">out</span> extraen informacion de exito sin forzar la creacion de Estructuras complejas aun.</li><li>Promueve legibilidad natural en los <span class="kbd">if(Try...)</span> (como hace <span class="kbd">int.TryParse</span> nativo de C#).</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Try por registro</span><span class="counter">6 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Implementacion</div><div class="content"><h2>Acumuladores del proceso</h2><div class="equal-col"><div class="card"><h2>Estado permitido</h2><ul><li><span class="kbd">int exitos</span></li><li><span class="kbd">int errores</span></li><li><span class="kbd">double totalNeto</span></li><li><span class="kbd">double totalPago</span></li></ul><p class="note">Son datos del proceso por lotes, no del calculo de cada empleado.</p></div><div class="card"><h2>Reglas</h2><ul><li>Solo ProcesarLote actualiza acumuladores.</li><li>Calculos unitarios siguen puros por parametro.</li><li>MostrarConsolidado no recalcula formulas.</li><li>Bitacora guarda errores por registro.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Acumuladores</span><span class="counter">7 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Implementacion del Estado</div><div class="content"><h2>Acumuladores vivos del proceso iterativo</h2><div class="equal-col"><div class="card"><h2>Variables del Entorno ('Scoped State')</h2><ul><li><span class="kbd">int exitos</span> - Incrementa si Try es True.</li><li><span class="kbd">int errores</span> - Incrementa si Try es False.</li><li><span class="kbd">double totalNeto</span> - La hucha donde caen sueldos brutos.</li><li><span class="kbd">double totalPago</span> - Egresos reales netos sumados de la tesoreria.</li></ul><p class="note">Su existencia y ciclo vital (Scope) nacen y mueren estrictamente dentro de ProcesarLote, no flotando aislados en la clase principal.</p></div><div class="card"><h2>Reglas inquebrantables de mutacion</h2><ul><li>ProcesarLote es la unica entidad autorizada a sumarles `+1` o `+= valor`.</li><li>Las funciones matematicas base (CalcularNeto) no pueden "tocar" los globales ni recibir referencia de ellos. Debe ser funcional Puro.</li><li>Si un Try resulta 'False', los acumuladores financieros se protegen e ignoran el ciclo vacio para no contaminarse.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Acumuladores</span><span class="counter">7 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Implementacion</div><div class="content"><h2>Ruta de construccion: funcion por funcion</h2><div class="step callout"><strong>Paso 1 · Main()</strong>: problema inicial -> no sabemos cuantos registros procesar.</div><div class="step callout"><strong>Paso 2 · ProcesarLote()</strong>: problema -> un error podria detener todo el ciclo.</div><div class="step callout"><strong>Paso 3 · TryProcesarEmpleado()</strong>: problema -> entrada invalida y reglas incumplidas.</div><div class="step callout"><strong>Paso 4 · MostrarConsolidado()</strong>: problema -> resultados dispersos y poco claros.</div><p class="note">En cada paso implementamos una solucion puntual antes de avanzar al siguiente bloque.</p></div><div class="footer"><span>Sesion 20 · Ruta de construccion</span><span class="counter">8 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Implementacion incremental</div><div class="content"><h2>Definiendo la ruta de construccion segura</h2><div class="step callout"><strong>Paso 1 · Main()</strong>: Blindaje inicial. Controlamos si <span class="kbd">N</span> tiene sentido matematico antes de entrar en zona de riesgo iterativa.</div><div class="step callout"><strong>Paso 2 · ProcesarLote()</strong>: Core orquestador anidando el ciclo Try catch con bifurcaciones Exito/Fallo muy claras y delimitadas.</div><div class="step callout"><strong>Paso 3 · TryProcesarEmpleado()</strong>: Logica que delega fallos, asume las caidas y retorna "Falsos pacíficos" pero con rastreo trazable.</div><div class="step callout"><strong>Paso 4 · MostrarConsolidado()</strong>: Metrica visual e impresiones de contadores globales convertidos a porcentajes analiticos puros.</div><p class="note">Tip Didactico: Codificar modulo a modulo y probar intermitentemente. Tratar de compilar luego de escribir 100 lineas nuevas juntas es la receta Nro 1 hacia la frustracion.</p></div><div class="footer"><span>Sesion 20 · Ruta de construccion</span><span class="counter">8 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 1: Main() define el punto de entrada</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Sin una cantidad valida, no existe proceso de lote confiable.</p><h2 style="margin-top:10px;">Solucion</h2><p>Validar <span class="kbd">n</span> antes de llamar a <span class="kbd">ProcesarLote(n)</span>.</p></div><div class="code"><span class="kw">static void</span> Main()
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada: FASE A</div><div class="content"><h2>Paso 1: Main() define el arranque y cierra el paso al error</h2><div class="two-col"><div class="card"><h2>El riesgo latente (Problema)</h2><p>Si el usuario digita "veinte" o <span class="kbd">-5</span> como numero de registros iniciales, el lote entero carece de sentido topologico y detonaría o bucles fantasmas o bloqueos de ejecución completos.</p><h2 style="margin-top:10px;">Solucion Restrictiva Anticipada</h2><p>Atrapar <span class="kbd">n</span> con <span class="kbd">int.TryParse</span> evitando excepciones graves formativas. Si el ingreso no supera nuestra expectativa `> 0`, detenemos tajantemente al proceso con un retorno elegante de salida tempana.</p></div><div class="code"><span class="kw">static void</span> Main()
 {
-  Console.Write(<span class="st">"Cantidad de registros: "</span>);
+  Console.Write("Cantidad de registros al lote: ");
+  <span class="cm">// Validacion integral de casteo y regla de negocio general</span>
   <span class="kw">if</span> (!<span class="ty">int</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> <span class="ty">int</span> n) || n &lt;= 0)
   {
-    Console.WriteLine(<span class="st">"Cantidad invalida"</span>);
-    <span class="kw">return</span>;
+    Console.WriteLine("Advertencia: Cantidad no operante invalida.");
+    <span class="kw">return</span>; <span class="cm">// El proceso aborta elegantemente (Fail-Fast a nivel raiz)</span>
   }
 
   ProcesarLote(n);
-}</div></div></div><div class="footer"><span>Sesion 20 · Paso 1</span><span class="counter">9 / 20</span></div></div></section>
+}</div></div></div><div class="footer"><span>Sesion 20 · Paso 1</span><span class="counter">9 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 2: ProcesarLote() coordina sin detenerse</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Si un registro falla, se puede cortar todo el proceso y perder resultados validos.</p><h2 style="margin-top:10px;">Solucion</h2><p>Controlar cada registro con <span class="kbd">if/else</span>, acumular exitos y registrar errores.</p></div><div class="code"><span class="kw">static void</span> ProcesarLote(<span class="ty">int</span> n)
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada: FASE B</div><div class="content"><h2>Paso 2: ProcesarLote() avanza absorbiendo golpes</h2><div class="two-col"><div class="card"><h2>El caos del ciclo inexperto (Problema)</h2><p>Tradicionalmente los estudiantes permiten que el programa colapse a la primera excepcion interna que salta en un for. Perdiendo toda meta o estado logrado procesado antes del quiebre.</p><h2 style="margin-top:10px;">La Boveda Segura (Solucion)</h2><p>Un IF que controla al validador Try. Los resultados limpios afectan a los acumuladores positivos, y los Falsos derivan sumas puras al contador de errores, notificando incidencias con <span class="kbd">RegistrarError()</span> especificando el indice de afectacion.</p></div><div class="code"><span class="kw">static void</span> ProcesarLote(<span class="ty">int</span> n)
 {
-  <span class="ty">int</span> exitos = 0;
-  <span class="ty">int</span> errores = 0;
-  <span class="ty">double</span> totalNeto = 0;
-  <span class="ty">double</span> totalPago = 0;
+  <span class="ty">int</span> exitos = 0, errores = 0;
+  <span class="ty">double</span> totalNeto = 0, totalPago = 0;
 
   <span class="kw">for</span> (<span class="ty">int</span> i = 1; i &lt;= n; i++)
   {
     <span class="kw">if</span> (TryProcesarEmpleado(i, <span class="kw">out</span> <span class="ty">double</span> neto, <span class="kw">out</span> <span class="ty">double</span> pago, <span class="kw">out</span> <span class="ty">string</span> err))
     {
-      exitos++;
-      totalNeto += neto;
-      totalPago += pago;
+      exitos++; totalNeto += neto; totalPago += pago; <span class="cm">// Todo Ok!</span>
     }
-    <span class="kw">else</span> { errores++; RegistrarError(i, err); }
+    <span class="kw">else</span> 
+    { 
+      errores++; RegistrarError(i, err); <span class="cm">// Aisla e identifica</span>
+    }
   }
-}</div></div></div><div class="footer"><span>Sesion 20 · Paso 2</span><span class="counter">10 / 20</span></div></div></section>
+}</div></div></div><div class="footer"><span>Sesion 20 · Paso 2</span><span class="counter">10 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 3: TryProcesarEmpleado() aisla fallas</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Entradas no numericas o reglas invalidas pueden contaminar el calculo.</p><h2 style="margin-top:10px;">Solucion</h2><p>Usar salidas anticipadas con <span class="kbd">return false</span> y mensaje de error por registro.</p></div><div class="code"><span class="kw">if</span> (!LeerEntradaRegistro(idx, <span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa))
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada: FASE C</div><div class="content"><h2>Paso 3: Aislamiento interno de fallos en el TryProcesar</h2><div class="two-col"><div class="card"><h2>Falsos Positivos o Contaminacion Global</h2><p>Procesar entradas de consola vacías o aplicar deducciones matematicas a horas absurdamente irreales en reglas de negocio (e.g. -10 horas), darian netos corrompidos, desestabilizando financieramente los finales.</p><h2 style="margin-top:10px;">'Guard Clauses' protectoras</h2><p>Existen validaciones tempranas donde si `ValidarReglas` reprueba, el metodo salta con `return false` al instante ("Fail-Fast"), dejando los montos `out` intactos en cero, y exportando al padre la causa verbal en el `string error`.</p></div><div class="code"><span class="cm">// Fragmento de TryProcesarEmpleado...</span>
+<span class="kw">if</span> (!LeerEntradaRegistro(idx, <span class="kw">out</span> <span class="ty">double</span> horas, <span class="kw">out</span> <span class="ty">double</span> tarifa))
 {
-  error = <span class="st">"Entrada no numerica"</span>;
+  error = "Entrada rechazada / formato No Numerico";
   <span class="kw">return</span> <span class="kw">false</span>;
 }
 
 <span class="kw">if</span> (!ValidarReglas(horas, tarifa, <span class="kw">out</span> error))
-  <span class="kw">return</span> <span class="kw">false</span>;
+  <span class="kw">return</span> <span class="kw">false</span>; <span class="cm">// Rompe la regla, el mensaje ya fue cargado por ValidarReglas</span>
 
+<span class="cm">// Si lograste sortear las barreras, procedemos al procesamiento contable</span>
 neto = CalcularNeto(horas, tarifa);
 pago = CalcularPagoFinal(neto);
-RegistrarLog(idx, <span class="st">"ok"</span>);
-<span class="kw">return</span> <span class="kw">true</span>;</div></div><p class="note">Se observa la diferencia: aqui se controla exito/error por registro, no por caso unico.</p></div><div class="footer"><span>Sesion 20 · Paso 3</span><span class="counter">11 / 20</span></div></div></section>
+<span class="kw">return</span> <span class="kw">true</span>;</div></div></div><div class="footer"><span>Sesion 20 · Paso 3</span><span class="counter">11 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada</div><div class="content"><h2>Paso 4: MostrarConsolidado() cierra el proceso</h2><div class="two-col"><div class="card"><h2>Problema</h2><p>Sin consolidado final, los resultados quedan dispersos y no se pueden interpretar.</p><h2 style="margin-top:10px;">Solucion</h2><p>Centralizar resumen de registros, exitos, errores, totales y tasa de error.</p></div><div class="code"><span class="kw">static void</span> MostrarConsolidado(
-  <span class="ty">int</span> n,
-  <span class="ty">int</span> exitos,
-  <span class="ty">int</span> errores,
-  <span class="ty">double</span> totalNeto,
-  <span class="ty">double</span> totalPago)
+    <section class="slide content-slide"><div class="inner"><div class="header">Practica guiada: FASE D</div><div class="content"><h2>Paso 4: Auditoria transparente via MostrarConsolidado()</h2><div class="two-col"><div class="card"><h2>El dilema de la caja negra</h2><p>Cuando un lote voluminoso finaliza de procesar silenciosamente y solo vemos finalizado el ciclo en la consola, se siente desconectado e inseguro para un cajero o auditor operativo.</p><h2 style="margin-top:10px;">Solucion de Tabulacion Centralizada</h2><p>Delegar la carga estética de UI terminal tomando las variables base acumuladas, para luego derivar internamente aquí tasas porcentuales, entregando un reporte humano conciso tabulado libre de lógica de negocios.</p></div><div class="code"><span class="kw">static void</span> MostrarConsolidado(
+  <span class="ty">int</span> n, <span class="ty">int</span> exitos, <span class="ty">int</span> errores, <span class="ty">double</span> totalNeto, <span class="ty">double</span> totalPago)
 {
   <span class="ty">double</span> tasaError = (<span class="ty">double</span>)errores / n;
-  Console.WriteLine(<span class="st">"--- RESUMEN LOTE ---"</span>);
-  Console.WriteLine($<span class="st">"Registros: {n}"</span>);
-  Console.WriteLine($<span class="st">"Exitos: {exitos}"</span>);
-  Console.WriteLine($<span class="st">"Errores: {errores}"</span>);
-  Console.WriteLine($<span class="st">"Total neto: {totalNeto}"</span>);
-  Console.WriteLine($<span class="st">"Total pago: {totalPago}"</span>);
-  Console.WriteLine($<span class="st">"Tasa error: {tasaError:P1}"</span>);
-}</div></div></div><div class="footer"><span>Sesion 20 · Paso 4</span><span class="counter">12 / 20</span></div></div></section>
+  Console.WriteLine("
+--- ANALISIS FINANCIERO DE FIN DE LOTE ---");
+  Console.WriteLine($"Registros evaluados globales: {n}");
+  Console.WriteLine($"Transacciones confirmadas:    {exitos}");
+  Console.WriteLine($"Inconsistencias halladas:     {errores}");
+  Console.WriteLine($"Acumulado de Brutos (Neto):   {totalNeto:C2}");
+  Console.WriteLine($"Impacto en Egresos final:     {totalPago:C2}");
+  Console.WriteLine($"Tasa desvio del lote (Error): {tasaError:P1}");
+}</div></div></div><div class="footer"><span>Sesion 20 · Paso 4</span><span class="counter">12 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Analisis</div><div class="content"><h2>Problemas y soluciones validadas al final</h2><table><thead><tr><th>Funcion</th><th>Problema detectado</th><th>Solucion aplicada</th><th>Como se valida</th></tr></thead><tbody><tr><td>Main</td><td>n invalido</td><td>guard clause de entrada</td><td>si n=0, no inicia proceso</td></tr><tr><td>ProcesarLote</td><td>se corta por error individual</td><td>if/else por registro</td><td>lote mixto termina completo</td></tr><tr><td>TryProcesarEmpleado</td><td>entrada/regla invalida</td><td>return false + motivo</td><td>error queda trazado por indice</td></tr><tr><td>MostrarConsolidado</td><td>resultados dispersos</td><td>resumen final centralizado</td><td>totales y tasa de error coherentes</td></tr></tbody></table></div><div class="footer"><span>Sesion 20 · Validacion</span><span class="counter">13 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Auditoria y Analisis Profundo</div><div class="content"><h2>Mapeo de riesgos cruzados mitigados satisfactoriamente</h2><table><thead><tr><th>Funcion Afectada</th><th>Sintoma o Peligro Inicial Identificado</th><th>Solucion y Mecanismo Arquitectonico</th></tr></thead><tbody><tr><td>Main (Arranque)</td><td>Variable maestra de ciclo `N` corrupta o incoherente lógica (Letras, -4 o un nulo absoluto).</td><td>Cláusula de Guarda y salida adelantada usando un parsing seguro estricto antes del ciclo origen.</td></tr><tr><td>ProcesarLote</td><td>Excepciones incontroladas liquidando el estado histórico del procesamiento masivo interrumpiendo.</td><td>Toma de control con un IF condicional bloqueante anidado a un try lógico silencioso pero alerta.</td></tr><tr><td>TryProcesarEmpleado</td><td>Inputs sucios logrando esquivar barreras, escalando e importando al resultado contable monetario generalizado corporativo total corrompido global.</td><td>"Return False" pasivo (fail-safe) que inyecta parámetros informativos salientes (out strings explicativas) a niveles superiores aislados inalterados con su tracking intacto total.</td></tr><tr><td>MostrarConsolidado</td><td>Resultados contables no interpretables por usuarios finales al cierre de la ejecución.</td><td>Formateo centralizado para la interfaz (con tabulaciones y formatos explícitos).</td></tr></tbody></table></div><div class="footer"><span>Sesion 20 · Validacion</span><span class="counter">13 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Analisis</div><div class="content"><h2>Errores frecuentes en lotes</h2><div class="equal-col"><div class="card"><h2>Fallas tipicas</h2><ul><li>Detener el for ante primer error.</li><li>No inicializar acumuladores.</li><li>Reusar variable error entre iteraciones.</li><li>No registrar indice de registro fallido.</li></ul></div><div class="card"><h2>Correcciones</h2><ul><li>Usar Try y continuar siguiente i.</li><li>Inicializar acumuladores antes del ciclo.</li><li>Resetear out en cada llamada Try.</li><li>RegistrarError(i, motivo) siempre.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Errores lote</span><span class="counter">14 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Tips Core de la industria: Antipatrones a desechar</div><div class="content"><h2>Errores lógicos de arquitectura comunes al lidiar con flujos pesados ("Loops")</h2><div class="equal-col"><div class="card"><h2>Patologías Críticas de flujo</h2><ul><li><strong>"Break impulsivo":</strong> Abortar del todo un `for` al tropezar con el primer error de tipeo sin reportar incidencias ni proseguir analíticamente.</li><li><strong>Caos Local-Global de variables:</strong> Reinicializar erróneamente compiladores (`exitos = 0`) DENTRO del ciclo en lugar de protegerlos AFUERA de la iteracion general maestra del método `Lote`.</li><li><strong>Variable `out string err` pegajosa:</strong> No inicializar o purgar el string receptor en la función Try base, arrastrando mensajes de error de la iteración anterior a registros válidos actuales.</li></ul></div><div class="card"><h2>Correcciones Estándar Obligatorias</h2><ul><li>Permitir ciclos limpios que ignoren o utilicen comandos `continue;` controlados absorbiéndose sanos.</li><li>Restringir modificadores de acumuladores puramente a la entidad contenedora Padre global `ProcesarLote` fuera y alejado previo de su ciclo for central de transacciones globales inmodificadas por agentes u métodos foráneos abstractos delegados unitarios iterativos aislados locales propios unitarios aislados limpios del lote total global inmodificable por funciones externas o validaciones individuales fuera del orquestador.</li></ul></div></div></div><div class="footer"><span>Sesion 20 · Errores lote</span><span class="counter">14 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Taller guiado</div><div class="content"><h2>Reto tecnico: nomina por lotes resiliente</h2><div class="callout"><p><strong>Reto tecnico:</strong> procesar N empleados en una ejecucion y registrar fallos individuales sin detener el proceso completo.</p></div><ul><li>Paso 1: crear Main + ProcesarLote(n).</li><li>Paso 2: implementar TryProcesarEmpleado con out error.</li><li>Paso 3: acumular exitos/errores/totales.</li><li>Paso 4: imprimir consolidado y bitacora de errores.</li></ul><p class="note">Trabajo completamente guiado en clase: no hay entrega evaluativa en esta sesion.</p></div><div class="footer"><span>Taller sesion 20</span><span class="counter">15 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Taller Interactivo Dirigido</div><div class="content"><h2>Reto lógico integral simultáneo: Nómina inquebrantable</h2><div class="callout"><p><strong>Meta del Laboratorio:</strong> Enviar por la consola integral in-situ a `N` empleados seguidos, provocar voluntariamente un quiebre validacional intermedio y demostrar sistemáticamente que el proceso terminal consolida al final exacto ignorando el error sin romper el entorno y contabilizando métricas confiablemente actualizadas correctamente y sin interrupciones.</p></div><ul><li><strong>Fase I:</strong> Restricción inicial del <span class="kbd">Main</span> y la cáscara del iterador total <span class="kbd">ProcesarLote(n)</span>.</li><li><strong>Fase II:</strong> El anclaje al validador Try de salidas condicionales de negocio paramétricas en string out limpio base formativo informativo tracking.</li><li><strong>Fase III:</strong> El alzamiento y protección financiera en sumadores estéticos aislados operantes inalterados puros matemáticos seguros puristas controlados independientes y sin perturbar el ciclo de validación general.</li></ul><p class="note">Dinámica: El docente codeará paso a paso acompañando lógicas constructivas de forma iterativa, probando las validaciones en la consola en tiempo real.</p></div><div class="footer"><span>Taller sesion 20</span><span class="counter">15 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Desarrollo guiado del profesor</div><div class="content"><h2>Codigo completo (bloque 1 de 2)</h2><div class="code"><span class="kw">using</span> System;
+    <section class="slide content-slide"><div class="inner"><div class="header">Despliegue Asistido (Parte I)</div><div class="content"><h2>Visualización de la Orquestación Superior Aislada</h2><div class="code"><span class="kw">using</span> System;
 
 <span class="kw">class</span> Program
 {
   <span class="kw">static void</span> Main()
   {
-    Console.Write(<span class="st">"Cantidad de empleados: "</span>);
+    Console.Write("Cantidad empleados a operar lote: ");
+    <span class="cm">// Escape total de excepciones base numéricas irreales crudas</span>
     <span class="kw">if</span> (!<span class="ty">int</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> <span class="ty">int</span> n) || n &lt;= 0)
     {
-      Console.WriteLine(<span class="st">"Cantidad invalida"</span>);
+      Console.WriteLine("Parámetro inválido. Saliendo del programa.");
       <span class="kw">return</span>;
     }
     ProcesarLote(n);
@@ -226,38 +224,55 @@ RegistrarLog(idx, <span class="st">"ok"</span>);
 
   <span class="kw">static void</span> ProcesarLote(<span class="ty">int</span> n)
   {
-    <span class="ty">int</span> exitos = 0, errores = 0;
-    <span class="ty">double</span> totalNeto = 0, totalPago = 0;
+    <span class="ty">int</span> exitos = 0, errores = 0; <span class="cm">// Acumuladores pre-ciclo protegidos</span>
+    <span class="ty">double</span> totalNeto = 0, totalPago = 0; <span class="cm">// Estado logístico del Batch puro</span>
 
     <span class="kw">for</span> (<span class="ty">int</span> i = 1; i &lt;= n; i++)
     {
+      <span class="cm">// La evaluación de la ramificación y absorción analítica pacifica del Try central de la iteracion</span>
       <span class="kw">if</span> (TryProcesarEmpleado(i, <span class="kw">out</span> <span class="ty">double</span> neto, <span class="kw">out</span> <span class="ty">double</span> pago, <span class="kw">out</span> <span class="ty">string</span> err))
-      { exitos++; totalNeto += neto; totalPago += pago; }
-      <span class="kw">else</span> { errores++; RegistrarError(i, err); }
-    }</div></div><div class="footer"><span>Sesion 20 · Desarrollo 1</span><span class="counter">16 / 20</span></div></div></section>
+      { exitos++; totalNeto += neto; totalPago += pago; } <span class="cm">// Lógica limpia</span>
+      <span class="kw">else</span> { errores++; RegistrarError(i, err); } <span class="cm">// Desvio estricto con track trace base</span>
+    }</div></div></div><div class="footer"><span>Sesion 20 · Desarrollo 1</span><span class="counter">16 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Desarrollo guiado del profesor</div><div class="content"><h2>Codigo completo (bloque 2 de 2)</h2><div class="code">    MostrarConsolidado(n, exitos, errores, totalNeto, totalPago);
+    <section class="slide content-slide"><div class="inner"><div class="header">Despliegue Asistido (Parte II)</div><div class="content"><h2>Componentes de Dominio Subyacente Estables Validados</h2><div class="code">    MostrarConsolidado(n, exitos, errores, totalNeto, totalPago);
   }
 
   <span class="kw">static bool</span> TryProcesarEmpleado(<span class="ty">int</span> i, <span class="kw">out</span> <span class="ty">double</span> neto, <span class="kw">out</span> <span class="ty">double</span> pago, <span class="kw">out</span> <span class="ty">string</span> err)
   {
-    neto = 0; pago = 0; err = <span class="st">""</span>;
-    <span class="kw">if</span> (!LeerEntradaRegistro(i, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t)) { err = <span class="st">"Entrada invalida"</span>; <span class="kw">return</span> <span class="kw">false</span>; }
-    <span class="kw">if</span> (!ValidarReglas(h, t, <span class="kw">out</span> err)) <span class="kw">return</span> <span class="kw">false</span>;
+    neto = 0; pago = 0; err = ""; <span class="cm">// Sanidad y Limpieza del iterador tracking</span>
+    <span class="kw">if</span> (!LeerEntradaRegistro(i, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t)) { err = "Entrada de formato no numérico inválida."; <span class="kw">return</span> <span class="kw">false</span>; }
+    <span class="kw">if</span> (!ValidarReglas(h, t, <span class="kw">out</span> err)) <span class="kw">return</span> <span class="kw">false</span>; <span class="cm">// El propio validante genera in-situ el mensaje de rechazo</span>
     neto = h * t; pago = neto - (neto * 0.04); <span class="kw">return</span> <span class="kw">true</span>;
   }
 
+  <span class="cm">// Simulación de subsistemas operativos base auxiliares delegados:</span>
   <span class="kw">static bool</span> LeerEntradaRegistro(<span class="ty">int</span> i, <span class="kw">out</span> <span class="ty">double</span> h, <span class="kw">out</span> <span class="ty">double</span> t) { h = 0; t = 0; <span class="kw">return</span> <span class="kw">true</span>; }
-  <span class="kw">static bool</span> ValidarReglas(<span class="ty">double</span> h, <span class="ty">double</span> t, <span class="kw">out</span> <span class="ty">string</span> e) { e = <span class="st">""</span>; <span class="kw">return</span> h &gt; 0 &amp;&amp; h &lt;= 60 &amp;&amp; t &gt;= 5000; }
-  <span class="kw">static void</span> RegistrarError(<span class="ty">int</span> i, <span class="ty">string</span> e) { Console.WriteLine($<span class="st">"[ERR] #{i}: {e}"</span>); }
-  <span class="kw">static void</span> MostrarConsolidado(<span class="ty">int</span> n, <span class="ty">int</span> x, <span class="ty">int</span> er, <span class="ty">double</span> tn, <span class="ty">double</span> tp) { Console.WriteLine($<span class="st">"{x}/{n} exitos"</span>); }
-}</div><p class="note">Este bloque se desarrolla por fases para visualizar el salto de un caso a un sistema por lotes.</p></div><div class="footer"><span>Sesion 20 · Desarrollo 2</span><span class="counter">17 / 20</span></div></div></section>
+  <span class="kw">static bool</span> ValidarReglas(<span class="ty">double</span> h, <span class="ty">double</span> t, <span class="kw">out</span> <span class="ty">string</span> e) { e = ""; <span class="kw">return</span> h &gt; 0 &amp;&amp; h &lt;= 60 &amp;&amp; t &gt;= 5000; }
+  <span class="kw">static void</span> RegistrarError(<span class="ty">int</span> i, <span class="ty">string</span> e) { Console.WriteLine($"[TRACK] Empleado #{i}: {e}"); }
+  <span class="kw">static void</span> MostrarConsolidado(<span class="ty">int</span> n, <span class="ty">int</span> x, <span class="ty">int</span> er, <span class="ty">double</span> tn, <span class="ty">double</span> tp) { Console.WriteLine($"Exitos finales: {x}/{n}"); }
+}</div><p class="note">Nótese cómo `Main` nunca es ensuciado y las sub-reglas deciden su propia terminación temprana en unificación formativa estructurada unificada.</p></div><div class="footer"><span>Sesion 20 · Desarrollo 2</span><span class="counter">17 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Consolidacion en clase</div><div class="content"><h2>Verificacion guiada del flujo completo</h2><div class="equal-col"><div class="card"><h2>Chequeos tecnicos</h2><ul><li>El ciclo procesa N registros sin detenerse.</li><li>Los errores quedan asociados a su indice.</li><li>Los acumuladores cambian solo en ProcesarLote.</li></ul></div><div class="card"><h2>Chequeos de salida</h2><ul><li>Se imprime resumen consolidado final.</li><li>La tasa de error coincide con el lote ejecutado.</li><li>El grupo explica por que el flujo es resiliente.</li></ul></div></div><p class="note">Cierre practico de aula: sin entrega de estudiantes y sin calificacion en esta sesion.</p></div><div class="footer"><span>Sesion 20 · Consolidacion</span><span class="counter">18 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Pruebas en Sala</div><div class="content"><h2>Laboratorio de Confirmación Formativa in-vivo Evaluativa</h2><div class="equal-col"><div class="card"><h2>Aserción de Iteración Robusta</h2><ul><li>Se ejecuta en base N=4 con al menos 1 entrada inválida alfabética a mitad de camino y otra por debajo del rango formativo mínimo logístico estricto.</li><li>Los totales base consolidados omiten íntegramente a las corruptas.</li><li>El sumador de registros finales es congruente formativamente consistente y real con los registros exitosos obtenidos.</li></ul></div><div class="card"><h2>Aserción Estilística Modular</h2><ul><li>No existió caída terminal abrupta cruda `Exception Unhandled` nativa de motor .NET. (Control formativo pasivo logrado).</li><li>La tasa de éxito es analíticamente real indexada mostrando un porcentaje real y exacto del desvío de la ejecución (ej. 50.0%).</li></ul></div></div><p class="note">Cierre del ciclo analítico iterativo. (Evaluación visual sin carga burocrática posterior).</p></div><div class="footer"><span>Sesion 20 · Consolidacion</span><span class="counter">18 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Sintesis tecnica</div><div class="content"><h2>Checklist del salto de complejidad</h2><ol><li>El sistema procesa N registros en un ciclo.</li><li>Cada registro falla o pasa sin romper el lote.</li><li>Existen acumuladores para metricas del proceso.</li><li>Se genera reporte consolidado final.</li><li>La bitacora conserva trazabilidad de errores.</li><li>El dominio unitario sigue desacoplado de consola.</li></ol></div><div class="footer"><span>Sesion 20 · Sintesis</span><span class="counter">19 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Sintesis de Aprendizaje</div><div class="content"><h2>Checklist Arquitectónico para Procesamiento por Lotes</h2><ol><li>El Sistema coordina orquestadamente transacciones abstractas conjuntas integrales en iteración maestra ininterrumpible controlada pura base.</li><li>El encapsulamiento y salida preventiva anticipada (Delegar fallos booleanos out string explicativos) es el estándar inalterable de los 'Sistemas Robustos a Error Resilientes'.</li><li>La contabilidad local pura y protegida (Acumuladores resguardados limitados controlados) prohíbe colisiones mutacionales corrompidas de orquestadores externos matemáticos no autorizados aislados puramente tabulables lógicos analíticos.</li><li>La separación final UI gráfica terminal estandarizada de contadores brutos operacionales crudos. (Separación de la lógica de cálculo y la presentación estética final de la consola).</li></ol></div><div class="footer"><span>Sesion 20 · Sintesis</span><span class="counter">19 / 25</span></div></div></section>
 
-    <section class="slide content-slide"><div class="inner"><div class="header">Cierre de sesion</div><div class="content"><h2>Ahora si hay una diferencia clara</h2><div class="equal-col"><div class="card"><h2>Lo que construimos hoy</h2><ul><li>Sistema modular que procesa un lote completo.</li><li>Manejo de fallos por registro con continuidad.</li><li>Resumen consolidado para analisis de resultados.</li></ul></div><div class="card"><h2>Que sigue en sesion 21</h2><ul><li>Refinar firmas y sobrecargas utiles.</li><li>Mejorar legibilidad y deuda tecnica del lote.</li><li>Estandarizar calidad de codigo modular.</li></ul></div></div><p class="note" style="margin-top:12px;">Sesion 20 deja de ser "otro ejemplo" y se convierte en un sistema de procesamiento completo en clase.</p></div><div class="footer"><span>Sesion 20 · Cierre</span><span class="counter">20 / 20</span></div></div></section>
+    <section class="slide content-slide"><div class="inner"><div class="header">Cierre y Siguientes Pasos (S21)</div><div class="content"><h2>Pasamos del caso único aislado a la persistencia escalable de transacciones reales.</h2><div class="equal-col"><div class="card"><h2>Lo cimentado hoy purificado:</h2><ul><li>Inmunidad sistémica analítica inter-iterativa tabulada.</li><li>Responsabilidad Unica formativa aislada en Try-bifurcacional delegacional unificada aislada protegida y rastreable indexada bitacorizada in-situ estructurada y asimilada en forma contable tabuladora.</li></ul></div><div class="card"><h2>Qué resolveremos y abarcaremos logísticamente de cara a S21 formativa integral a nivel código fuente arquitectónica base formal:</h2><ul><li>Sobrecargas estructurales analíticas purificadas limpias para parámetros globales pesados visuales de parametrización unificada formativa base `Clean Code` pura (Refinamiento modular extremo unitario formal sin sobre-variables extendidas molestas operacionales de firmas).</li></ul></div></div><p class="note" style="margin-top:12px;">Sesión terminada. Preparen la óptica y asimilen la resiliencia estructural lograda hoy iterada aplicando estricta cohesión.</p></div><div class="footer"><span>Sesion 20 · Cierre</span><span class="counter">20 / 25</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Tema Avanzado: Complejidad RAM y Rendimiento general</div><div class="content"><h2>¿Por qué procesar y descartar un registro a la vez es crítico en sistemas Cloud reales a gran escala?</h2><div class="callout"><p><strong>Tip Analítico Escalable:</strong> Si tuvieramos que resolver N=1 Millon iterado, si creáramos objetos o guardáramos arrays enteros por empleado pre-lote base en main, la Memoria RAM disponible se desbordaría críticamente sin sentido logrando el fallo fatal de hardware local host (OutOfMemoryException).</p></div><ul><li><strong>Stream Processing iterado:</strong> Abstraer un for con Try paramétrico `neto`, acumular un total global matemático sumatorio, y descartar instantáneamente el dato de memoria, garantiza una huella de servidor constante y plana predecible en consumos AWS independientemente y libre de la masividad e infinitud base operativa de N (Bajo impacto de memoria O(1)).</li></ul></div><div class="footer"><span>Rendimiento escalable analítico formativo</span><span class="counter">21 / 25</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Tema Avanzado: Persistencia y Bitácoras de Texto (Logs)</div><div class="content"><h2>Extrayendo Tracking Terminal y orientándolo al análisis forense</h2><div class="two-col"><div class="card"><h2>La volatilidad visual de la Terminal de Comandos:</h2><p>ConsoleWriteLine es un buffer visual limitado, 45,000 errores logueados de desvíos operacionales se barren ignorando la auditoría posterior analizable profunda de tracking corporativo.</p><h2 style="margin-top:10px;">Refactorización Persistente Delegacional</h2><p>El delegador `RegistrarError` central estricto, permitirá, en el futuro, inyectarle lógica `I/O File Append` a .txt puramente persistente inmodificable, sin jamás y sin repercusiones estructurales tener que tocar al orquestador principal general `ProcesarLote` aislado. Esa es la magia estructural del Clean Code encapsulante y separativo base unificado.</p></div><div class="code"><span class="kw">static void</span> RegistrarError(<span class="ty">int</span> idx, <span class="ty">string</span> info) {
+  <span class="cm">// Hoy visto con una simple salida ilustrativa en consola</span>
+  Console.WriteLine($<span class="st">"[LOG] Falla # {idx}: {info}"</span>);
+  <span class="cm">// Proyección futura (Archivos físicos IO System) para Logs reales acoplados:</span>
+  <span class="cm">// System.IO.File.AppendAllText("fallosBatch.log", $"Id {idx} | {info}");</span>
+}</div></div></div><div class="footer"><span>Bitácoras y Persistencia Analítica Escalable</span><span class="counter">22 / 25</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Tema Avanzado: Errores de Sintaxis vs Reglas de Negocio</div><div class="content"><h2>Separación de responsabilidades ante fallos en Sistemas Resilientes</h2><div class="equal-col"><div class="card"><h2>El fallo temprano (Conversiones numéricas Parse/Catch):</h2><ul><li>Valida tipado primitivo: (Letras vs Int/Double base paramétrica general formativa).</li><li>Se controla prematuramente al inicio pre-lógica pura de mateméticas, devolviendo fallos pre-dominio abstractos analíticamente resguardables.</li></ul></div><div class="card"><h2>Las reglas del negocio o "Dominio" (Lógica Matemática):</h2><ul><li>El tipo de información fluye perfecto y procesado (e.g. Hrs -14), pero la Ley Abstracta analítica de la plataforma prohíbe u aserciona que excede límite.</li><li>Estas barreras puristas evitan contabilidades fantasmas abstractas ilógicas irreales y fugas de capitales no validadas puramente estructurales matemáticas asegurando integridad.</li></ul></div></div></div><div class="footer"><span>Dominio vs Parser Formativo Analítico Unificado Resguardado</span><span class="counter">23 / 25</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Tip de Experto en IDE: Dominando la Auditoría de Ciclos con Breakpoints</div><div class="content"><h2>Depurando cientos de iteraciones sin paso a paso manual (Puntos de interrupción Condicionales)</h2><div class="callout"><p><strong>La herramiento maestra:</strong> No presione F10 (Step-Over) de forma monótona en un proceso masivo. Su cerebro se agotará o perderá el patrón de rastreo.</p></div><ul><li>En IDEs potentes modernos (VS Code / Visual Studio base) posicione el cursor y haga clic derecho en el círculo rojo (`Breakpoint`) de la iteración y use a su favor: `Condition -> Expression -> == (numero sospechoso problemático)`.</li><li>Esto pausa el código analítico  directo en el índice i o estado numérico que lo causa, ahorrándole horas de depuración en la consola.</li></ul></div><div class="footer"><span>Debugging Visual Indexado</span><span class="counter">24 / 25</span></div></div></section>
+
+    <section class="slide content-slide"><div class="inner"><div class="header">Puntos Finales e Hito Concluido de Módulo Lógico</div><div class="content"><h2>Misión Cumplida: Resiliencia de Ejecución por Lotes</h2><div class="two-col"><div class="card"><h2>Los entregables funcionales en el logro de hoy:</h2><p>Un sistema robusto a interrupciones, centralizado en reportes visuales consolidados. Delegación perfecta analítica de rastreo bitacorizado paramétrico. Control sin Exceptions cediendo y cortando ejecución sistemática formativa.</p></div><div class="card"><h2>El fundamento definitivo adoptado para desarrollos tipo Batch:</h2><p>No volvemos jamás a bucles de procesamiento ciegos propensos al error destructivo. Orquestamos todo lote o conjunto continuo bajo premisas Fail-Fast, donde fallar un ítem aislado significa continuar protegidos para auditoría futura y consolidación garantizada.</p></div></div></div><div class="footer"><span>Logística</span><span class="counter">25 / 25</span></div></div></section>
 
   </div>
 
@@ -341,3 +356,5 @@ RegistrarLog(idx, <span class="st">"ok"</span>);
 </script>
 </body>
 </html>
+
+
