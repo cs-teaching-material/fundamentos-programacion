@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 21</title>
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px);
+      --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px);
+      --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#ffffff;}
+    .deck{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px);box-sizing:border-box;background:#ffffff;}
+    .stage{width:min(96vw,calc(92vh*(16/9)));aspect-ratio:16/9;position:relative;}
+    .slide{position:absolute;inset:0;display:none;box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;}
+    .slide.active{display:block;}
+    .slide.cover{background:url("./Portada.png") center/cover no-repeat;color:#ffffff;}
+    .slide.content-slide{background:url("./Contenido.png") top left/contain no-repeat,#ffffff;color:var(--texto);}
+    .inner{height:100%;box-sizing:border-box;padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);display:flex;flex-direction:column;gap:clamp(10px,1.1vw,18px);}
+    .cover .inner{padding:var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);}
+    .content{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.1vw,16px);min-height:0;}
+    .header{color:var(--azul-medio);font-size:clamp(18px,1.6vw,22px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    h1{margin:0;font-size:var(--h1);line-height:1.08;color:var(--texto);}
+    h2{margin:0;font-size:var(--h2);line-height:1.15;color:var(--azul-medio);}
+    p{margin:0;font-size:var(--p);line-height:1.4;color:var(--texto);}
+    li{font-size:var(--li);line-height:1.4;color:var(--texto);}
+    ul,ol{margin:0;padding-left:1.2em;}
+    .subtitle{color:var(--turquesa);font-weight:800;font-size:clamp(18px,1.8vw,24px);margin-top:clamp(6px,1vw,10px);}
+    .cover h1{color:#ffffff;}
+    .cover p{color:#e5edf8;}
+    .cover .subtitle{color:#f7df00;}
+    .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
+    .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .callout-warn{background:rgba(255,251,235,.97);border-left:6px solid #f59e0b;padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .callout-ok{background:rgba(236,253,245,.97);border-left:6px solid #10b981;padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .two-col{display:grid;grid-template-columns:1.15fr .9fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dde2f1;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .card-bad{background:rgba(255,245,245,.97);border:1px solid #fca5a5;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .card-good{background:rgba(240,253,244,.97);border:1px solid #86efac;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#111827;color:#e5e7eb;padding:2px 8px;border-radius:7px;font-size:clamp(11px,1vw,13px);border:1px solid rgba(255,255,255,.08);}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.05vw,14px);line-height:1.35;background:#0b1020;color:#e5e7eb;border-radius:10px;padding:clamp(10px,1.1vw,14px);overflow:auto;max-height:44vh;border:1px solid rgba(17,24,39,.25);white-space:pre-wrap;}
+    .kw{color:#7dd3fc;}
+    .ty{color:#86efac;}
+    .fn{color:#fde68a;}
+    .cm{color:#94a3b8;font-style:italic;}
+    .st{color:#f9a8d4;}
+    .warn{color:#fbbf24;}
+    .bad{color:#f87171;}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
+    th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
+    th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
+    .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
+    .counter{font-weight:800;color:var(--azul-medio);}
+    .cover .counter{color:#e5edf8;}
+    .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
+    .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
+    #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
+    .stage:hover #touchNav{opacity:1;transform:translateY(-50%) translateY(0);}
+    @media (hover:none){#touchNav{opacity:1;transform:translateY(-50%);}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+    .step{opacity:0;animation:fadeIn .45s ease forwards;}
+    .step:nth-child(1){animation-delay:.15s;}
+    .step:nth-child(2){animation-delay:.55s;}
+    .step:nth-child(3){animation-delay:.95s;}
+    .step:nth-child(4){animation-delay:1.35s;}
+    .step:nth-child(5){animation-delay:1.75s;}
+    .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:clamp(10px,.9vw,12px);font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+    .badge-bad{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;}
+    .badge-ok{background:#f0fdf4;color:#166534;border:1px solid #86efac;}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 PORTADA -->
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 21</h1>
+          <div class="subtitle">Refinamiento, sobrecarga pertinente y calidad de codigo</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 &middot; Hacer que el codigo modular sea legible, mantenible y expresivo</p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; &middot; Home / End &middot; F pantalla completa &middot; Tactil: desliza</p>
+        </div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion &middot; Grupos 810 / 811</span><span class="counter">1 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 2 PROPOSITO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Proposito de la sesion</div>
+        <div class="content">
+          <h2>Hacer que el codigo modular diga lo que hace</h2>
+          <ul>
+            <li>Reconocer senales de codigo que funciona pero que es dificil de leer o mantener (<em>code smells</em>).</li>
+            <li>Aplicar tres reglas concretas de calidad: nombres significativos, funcion de una sola responsabilidad y funciones cortas.</li>
+            <li>Entender que es la sobrecarga de metodos en C# y cuando usarla aporta claridad en lugar de confusion.</li>
+            <li>Refactorizar el sistema de la sesion anterior sin cambiar su comportamiento externo.</li>
+            <li>Distinguir entre <em>codigo que funciona</em> y <em>codigo de calidad</em> como diferencia profesional.</li>
+          </ul>
+          <div class="callout">
+            <p><strong>Punto de partida:</strong> El sistema de nomina de la sesion 20 funciona correctamente. Hoy lo vamos a mejorar sin tocar su logica: solo su expresividad.</p>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Proposito</span><span class="counter">2 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 3 RECORDATORIO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Punto de partida</div>
+        <div class="content">
+          <h2>El sistema que construimos en la sesion 20</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Lo que ya tenemos</h2>
+              <ul>
+                <li><span class="kbd">Main()</span> lee cantidad N y delega.</li>
+                <li><span class="kbd">LeerCantidad()</span> valida el total de empleados.</li>
+                <li><span class="kbd">ProcesarLote(n)</span> coordina el ciclo y acumula totales.</li>
+                <li><span class="kbd">TryProcesarEmpleado(i, out neto, out pago, out err)</span> aisla un registro.</li>
+                <li><span class="kbd">CalcularNeto(horas, tarifa)</span> y <span class="kbd">CalcularPagoFinal(neto)</span></li>
+                <li><span class="kbd">MostrarConsolidado(...)</span> imprime el resumen del lote.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>La pregunta de hoy</h2>
+              <p>El sistema calcula bien. Pero si alguien lo lee por primera vez, &iquest;puede entender en 30 segundos que hace cada funcion?</p>
+              <p class="note" style="margin-top:10px;">Esa capacidad de ser entendido sin explicacion verbal se llama <strong>legibilidad</strong>, y es un atributo de calidad tan importante como la correccion.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Contexto</span><span class="counter">3 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 4 CODE SMELL DEFINICION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto clave</div>
+        <div class="content">
+          <h2>Code smell: cuando el codigo huele mal sin estar roto</h2>
+          <div class="callout">
+            <p><strong>Definicion:</strong> Un <em>code smell</em> es una senal en el codigo que indica un problema de diseno o legibilidad, aunque el programa compile y ejecute sin errores. No es un bug: es una advertencia de que algo puede mejorar.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="card">
+              <h2>Analogia</h2>
+              <p>Una habitacion puede estar "ordenada" si todo fue metido bajo la cama. Funcionalmente nada se perdio, pero si alguien mas necesita buscar algo, tendra un problema. El codigo con code smells es igual.</p>
+            </div>
+            <div class="card">
+              <h2>Por que importa en U3</h2>
+              <p>Construimos funciones para que el codigo sea mas manejable. Si las funciones tienen nombres vagos o hacen demasiadas cosas, perdemos el beneficio de haberlas separado.</p>
+            </div>
+          </div>
+          <p class="note">Origen del termino: Martin Fowler, <em>Refactoring: Improving the Design of Existing Code</em> (1999). Hoy es vocabulario estandar en la industria.</p>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Code Smells</span><span class="counter">4 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 5 LOS TRES SMELLS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Tres senales concretas</div>
+        <div class="content">
+          <h2>Los code smells mas frecuentes en codigo de principiantes</h2>
+          <table>
+            <thead><tr><th>Senal</th><th>Ejemplo real</th><th>Por que es un problema</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Nombre vago</strong></td>
+                <td><span class="kbd">Calcular(x, y)</span>, <span class="kbd">Proceso()</span>, <span class="kbd">val1</span></td>
+                <td>Obliga a leer el cuerpo completo para entender que hace. El nombre deberia ser suficiente.</td>
+              </tr>
+              <tr>
+                <td><strong>Funcion con multiples responsabilidades</strong></td>
+                <td><span class="kbd">TryProcesar</span> que lee, valida, calcula <em>y</em> muestra errores</td>
+                <td>Si cambia una responsabilidad puede romper las otras. Dificil de probar de forma aislada.</td>
+              </tr>
+              <tr>
+                <td><strong>Funcion demasiado larga</strong></td>
+                <td>Funcion de 60 lineas sin subfunciones</td>
+                <td>La memoria de trabajo humana no puede seguir mas de 7 elementos a la vez. Mas de 20 lineas comienza a ser riesgoso.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Los tres smells</span><span class="counter">5 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 6 REGLA 1 NOMBRES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Regla de calidad 1</div>
+        <div class="content">
+          <h2>Los nombres deben revelar la intencion</h2>
+          <div class="equal-col">
+            <div>
+              <div class="card-bad" style="margin-bottom:10px;">
+                <span class="badge badge-bad">Evitar</span>
+                <div class="code" style="margin-top:8px;"><span class="kw">static double</span> <span class="fn bad">Calc</span>(<span class="kw">double</span> <span class="bad">a</span>, <span class="kw">double</span> <span class="bad">b</span>)
+{
+  <span class="kw">return</span> a * b;
+}
+
+<span class="kw">double</span> <span class="bad">res</span> = Calc(horas, tarifa);
+<span class="kw">double</span> <span class="bad">r2</span>  = Calc(res, 0.92);</div>
+              </div>
+            </div>
+            <div>
+              <div class="card-good">
+                <span class="badge badge-ok">Preferir</span>
+                <div class="code" style="margin-top:8px;"><span class="kw">static double</span> <span class="fn">CalcularSalarioBruto</span>(
+  <span class="kw">double</span> horasTrabajadas,
+  <span class="kw">double</span> tarifaPorHora)
+{
+  <span class="kw">return</span> horasTrabajadas * tarifaPorHora;
+}
+
+<span class="kw">double</span> salarioBruto = CalcularSalarioBruto(h, t);
+<span class="kw">double</span> pagoFinal    = AplicarDeduccionLegal(salarioBruto);</div>
+              </div>
+            </div>
+          </div>
+          <p class="note">Regla practica: si necesitas un comentario para explicar que hace una variable o funcion, el nombre no es suficientemente bueno.</p>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Regla 1: Nombres</span><span class="counter">6 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 7 REGLA 2 SRP -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Regla de calidad 2</div>
+        <div class="content">
+          <h2>Una funcion = una responsabilidad (Principio SRP)</h2>
+          <div class="two-col">
+            <div>
+              <div class="card-bad" style="margin-bottom:10px;">
+                <span class="badge badge-bad">Funcion que hace tres cosas</span>
+                <div class="code" style="margin-top:8px;"><span class="kw">static void</span> <span class="fn bad">ProcesarYMostrar</span>(<span class="kw">int</span> idx)
+{
+  <span class="cm">// Responsabilidad 1: leer datos</span>
+  Console.Write(<span class="st">"Horas: "</span>);
+  <span class="kw">double</span> h = <span class="kw">double</span>.Parse(Console.ReadLine());
+
+  <span class="cm">// Responsabilidad 2: calcular</span>
+  <span class="kw">double</span> neto = h * 15000 * 0.92;
+
+  <span class="cm">// Responsabilidad 3: mostrar</span>
+  Console.WriteLine(<span class="st">$"Empleado {idx}: {neto:C}"</span>);
+}</div>
+              </div>
+            </div>
+            <div class="card">
+              <h2>El problema concreto</h2>
+              <p>Si la empresa cambia la forma de ingresar datos (archivo CSV en vez de consola), hay que reescribir una funcion que tambien calcula y muestra. Tres razones para cambiarla = tres fuentes de bugs.</p>
+              <div class="callout-ok" style="margin-top:10px;">
+                <p><strong>Prueba rapida:</strong> describe la funcion en una oracion. Si necesitas la palabra "y" mas de una vez, tiene mas de una responsabilidad.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Regla 2: SRP</span><span class="counter">7 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 8 REGLA 3 LONGITUD -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Regla de calidad 3</div>
+        <div class="content">
+          <h2>Una funcion debe caber en la pantalla sin hacer scroll</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>&iquest;Por que 20 lineas como limite orientativo?</h2>
+              <ul>
+                <li>La memoria de trabajo humana retiene entre 5 y 9 elementos simultaneos.</li>
+                <li>Una funcion larga obliga a desplazarse y perder el contexto visual.</li>
+                <li>Si supera las 20 lineas, casi siempre hay un subproblema dentro que puede tener su propio nombre.</li>
+              </ul>
+              <p class="note" style="margin-top:8px;">No es una regla dogmatica: 25 lineas con comentarios claros pueden ser mejores que 15 lineas confusas.</p>
+            </div>
+            <div class="card">
+              <h2>Senales de que hay que extraer una subfuncion</h2>
+              <ul>
+                <li>Hay un bloque con un comentario que lo describe (ese comentario deberia ser el nombre de una funcion).</li>
+                <li>Un bloque <span class="kbd">if</span> tiene mas de 8 lineas internas.</li>
+                <li>Se repite la misma logica en dos lugares con variables diferentes (DRY).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Regla 3: Longitud</span><span class="counter">8 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 9 DIAGNOSTICO S20 -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada</div>
+        <div class="content">
+          <h2>Diagnostico: &iquest;donde viola las reglas el sistema de la S20?</h2>
+          <table>
+            <thead><tr><th>Funcion original</th><th>Regla que viola</th><th>Senal visible</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="kbd">TryProcesarEmpleado</span></td>
+                <td>SRP: lee, valida y calcula dentro del mismo cuerpo</td>
+                <td>Cuerpo de mas de 25 lineas con tres bloques logicamente independientes</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">CalcularNeto</span></td>
+                <td>Nombre ambiguo: "neto" puede significar cosas distintas segun el dominio</td>
+                <td>Sin leer el cuerpo no se sabe si aplica deducciones o solo multiplica</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">MostrarConsolidado</span></td>
+                <td>Recibe 5 parametros del mismo tipo: propenso a errores de orden</td>
+                <td>Firmas con mas de 3-4 parametros del mismo tipo son una senal de que los datos deberian agruparse</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Objetivo del taller de hoy:</strong> corregir estas tres situaciones concretas aplicando las reglas 1, 2 y 3.</p>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Diagnostico S20</span><span class="counter">9 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 10 SOBRECARGA DEFINICION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto nuevo</div>
+        <div class="content">
+          <h2>Sobrecarga de metodos: el mismo nombre, distintas firmas</h2>
+          <div class="callout">
+            <p><strong>Definicion:</strong> La sobrecarga (<em>method overloading</em>) permite definir dos o mas metodos con el <strong>mismo nombre</strong> en la misma clase, siempre que difieran en la cantidad o el tipo de sus parametros. El compilador elige cual llamar segun los argumentos que recibe.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="code"><span class="cm">// Version 1: horas normales (sin extras)</span>
+<span class="kw">static double</span> <span class="fn">CalcularSalarioBruto</span>(
+  <span class="kw">double</span> horas,
+  <span class="kw">double</span> tarifa)
+{
+  <span class="kw">return</span> horas * tarifa;
+}
+
+<span class="cm">// Version 2: con recargo por horas extra</span>
+<span class="kw">static double</span> <span class="fn">CalcularSalarioBruto</span>(
+  <span class="kw">double</span> horasNormales,
+  <span class="kw">double</span> horasExtra,
+  <span class="kw">double</span> tarifa)
+{
+  <span class="kw">double</span> base  = horasNormales * tarifa;
+  <span class="kw">double</span> extra = horasExtra * tarifa * 1.5;
+  <span class="kw">return</span> base + extra;
+}</div>
+            <div class="card">
+              <h2>Que gana el codigo</h2>
+              <ul>
+                <li>El nombre expresa el proposito sin sufijos artificiales como <span class="kbd">CalcularSalarioBrutoConExtra</span>.</li>
+                <li>El sitio de llamada es legible: quien llama con 3 argumentos activa automaticamente la logica de extras.</li>
+                <li>Las dos versiones comparten semantica: ambas calculan salario bruto, solo difieren en la informacion disponible.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Sobrecarga: definicion</span><span class="counter">10 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 11 RESOLUCION SOBRECARGA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Mecanismo</div>
+        <div class="content">
+          <h2>Como elige el compilador cual version ejecutar</h2>
+          <div class="two-col">
+            <div class="card">
+              <h2>Resolucion en tiempo de compilacion</h2>
+              <p>El compilador examina los argumentos en el sitio de llamada y busca la firma que coincida. Si hay ambiguedad, lanza un error de compilacion; no elige arbitrariamente.</p>
+              <div class="code" style="margin-top:10px;"><span class="cm">// Llama a la version de 2 parametros:</span>
+<span class="kw">double</span> s1 = CalcularSalarioBruto(40, 15000);
+
+<span class="cm">// Llama a la version de 3 parametros:</span>
+<span class="kw">double</span> s2 = CalcularSalarioBruto(40, 8, 15000);
+
+<span class="cm">// Error: no hay version con 1 parametro:</span>
+<span class="kw">double</span> s3 = CalcularSalarioBruto(40); <span class="bad">// no compila</span></div>
+            </div>
+            <div class="card">
+              <h2>Reglas de diferenciacion validas</h2>
+              <ul>
+                <li>Distintos <strong>tipos</strong> de parametros: <span class="kbd">int</span> vs <span class="kbd">double</span> &rarr; valido.</li>
+                <li>Distinta <strong>cantidad</strong> de parametros &rarr; valido.</li>
+                <li>Solo distinto <strong>nombre</strong> de parametro &rarr; NO es sobrecarga, es error.</li>
+                <li>Solo distinto <strong>tipo de retorno</strong> &rarr; NO es sobrecarga valida.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Resolucion de sobrecarga</span><span class="counter">11 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 12 CUANDO SI Y NO SOBRECARGAR -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Criterio de diseno</div>
+        <div class="content">
+          <h2>Sobrecarga: cuando ayuda y cuando confunde</h2>
+          <div class="equal-col">
+            <div class="card-good">
+              <span class="badge badge-ok">Usar sobrecarga cuando...</span>
+              <ul style="margin-top:10px;">
+                <li>Las versiones realizan la <strong>misma operacion conceptual</strong> con diferente informacion disponible.</li>
+                <li>El nombre es igualmente valido para todas las versiones sin ambiguedad.</li>
+                <li>Ejemplo: <span class="kbd">CalcularSalarioBruto</span> con y sin horas extra.</li>
+                <li>Ejemplo: <span class="kbd">Mostrar(nombre)</span> y <span class="kbd">Mostrar(nombre, cargo)</span>.</li>
+              </ul>
+            </div>
+            <div class="card-bad">
+              <span class="badge badge-bad">Evitar sobrecarga cuando...</span>
+              <ul style="margin-top:10px;">
+                <li>Las versiones hacen cosas <strong>semanticamente distintas</strong> aunque relacionadas.</li>
+                <li>El lector no puede deducir cual version se esta llamando sin leer la firma completa.</li>
+                <li>Se usa solo para evitar escribir dos nombres distintos.</li>
+                <li>Ejemplo confuso: <span class="kbd">Calcular(horas, tarifa)</span> y <span class="kbd">Calcular(sueldo, porcentaje)</span> con logicas distintas.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note">Regla de oro: si al leer la llamada no queda claro cual sobrecarga se invoca, la sobrecarga no deberia existir.</p>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Criterio de sobrecarga</span><span class="counter">12 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 13 SOBRECARGA VS PARAMETROS OPCIONALES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Comparacion de tecnicas</div>
+        <div class="content">
+          <h2>Sobrecarga vs parametros con valor por defecto</h2>
+          <div class="two-col">
+            <div class="card">
+              <h2>Parametro con valor por defecto</h2>
+              <div class="code"><span class="kw">static double</span> <span class="fn">CalcularSalarioBruto</span>(
+  <span class="kw">double</span> horas,
+  <span class="kw">double</span> tarifa,
+  <span class="kw">double</span> horasExtra = 0)
+{
+  <span class="kw">double</span> base  = horas * tarifa;
+  <span class="kw">double</span> extra = horasExtra * tarifa * 1.5;
+  <span class="kw">return</span> base + extra;
+}
+<span class="cm">// Ambas llamadas son validas:</span>
+CalcularSalarioBruto(40, 15000);
+CalcularSalarioBruto(40, 15000, 8);</div>
+              <p class="note" style="margin-top:6px;">Una sola firma. Si no se pasa horasExtra, vale 0 y el recargo es cero.</p>
+            </div>
+            <div class="card">
+              <h2>Cuando preferir cada opcion</h2>
+              <ul>
+                <li><strong>Parametro por defecto:</strong> cuando la logica interna es identica y el parametro solo agrega datos. Menos duplicacion.</li>
+                <li><strong>Sobrecarga:</strong> cuando la logica interna difiere segun los datos, o cuando el valor por defecto seria semanticamente confuso.</li>
+              </ul>
+              <div class="callout" style="margin-top:8px;">
+                <p>En el dominio laboral, "0 horas extra" y "no aplica horas extra" son conceptos distintos. La sobrecarga los separa con mayor precision.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Sobrecarga vs default</span><span class="counter">13 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 14 PRACTICA: EXTRAER SUBFUNCION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada</div>
+        <div class="content">
+          <h2>Paso 1: extraer la lectura de datos a su propia funcion</h2>
+          <div class="two-col">
+            <div>
+              <div class="card-bad" style="margin-bottom:8px;">
+                <span class="badge badge-bad">Antes: responsabilidades mezcladas</span>
+                <div class="code" style="margin-top:8px;"><span class="kw">static bool</span> TryProcesarEmpleado(<span class="kw">int</span> idx,
+  <span class="kw">out double</span> neto, <span class="kw">out double</span> pago, <span class="kw">out string</span> err)
+{
+  <span class="cm">// Leer datos aqui dentro</span>
+  Console.Write(<span class="st">"Horas: "</span>);
+  <span class="kw">if</span> (!<span class="kw">double</span>.TryParse(Console.ReadLine(), <span class="kw">out double</span> h))
+  { neto=pago=0; err=<span class="st">"Horas invalidas"</span>; <span class="kw">return false</span>; }
+  Console.Write(<span class="st">"Tarifa: "</span>);
+  <span class="kw">if</span> (!<span class="kw">double</span>.TryParse(Console.ReadLine(), <span class="kw">out double</span> t))
+  { neto=pago=0; err=<span class="st">"Tarifa invalida"</span>; <span class="kw">return false</span>; }
+  <span class="cm">// ...luego valida y calcula en el mismo cuerpo</span>
+}</div>
+              </div>
+            </div>
+            <div>
+              <div class="card-good">
+                <span class="badge badge-ok">Despues: responsabilidades separadas</span>
+                <div class="code" style="margin-top:8px;"><span class="kw">static bool</span> <span class="fn">LeerDatosEmpleado</span>(<span class="kw">int</span> idx,
+  <span class="kw">out double</span> horas, <span class="kw">out double</span> tarifa)
+{
+  Console.Write(<span class="st">$"Empleado {idx} - Horas: "</span>);
+  <span class="kw">if</span> (!<span class="kw">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> horas))
+    { tarifa = 0; <span class="kw">return false</span>; }
+  Console.Write(<span class="st">$"Empleado {idx} - Tarifa: "</span>);
+  <span class="kw">return double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> tarifa);
+}
+
+<span class="cm">// TryProcesarEmpleado ahora solo valida y calcula:</span>
+<span class="kw">static bool</span> TryProcesarEmpleado(<span class="kw">int</span> idx,
+  <span class="kw">out double</span> neto, <span class="kw">out double</span> pago, <span class="kw">out string</span> err)
+{
+  <span class="kw">if</span> (!LeerDatosEmpleado(idx, <span class="kw">out double</span> h, <span class="kw">out double</span> t))
+  { neto=pago=0; err=<span class="st">"Datos no legibles"</span>; <span class="kw">return false</span>; }
+  <span class="cm">// ...continua con la logica de calculo</span>
+}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Extraer subfuncion</span><span class="counter">14 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 15 PRACTICA: RENOMBRAR Y AGRUPAR -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada</div>
+        <div class="content">
+          <h2>Paso 2: renombrar funciones y reducir el numero de parametros</h2>
+          <div class="equal-col">
+            <div>
+              <div class="card-bad" style="margin-bottom:8px;">
+                <span class="badge badge-bad">MostrarConsolidado con 5 parametros</span>
+                <div class="code" style="margin-top:8px;"><span class="cm">// Quien lee esto no sabe si el orden es correcto</span>
+MostrarConsolidado(n, exitos, errores, totalNeto, totalPago);</div>
+                <p class="note" style="margin-top:6px;">5 parametros del mismo tipo: facil invertir dos sin que el compilador se queje.</p>
+              </div>
+            </div>
+            <div>
+              <div class="card-good">
+                <span class="badge badge-ok">Con un tipo de resumen</span>
+                <div class="code" style="margin-top:8px;"><span class="cm">// Estructura que agrupa los datos del lote</span>
+<span class="kw">struct</span> <span class="ty">ResumenLote</span>
+{
+  <span class="kw">public int</span>    Total, Exitos, Errores;
+  <span class="kw">public double</span> TotalBruto, TotalNeto;
+}
+
+<span class="ty">ResumenLote</span> resumen = <span class="kw">new</span> <span class="ty">ResumenLote</span>();
+<span class="cm">// ...se rellena dentro del ciclo...</span>
+MostrarResumenLote(resumen);</div>
+                <p class="note" style="margin-top:6px;">Un solo parametro con nombre expresivo. El orden ya no puede equivocarse.</p>
+              </div>
+            </div>
+          </div>
+          <p class="note">Nota: <span class="kbd">struct</span> es un tipo de valor en C#. Es apropiado para datos simples sin comportamiento, como este resumen. Se profundiza en cursos posteriores.</p>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Renombrar y agrupar</span><span class="counter">15 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 16 TALLER INSTRUCCIONES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Taller guiado</div>
+        <div class="content">
+          <h2>Refactorizar el sistema de nomina aplicando las tres reglas</h2>
+          <div class="callout">
+            <p><strong>Codigo de partida:</strong> Se provee una version funcional del sistema de la S20 que calcula correctamente pero tiene nombres vagos, funciones mezcladas y una firma larga. El comportamiento externo (lo que ve el usuario) debe quedar identico.</p>
+          </div>
+          <div class="step callout-warn"><strong>Paso 1:</strong> Leer el codigo completo e identificar en papel las tres senales. Anotar funcion y linea.</div>
+          <div class="step callout-warn"><strong>Paso 2:</strong> Extraer la lectura de datos del empleado a <span class="kbd">LeerDatosEmpleado</span>. Compilar y verificar que el resultado no cambia.</div>
+          <div class="step callout-warn"><strong>Paso 3:</strong> Renombrar <span class="kbd">CalcularNeto</span> con un nombre que refleje si incluye o no deducciones. Agregar la sobrecarga para horas extra.</div>
+          <div class="step callout-warn"><strong>Paso 4:</strong> Reducir los parametros de <span class="kbd">MostrarConsolidado</span> agrupandolos en <span class="kbd">ResumenLote</span>. Verificar que la salida impresa es identica.</div>
+          <p class="note">Evidencia: codigo refactorizado con un comentario por funcion indicando cual regla se aplico y por que.</p>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Instrucciones taller</span><span class="counter">16 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 17 TALLER CODIGO CON SMELLS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Taller guiado &middot; codigo inicial</div>
+        <div class="content">
+          <h2>Version original: funciona, pero tiene tres problemas</h2>
+          <div class="code"><span class="kw">static bool</span> <span class="fn warn">Proceso</span>(<span class="kw">int</span> idx, <span class="kw">out double</span> <span class="warn">r1</span>, <span class="kw">out double</span> <span class="warn">r2</span>, <span class="kw">out string</span> <span class="warn">msg</span>)
+{
+  <span class="cm">// smell 1: nombre "Proceso" no dice nada; r1, r2 no revelan su intencion</span>
+  Console.Write(<span class="st">$"Emp {idx} horas: "</span>);
+  <span class="kw">if</span> (!<span class="kw">double</span>.TryParse(Console.ReadLine(), <span class="kw">out double</span> h) || h &lt;= 0)
+    { r1=r2=0; msg=<span class="st">"Horas invalidas"</span>; <span class="kw">return false</span>; }
+  Console.Write(<span class="st">$"Emp {idx} tarifa: "</span>);
+  <span class="kw">if</span> (!<span class="kw">double</span>.TryParse(Console.ReadLine(), <span class="kw">out double</span> t) || t &lt;= 0)
+    { r1=r2=0; msg=<span class="st">"Tarifa invalida"</span>; <span class="kw">return false</span>; }
+  <span class="cm">// smell 2: la funcion lee Y valida Y calcula (3 responsabilidades)</span>
+  r1 = h * t;
+  r2 = r1 * 0.92;
+  msg = <span class="st">""</span>;
+  <span class="kw">return true</span>;
+}
+
+<span class="kw">static void</span> <span class="fn warn">Print</span>(<span class="kw">int</span> n, <span class="kw">int</span> ok, <span class="kw">int</span> fail, <span class="kw">double</span> sn, <span class="kw">double</span> sp)
+{
+  <span class="cm">// smell 3: 5 parametros del mismo tipo y nombre "Print" sin contexto</span>
+  Console.WriteLine(<span class="st">$"Total:{n} OK:{ok} Err:{fail} Bruto:{sn:C} Neto:{sp:C}"</span>);
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Codigo inicial taller</span><span class="counter">17 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 18 TALLER CODIGO REFINADO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Taller guiado &middot; version refinada</div>
+        <div class="content">
+          <h2>Version refactorizada: misma logica, mayor expresividad</h2>
+          <div class="code"><span class="cm">// Regla 2: lectura separada del calculo</span>
+<span class="kw">static bool</span> <span class="fn">LeerDatosEmpleado</span>(<span class="kw">int</span> idx, <span class="kw">out double</span> horas, <span class="kw">out double</span> tarifa)
+{
+  Console.Write(<span class="st">$"Empleado {idx} - Horas trabajadas: "</span>);
+  <span class="kw">if</span> (!<span class="kw">double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> horas) || horas &lt;= 0) { tarifa=0; <span class="kw">return false</span>; }
+  Console.Write(<span class="st">$"Empleado {idx} - Tarifa por hora: "</span>);
+  <span class="kw">return double</span>.TryParse(Console.ReadLine(), <span class="kw">out</span> tarifa) &amp;&amp; tarifa &gt; 0;
+}
+
+<span class="cm">// Regla 1 + Regla 2: calculo con nombre claro, sin lectura</span>
+<span class="kw">static bool</span> <span class="fn">TryCalcularPagoEmpleado</span>(<span class="kw">int</span> idx,
+  <span class="kw">out double</span> salarioBruto, <span class="kw">out double</span> pagoNeto, <span class="kw">out string</span> mensajeError)
+{
+  <span class="kw">if</span> (!LeerDatosEmpleado(idx, <span class="kw">out double</span> horas, <span class="kw">out double</span> tarifa))
+    { salarioBruto=pagoNeto=0; mensajeError=<span class="st">"Datos invalidos"</span>; <span class="kw">return false</span>; }
+  salarioBruto = CalcularSalarioBruto(horas, tarifa);
+  pagoNeto     = AplicarDeduccionLegal(salarioBruto);
+  mensajeError = <span class="st">""</span>;
+  <span class="kw">return true</span>;
+}
+
+<span class="cm">// Regla 3: un parametro expresivo en lugar de cinco</span>
+<span class="kw">static void</span> <span class="fn">MostrarResumenLote</span>(<span class="ty">ResumenLote</span> resumen)
+{
+  Console.WriteLine(<span class="st">$"Procesados: {resumen.Total} | Exitos: {resumen.Exitos} | Errores: {resumen.Errores}"</span>);
+  Console.WriteLine(<span class="st">$"Total bruto: {resumen.TotalBruto:C} | Total neto: {resumen.TotalNeto:C}"</span>);
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Codigo refinado</span><span class="counter">18 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 19 COMPARACION ANTES DESPUES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis comparativo</div>
+        <div class="content">
+          <h2>&iquest;Que ganamos con el refinamiento?</h2>
+          <table>
+            <thead><tr><th>Dimension</th><th>Antes</th><th>Despues</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Legibilidad</strong></td>
+                <td>Nombres como <span class="kbd">Proceso</span>, <span class="kbd">r1</span>, <span class="kbd">r2</span> obligan a leer el cuerpo</td>
+                <td><span class="kbd">TryCalcularPagoEmpleado</span>, <span class="kbd">salarioBruto</span>, <span class="kbd">pagoNeto</span> son autoexplicativos</td>
+              </tr>
+              <tr>
+                <td><strong>Mantenibilidad</strong></td>
+                <td>Cambiar el origen de los datos requiere modificar la funcion de calculo</td>
+                <td>Solo se cambia <span class="kbd">LeerDatosEmpleado</span>; el calculo no se toca</td>
+              </tr>
+              <tr>
+                <td><strong>Testabilidad</strong></td>
+                <td>No se puede probar el calculo sin simular entrada de consola</td>
+                <td><span class="kbd">CalcularSalarioBruto</span> y <span class="kbd">AplicarDeduccionLegal</span> reciben valores fijos y son directamente probables</td>
+              </tr>
+              <tr>
+                <td><strong>Comportamiento externo</strong></td>
+                <td colspan="2" style="text-align:center;color:var(--azul-medio);font-weight:700;">Identico en ambas versiones. El usuario no nota diferencia alguna.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Comparacion</span><span class="counter">19 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 20 CIERRE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Cierre de sesion</div>
+        <div class="content">
+          <h2>Codigo que funciona y codigo de calidad no son lo mismo</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Lo que construimos hoy</h2>
+              <ul>
+                <li>Identificamos code smells: nombres vagos, SRP violado, funciones largas.</li>
+                <li>Aplicamos tres reglas de calidad concretas al sistema de la S20.</li>
+                <li>Aprendimos la sobrecarga de metodos: misma operacion, distinta informacion disponible.</li>
+                <li>Distinguimos cuando sobrecargar aporta claridad y cuando genera confusion.</li>
+                <li>Refactorizamos sin cambiar el comportamiento externo del programa.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Que viene en la siguiente sesion</h2>
+              <ul>
+                <li>Laboratorio de refactorizacion: convertir codigo iterativo monolitico a modular.</li>
+                <li>Justificar las decisiones de diseno con argumentos tecnicos.</li>
+                <li>Preparacion para los ejercicios integradores de la sesion 24.</li>
+              </ul>
+              <div class="callout" style="margin-top:10px;">
+                <p><strong>Criterio profesional:</strong> en revision de codigo entre pares, la pregunta no es "&iquest;funciona?" sino "&iquest;lo puede mantener alguien que no lo escribio?"</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 21 &middot; Cierre</span><span class="counter">20 / 20</span></div>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div><!-- /deck -->
+
+<script>
+  (function(){
+    const slides=Array.from(document.querySelectorAll('.slide'));
+    const counters=Array.from(document.querySelectorAll('.counter'));
+    const stage=document.getElementById('stage');
+    const btnPrev=document.getElementById('btnPrev');
+    const btnNext=document.getElementById('btnNext');
+    let idx=0;
+    function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+    function show(i){
+      idx=clamp(i,0,slides.length-1);
+      slides.forEach((s,k)=>s.classList.toggle('active',k===idx));
+      const label=(idx+1)+" / "+slides.length;
+      counters.forEach(el=>el.textContent=label);
+      history.replaceState(null,"","#"+(idx+1));
+    }
+    function next(){show(idx+1);}
+    function prev(){show(idx-1);}
+    const m=(location.hash||"").match(/^#(\d+)$/);
+    if(m){const s=parseInt(m[1],10);if(!isNaN(s))idx=clamp(s-1,0,slides.length-1);}
+    show(idx);
+    btnPrev.addEventListener('click',prev);
+    btnNext.addEventListener('click',next);
+    document.addEventListener('keydown',(e)=>{
+      const k=e.key;
+      if(k==='f'||k==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();return;}
+      if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();next();}
+      else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();prev();}
+      else if(k==='Home'){e.preventDefault();show(0);}
+      else if(k==='End'){e.preventDefault();show(slides.length-1);}
+    });
+    const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    if(isTouch){
+      let x0=null,y0=null,t0=0;
+      const SWIPE_MIN_X=50,SWIPE_MAX_Y=80,SWIPE_MAX_MS=800;
+      stage.addEventListener('touchstart',(e)=>{const t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();},{passive:true});
+      stage.addEventListener('touchend',(e)=>{
+        if(x0===null||y0===null)return;
+        const t=e.changedTouches[0];const dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
+        x0=null;y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y)return;
+        if(dx<=-SWIPE_MIN_X)next();else if(dx>=SWIPE_MIN_X)prev();
+      },{passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
