@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 23</title>
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px);
+      --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px);
+      --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#ffffff;}
+    .deck{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px);box-sizing:border-box;background:#ffffff;}
+    .stage{width:min(96vw,calc(92vh*(16/9)));aspect-ratio:16/9;position:relative;}
+    .slide{position:absolute;inset:0;display:none;box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;}
+    .slide.active{display:block;}
+    .slide.cover{background:url("./Portada.png") center/cover no-repeat;color:#ffffff;}
+    .slide.content-slide{background:url("./Contenido.png") top left/contain no-repeat,#ffffff;color:var(--texto);}
+    .inner{height:100%;box-sizing:border-box;padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);display:flex;flex-direction:column;gap:clamp(10px,1.1vw,18px);}
+    .cover .inner{padding:var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);}
+    .content{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.1vw,16px);min-height:0;}
+    .header{color:var(--azul-medio);font-size:clamp(18px,1.6vw,22px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    h1{margin:0;font-size:var(--h1);line-height:1.08;color:var(--texto);}
+    h2{margin:0;font-size:var(--h2);line-height:1.15;color:var(--azul-medio);}
+    p{margin:0;font-size:var(--p);line-height:1.4;color:var(--texto);}
+    li{font-size:var(--li);line-height:1.4;color:var(--texto);}
+    ul,ol{margin:0;padding-left:1.2em;}
+    .subtitle{color:var(--turquesa);font-weight:800;font-size:clamp(18px,1.8vw,24px);margin-top:clamp(6px,1vw,10px);}
+    .cover h1{color:#ffffff;}
+    .cover p{color:#e5edf8;}
+    .cover .subtitle{color:#f7df00;}
+    .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
+    .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .two-col{display:grid;grid-template-columns:1.15fr .9fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dde2f1;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#111827;color:#e5e7eb;padding:2px 8px;border-radius:7px;font-size:clamp(11px,1vw,13px);border:1px solid rgba(255,255,255,.08);}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.05vw,14px);line-height:1.35;background:#0b1020;color:#e5e7eb;border-radius:10px;padding:clamp(10px,1.1vw,14px);overflow:auto;max-height:44vh;border:1px solid rgba(17,24,39,.25);white-space:pre-wrap;}
+    .kw{color:#7dd3fc;}
+    .ty{color:#86efac;}
+    .fn{color:#fde68a;}
+    .cm{color:#94a3b8;font-style:italic;}
+    .st{color:#f9a8d4;}
+    .warn{color:#fbbf24;}
+    .ok{color:#86efac;}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
+    th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
+    th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
+    .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
+    .counter{font-weight:800;color:var(--azul-medio);}
+    .cover .counter{color:#e5edf8;}
+    .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
+    .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
+    #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
+    .stage:hover #touchNav{opacity:1;transform:translateY(-50%) translateY(0);}
+    @media (hover:none){#touchNav{opacity:1;transform:translateY(-50%);}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+    .step{opacity:0;animation:fadeIn .45s ease forwards;}
+    .step:nth-child(1){animation-delay:.15s;}
+    .step:nth-child(2){animation-delay:.55s;}
+    .step:nth-child(3){animation-delay:.95s;}
+    .step:nth-child(4){animation-delay:1.35s;}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 23</h1>
+          <div class="subtitle">Consolidacion de arquitectura y mantenibilidad</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 · Reconocer deuda tecnica y construir codigo que evolucione sin romperse</p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; · Home / End · F pantalla completa · Tactil: desliza</p>
+        </div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 2 · PROPOSITO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Proposito de la sesion</div>
+        <div class="content">
+          <h2>Un programa no termina cuando compila: termina cuando puede evolucionar</h2>
+          <ul>
+            <li>Identificar deuda tecnica en codigo funcional: nombres confusos, funciones con multiples responsabilidades, logica duplicada.</li>
+            <li>Aplicar convenciones de calidad que hacen el codigo comprensible para quien lo modifique despues.</li>
+            <li>Relacionar cada decision tecnica con su costo de mantenimiento futuro.</li>
+            <li>Construir un plan de mejora modular basado en evidencia del codigo existente.</li>
+          </ul>
+        </div>
+        <div class="footer"><span>Sesion 23 · Proposito</span><span class="counter">2 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 3 · QUE ES DEUDA TECNICA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto</div>
+        <div class="content">
+          <h2>Deuda tecnica: codigo que funciona pero que cuesta mantener</h2>
+          <div class="callout">
+            <p><strong>Definicion:</strong> La deuda tecnica es el costo adicional de trabajo que se genera cuando se elige una solucion rapida o descuidada en lugar de una solucion bien diseñada. Como una deuda financiera, si no se paga, crece con intereses.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="card">
+              <h2>Señales de deuda tecnica</h2>
+              <ul>
+                <li>Nombres de variables: <span class="kbd">x</span>, <span class="kbd">temp2</span>, <span class="kbd">aux</span>.</li>
+                <li>Funciones de mas de 40 lineas.</li>
+                <li>Logica identica copiada en dos lugares.</li>
+                <li>Comentarios que explican "que hace" en vez de "por que".</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Costo real</h2>
+              <ul>
+                <li>Cambiar una regla de negocio requiere modificar 4 funciones en vez de 1.</li>
+                <li>Un compañero no puede entender el codigo sin preguntarle al autor.</li>
+                <li>Un defecto en un lugar produce errores en otro lugar no relacionado visiblemente.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Deuda tecnica</span><span class="counter">3 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 4 · IDENTIFICAR DEUDA EN CODIGO REAL -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis de codigo</div>
+        <div class="content">
+          <h2>Identificar deuda en un fragmento real</h2>
+          <div class="two-col">
+            <div class="code"><span class="kw">static void</span> Procesar(<span class="kw">int</span> n)
+{
+  <span class="kw">double</span> x = 0;
+  <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= n; i++)
+  {
+    Console.Write(<span class="st">"h: "</span>);
+    <span class="kw">double</span> h = <span class="ty">double</span>.Parse(Console.ReadLine());
+    Console.Write(<span class="st">"t: "</span>);
+    <span class="kw">double</span> t = <span class="ty">double</span>.Parse(Console.ReadLine());
+    <span class="warn">// calcula el neto (igual que la funcion de nomina)</span>
+    <span class="kw">double</span> neto = h * t;
+    <span class="kw">if</span> (h &gt; 40) neto += (h - 40) * t * 0.5;
+    x += neto;
+    Console.WriteLine(<span class="st">$"Neto {i}: {neto:C}"</span>);
+  }
+  Console.WriteLine(<span class="st">$"Total: {x:C}"</span>);
+}</div>
+            <div class="card">
+              <h2>Problemas identificados</h2>
+              <ul>
+                <li><span class="warn">Nombre <span class="kbd">x</span>:</span> no comunica su intencion. Deberia ser <span class="kbd">totalNeto</span>.</li>
+                <li><span class="warn">Parametros <span class="kbd">h</span> y <span class="kbd">t</span>:</span> sin contexto. Deberian ser <span class="kbd">horas</span> y <span class="kbd">tarifa</span>.</li>
+                <li><span class="warn">Logica duplicada:</span> el calculo de neto ya existe en otra funcion; se esta copiando.</li>
+                <li><span class="warn">Mezcla UI + logica:</span> leer, calcular y mostrar dentro del mismo ciclo.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Analisis</span><span class="counter">4 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 5 · CONVENCIONES DE NOMBRES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Convenciones de calidad</div>
+        <div class="content">
+          <h2>Convencion 1: nombres que comunican intencion</h2>
+          <table>
+            <thead><tr><th>Con deuda</th><th>Con calidad</th><th>Por que mejora</th></tr></thead>
+            <tbody>
+              <tr><td><span class="code" style="display:inline;padding:2px 6px;">double x</span></td><td><span class="code" style="display:inline;padding:2px 6px;">double totalNeto</span></td><td>El nombre explica lo que acumula</td></tr>
+              <tr><td><span class="code" style="display:inline;padding:2px 6px;">Procesar(int n)</span></td><td><span class="code" style="display:inline;padding:2px 6px;">ProcesarLote(int cantidad)</span></td><td>Nombre de funcion indica accion y contexto</td></tr>
+              <tr><td><span class="code" style="display:inline;padding:2px 6px;">bool b</span></td><td><span class="code" style="display:inline;padding:2px 6px;">bool esValido</span></td><td>Booleanos con prefijo es/tiene/puede</td></tr>
+              <tr><td><span class="code" style="display:inline;padding:2px 6px;">int c</span></td><td><span class="code" style="display:inline;padding:2px 6px;">int contadorErrores</span></td><td>Contadores con nombre de lo que cuentan</td></tr>
+            </tbody>
+          </table>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Regla practica:</strong> si necesitas un comentario para explicar el nombre de una variable, el nombre esta mal.</p>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Nombres</span><span class="counter">5 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 6 · COHESION DE FUNCIONES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Convenciones de calidad</div>
+        <div class="content">
+          <h2>Convencion 2: una funcion, una responsabilidad</h2>
+          <div class="two-col">
+            <div class="card">
+              <h2>Funcion con baja cohesion</h2>
+              <p>Lee datos, valida, calcula Y muestra resultado en la misma funcion.</p>
+              <ul style="margin-top:8px;">
+                <li>Si cambia el formato de salida, hay que editar la funcion de calculo.</li>
+                <li>No se puede probar el calculo sin la entrada interactiva.</li>
+                <li>Es imposible reutilizar solo la parte de calculo.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Funcion con alta cohesion</h2>
+              <p>Cada funcion hace exactamente una cosa, bien definida en su nombre.</p>
+              <ul style="margin-top:8px;">
+                <li><span class="kbd">LeerDatos()</span> → solo lee.</li>
+                <li><span class="kbd">Validar()</span> → solo valida.</li>
+                <li><span class="kbd">Calcular()</span> → solo calcula.</li>
+                <li><span class="kbd">Mostrar()</span> → solo presenta.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="note" style="margin-top:8px;">Pregunta de diagnostico: "¿Puedo describir lo que hace esta funcion en una sola frase sin usar 'y'?"</p>
+        </div>
+        <div class="footer"><span>Sesion 23 · Cohesion</span><span class="counter">6 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 7 · ACOPLAMIENTO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Convenciones de calidad</div>
+        <div class="content">
+          <h2>Convencion 3: reducir acoplamiento entre funciones</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Alto acoplamiento (problematico)</h2>
+              <div class="code" style="margin-top:8px;"><span class="warn">static double valorGlobal = 0;</span>
+
+<span class="kw">static double</span> Calcular()
+{
+  <span class="warn">valorGlobal = 100;</span> <span class="cm">// modifica global</span>
+  <span class="kw">return</span> valorGlobal * 2;
+}</span></div>
+              <p class="note" style="margin-top:8px;">Si <span class="kbd">Calcular</span> modifica una variable global, cualquier otra funcion que la lea puede recibir un valor inesperado.</p>
+            </div>
+            <div class="card">
+              <h2>Bajo acoplamiento (correcto)</h2>
+              <div class="code" style="margin-top:8px;"><span class="cm">// Funcion pura: recibe todo por parametro</span>
+<span class="kw">static double</span> Calcular(<span class="kw">double</span> valor)
+{
+  <span class="kw">return</span> valor * 2;
+}</div>
+              <p class="note" style="margin-top:8px;">Solo depende de sus parametros. Se puede probar con cualquier valor sin preparar estado global.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Acoplamiento</span><span class="counter">7 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 8 · CICLO DE VIDA Y MANTENIMIENTO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Ciclo de vida</div>
+        <div class="content">
+          <h2>Las decisiones de hoy determinan el costo de mañana</h2>
+          <div class="callout">
+            <p><strong>Dato real de industria:</strong> entre el 40% y el 80% del costo total de un software se destina a mantenimiento (correcciones, nuevas reglas, cambios de plataforma). Un diseño modular reduce ese costo de forma directa.</p>
+          </div>
+          <table style="margin-top:8px;">
+            <thead><tr><th>Decision tecnica hoy</th><th>Efecto en mantenimiento</th></tr></thead>
+            <tbody>
+              <tr><td>Nombres descriptivos en variables y funciones</td><td>Tiempo de comprension del codigo: minutos en lugar de horas</td></tr>
+              <tr><td>Separar UI de logica de negocio</td><td>Cambiar la presentacion no rompe el calculo</td></tr>
+              <tr><td>Funciones con una sola responsabilidad</td><td>Localizar el lugar del cambio es inmediato</td></tr>
+              <tr><td>Evitar logica duplicada</td><td>Corregir un error implica cambiar un solo lugar</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 23 · Costo de mantenimiento</span><span class="counter">8 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 9 · PLAN DE MEJORA MODULAR -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Plan de mejora</div>
+        <div class="content">
+          <h2>Como construir un plan de mejora modular</h2>
+          <div class="step callout"><strong>Paso 1 — Inventario:</strong> listar todas las funciones del programa con su responsabilidad actual.</div>
+          <div class="step callout"><strong>Paso 2 — Diagnosis:</strong> para cada funcion, responder: ¿hace mas de una cosa? ¿usa variables globales? ¿esta duplicada?</div>
+          <div class="step callout"><strong>Paso 3 — Priorizar:</strong> atacar primero la deuda que mas impacta en el siguiente cambio previsto.</div>
+          <div class="step callout"><strong>Paso 4 — Mejorar con pruebas:</strong> antes de refactorizar, construir al menos un caso de prueba que confirme que la funcion ya funciona. Refactorizar sin romper ese caso.</div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Plan de mejora</span><span class="counter">9 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 10 · REFACTORIZAR SIN ROMPER: EJEMPLO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Refactorizacion segura</div>
+        <div class="content">
+          <h2>Ejemplo: extraer logica duplicada a una funcion</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Antes (con deuda)</h2>
+              <div class="code"><span class="cm">// En funcion A:</span>
+<span class="kw">double</span> neto = horas * tarifa;
+<span class="kw">if</span> (horas &gt; 40)
+  neto += (horas - 40) * tarifa * 0.5;
+
+<span class="cm">// En funcion B (copia exacta):</span>
+<span class="kw">double</span> neto = horas * tarifa;
+<span class="kw">if</span> (horas &gt; 40)
+  neto += (horas - 40) * tarifa * 0.5;</div>
+            </div>
+            <div class="card">
+              <h2>Despues (mejorado)</h2>
+              <div class="code"><span class="cm">// Nueva funcion extraida:</span>
+<span class="kw">static double</span> CalcularNeto(
+  <span class="kw">double</span> horas, <span class="kw">double</span> tarifa)
+{
+  <span class="kw">double</span> neto = horas * tarifa;
+  <span class="kw">if</span> (horas &gt; 40)
+    neto += (horas - 40) * tarifa * 0.5;
+  <span class="kw">return</span> neto;
+}
+
+<span class="cm">// Funcion A y B usan la misma funcion:</span>
+<span class="kw">double</span> neto = CalcularNeto(h, t);</div>
+            </div>
+          </div>
+          <p class="note" style="margin-top:4px;">El caso de prueba de la funcion original debe seguir pasando despues de la refactorizacion.</p>
+        </div>
+        <div class="footer"><span>Sesion 23 · Refactorizacion</span><span class="counter">10 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 11 · REVISANDO EL PROYECTO COMPLETO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Revision de proyecto</div>
+        <div class="content">
+          <h2>Lista de verificacion de arquitectura modular</h2>
+          <table>
+            <thead><tr><th>Criterio</th><th>Como verificarlo</th></tr></thead>
+            <tbody>
+              <tr><td>Cada funcion tiene un nombre que describe su accion</td><td>Leer el nombre en voz alta: ¿tiene sentido sin el codigo?</td></tr>
+              <tr><td>Main solo coordina, no calcula ni presenta</td><td>Contar cuantas responsabilidades tiene Main</td></tr>
+              <tr><td>No hay logica de negocio en funciones de presentacion</td><td>Buscar calculos dentro de Console.WriteLine</td></tr>
+              <tr><td>No hay variables globales innecesarias</td><td>Contar variables declaradas fuera de todas las funciones</td></tr>
+              <tr><td>No hay bloques de codigo repetidos</td><td>Buscar segmentos identicos o casi identicos</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 23 · Lista de verificacion</span><span class="counter">11 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 12 · DOCUMENTACION MINIMA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Convenciones de calidad</div>
+        <div class="content">
+          <h2>Convencion 4: documentar el por que, no el que</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Comentario que no aporta</h2>
+              <div class="code"><span class="cm">// multiplica horas por tarifa</span>
+<span class="kw">double</span> neto = horas * tarifa;</div>
+              <p class="note" style="margin-top:8px;">El codigo ya dice lo mismo. El comentario es ruido.</p>
+            </div>
+            <div class="card">
+              <h2>Comentario que aporta</h2>
+              <div class="code"><span class="cm">// Se retorna porcentaje (0.20) y no monto</span>
+<span class="cm">// para que el precio base pueda cambiar</span>
+<span class="cm">// sin modificar esta funcion.</span>
+<span class="kw">return</span> 0.20;</div>
+              <p class="note" style="margin-top:8px;">Explica la decision de diseño que no es obvia leyendo el codigo.</p>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:8px;">
+            <p><strong>Regla:</strong> comentar decisiones no evidentes, restricciones del negocio y contratos que la firma no puede expresar.</p>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Comentarios</span><span class="counter">12 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 13 · MENSAJES DE COMMIT -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Control de versiones</div>
+        <div class="content">
+          <h2>El commit como registro de decision tecnica</h2>
+          <div class="two-col">
+            <div class="card">
+              <h2>Mensajes sin valor</h2>
+              <ul>
+                <li><span class="kbd">cambios</span></li>
+                <li><span class="kbd">fix</span></li>
+                <li><span class="kbd">actualizacion del lunes</span></li>
+                <li><span class="kbd">no se que mas agregar</span></li>
+              </ul>
+              <p class="note" style="margin-top:8px;">Estos mensajes no permiten entender que cambio ni por que.</p>
+            </div>
+            <div class="card">
+              <h2>Mensajes con valor tecnico</h2>
+              <ul>
+                <li><span class="kbd">refactor: extraer CalcularNeto de Procesar()</span></li>
+                <li><span class="kbd">fix: corregir conteo de errores en ProcesarLote</span></li>
+                <li><span class="kbd">feat: agregar validacion de tarifa negativa</span></li>
+                <li><span class="kbd">docs: agregar comentario de contrato en CalcularDescuento</span></li>
+              </ul>
+            </div>
+          </div>
+          <p class="note" style="margin-top:8px;">Formato sugerido: <span class="kbd">tipo: descripcion breve del cambio</span> (tipos: feat, fix, refactor, docs, test).</p>
+        </div>
+        <div class="footer"><span>Sesion 23 · Commits</span><span class="counter">13 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 14 · PRACTICA: DIAGNOSTICAR UN PROYECTO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada</div>
+        <div class="content">
+          <h2>Diagnosticar el proyecto de la sesion 22</h2>
+          <div class="step callout"><strong>Paso 1:</strong> Abrir el proyecto del gimnasio (S22). Listar todas las funciones con una frase de descripcion.</div>
+          <div class="step callout"><strong>Paso 2:</strong> Aplicar la lista de verificacion de la diapositiva 11. Marcar que criterios se cumplen y cuales no.</div>
+          <div class="step callout"><strong>Paso 3:</strong> Identificar al menos un punto de deuda tecnica con evidencia: nombre poco claro, funcion con dos responsabilidades o logica duplicada.</div>
+          <div class="step callout"><strong>Paso 4:</strong> Proponer una mejora concreta (no implementarla todavia): ¿que cambiaria? ¿que nombre pondria? ¿que funcion extraeria?</div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Diagnostico</span><span class="counter">14 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 15 · PRACTICA: APLICAR UNA MEJORA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada</div>
+        <div class="content">
+          <h2>Aplicar una mejora de calidad</h2>
+          <div class="two-col">
+            <div class="card">
+              <h2>Reglas del proceso</h2>
+              <ul>
+                <li>Antes de cambiar cualquier linea, ejecutar el proyecto y anotar la salida esperada.</li>
+                <li>Hacer solo un cambio a la vez (renombrar OR extraer OR separar).</li>
+                <li>Compilar y verificar que la salida sigue siendo la misma.</li>
+                <li>Hacer commit con mensaje descriptivo del tipo de mejora.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Mejoras sugeridas para comenzar</h2>
+              <ul>
+                <li>Renombrar una variable con nombre generico a nombre semantico.</li>
+                <li>Agregar un comentario de contrato en una funcion que tiene restricciones no obvias.</li>
+                <li>Separar un bloque de consola que esta mezclado con un calculo.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Aplicar mejora</span><span class="counter">15 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 16 · ERRORES DE MANTENIMIENTO COMUNES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Analisis de errores</div>
+        <div class="content">
+          <h2>Lo que suele salir mal al hacer mantenimiento</h2>
+          <table>
+            <thead><tr><th>Situacion</th><th>Consecuencia</th><th>Prevencion</th></tr></thead>
+            <tbody>
+              <tr><td>Cambiar una regla de negocio en un lugar y olvidar el duplicado</td><td>El programa tiene dos comportamientos distintos segun la ruta de ejecucion</td><td>Eliminar duplicados antes de hacer el cambio</td></tr>
+              <tr><td>Renombrar una variable localmente sin actualizar todos sus usos</td><td>Error de compilacion o peor: referencia al valor antiguo</td><td>Usar "Rename Symbol" del editor en vez de Find & Replace</td></tr>
+              <tr><td>Agregar logica de negocio a una funcion de presentacion</td><td>Cambiar la interfaz rompe el calculo</td><td>Verificar que la funcion solo tenga llamadas a Console</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 23 · Errores de mantenimiento</span><span class="counter">16 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 17 · TALLER -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Desarrollo guiado</div>
+        <div class="content two-col">
+          <div>
+            <h2>Taller: refactorizar el gimnasio con deuda acumulada</h2>
+            <div class="code"><span class="cm">// VERSION CON DEUDA — punto de partida</span>
+<span class="kw">static void</span> <span class="fn">Procesar</span>(<span class="kw">int</span> n, <span class="kw">double</span> p)
+{
+  <span class="warn">static double x = 0;</span> <span class="cm">// global innecesaria</span>
+  <span class="kw">int</span> c = 0;
+  <span class="kw">for</span> (<span class="kw">int</span> i = 1; i &lt;= n; i++)
+  {
+    Console.Write(<span class="st">$"Cliente {i} - Nombre: "</span>);
+    <span class="kw">string</span> n2 = Console.ReadLine();
+    Console.Write(<span class="st">"Visitas: "</span>);
+    <span class="kw">int</span> v = <span class="ty">int</span>.Parse(Console.ReadLine());
+    Console.Write(<span class="st">"Tipo: "</span>);
+    <span class="kw">string</span> t = Console.ReadLine();
+    <span class="cm">// calcula descuento (igual que en otro lugar)</span>
+    <span class="kw">double</span> d = 0;
+    <span class="kw">if</span> (t == <span class="st">"premium"</span>) d = 0.20;
+    <span class="kw">else if</span> (v &gt; 15) d = 0.10;
+    <span class="kw">double</span> final = p * (1 - d);
+    x += final;
+    <span class="kw">if</span> (d &gt; 0) c++;
+    Console.WriteLine(<span class="st">$"{n2}: {final:C} (desc {d:P0})"</span>);
+  }
+  Console.WriteLine(<span class="st">$"Total: {x:C} | Con descuento: {c}"</span>);
+}</div>
+          </div>
+          <div class="card">
+            <h2>Tu tarea</h2>
+            <ol>
+              <li>Ejecutar y anotar la salida con N=2, precio=100000, un cliente premium y uno basico con 18 visitas.</li>
+              <li>Diagnosticar con la lista de la diapositiva 11: ¿cuantos criterios fallan?</li>
+              <li>Aplicar al menos dos mejoras en orden (una por commit): renombrar variables, extraer <span class="kbd">CalcularDescuento</span>, separar lectura de calculo.</li>
+              <li>Verificar que la salida de referencia se mantiene tras cada cambio.</li>
+            </ol>
+            <p class="note" style="margin-top:8px;">Tipos de commit esperados: <span class="kbd">refactor:</span> y <span class="kbd">fix:</span></p>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Taller</span><span class="counter">17 / 18</span></div>
+      </div>
+    </section>
+
+    <!-- 18 · CIERRE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Cierre de sesion</div>
+        <div class="content">
+          <h2>Codigo de calidad no es perfeccion: es codigo que puede evolucionar</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Lo que construimos hoy</h2>
+              <ul>
+                <li>Identificamos deuda tecnica con criterios concretos.</li>
+                <li>Aplicamos convenciones de calidad: nombres, cohesion, acoplamiento, documentacion.</li>
+                <li>Relacionamos decisiones tecnicas con su costo de mantenimiento.</li>
+                <li>Refactorizamos sin romper comportamiento verificado.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Que viene en la siguiente sesion</h2>
+              <ul>
+                <li>IA como copiloto de programacion: que puede hacer y que no puede reemplazar.</li>
+                <li>Riesgos reales: alucinaciones, sesgos y codigo inseguro generado por IA.</li>
+                <li>Flujo de trabajo futuro: humano diseña, IA asiste, humano valida.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Cierre</span><span class="counter">18 / 18</span></div>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div><!-- /deck -->
+
+<script>
+  (function(){
+    const slides=Array.from(document.querySelectorAll('.slide'));
+    const counters=Array.from(document.querySelectorAll('.counter'));
+    const stage=document.getElementById('stage');
+    const btnPrev=document.getElementById('btnPrev');
+    const btnNext=document.getElementById('btnNext');
+    let idx=0;
+    function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+    function show(i){
+      idx=clamp(i,0,slides.length-1);
+      slides.forEach((s,k)=>s.classList.toggle('active',k===idx));
+      const label=(idx+1)+" / "+slides.length;
+      counters.forEach(el=>el.textContent=label);
+      history.replaceState(null,"","#"+(idx+1));
+    }
+    function next(){show(idx+1);}
+    function prev(){show(idx-1);}
+    const m=(location.hash||"").match(/^#(\d+)$/);
+    if(m){const s=parseInt(m[1],10);if(!isNaN(s))idx=clamp(s-1,0,slides.length-1);}
+    show(idx);
+    btnPrev.addEventListener('click',prev);
+    btnNext.addEventListener('click',next);
+    document.addEventListener('keydown',(e)=>{
+      const k=e.key;
+      if(k==='f'||k==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();return;}
+      if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();next();}
+      else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();prev();}
+      else if(k==='Home'){e.preventDefault();show(0);}
+      else if(k==='End'){e.preventDefault();show(slides.length-1);}
+    });
+    const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    if(isTouch){
+      let x0=null,y0=null,t0=0;
+      const SWIPE_MIN_X=50,SWIPE_MAX_Y=80,SWIPE_MAX_MS=800;
+      stage.addEventListener('touchstart',(e)=>{const t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();},{passive:true});
+      stage.addEventListener('touchend',(e)=>{
+        if(x0===null||y0===null)return;
+        const t=e.changedTouches[0];const dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
+        x0=null;y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y)return;
+        if(dx<=-SWIPE_MIN_X)next();else if(dx>=SWIPE_MIN_X)prev();
+      },{passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
