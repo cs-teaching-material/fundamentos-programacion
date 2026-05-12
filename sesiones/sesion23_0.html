@@ -45,6 +45,8 @@
     .cover .subtitle{color:#f7df00;}
     .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
     .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .callout-warn{background:rgba(255,251,235,.96);border-left:6px solid #f59e0b;padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .callout-ok{background:rgba(240,253,244,.96);border-left:6px solid #22c55e;padding:clamp(10px,1.1vw,14px);border-radius:6px;}
     .two-col{display:grid;grid-template-columns:1.15fr .9fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
     .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
     @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
@@ -58,12 +60,14 @@
     .st{color:#f9a8d4;}
     .warn{color:#fbbf24;}
     .ok{color:#86efac;}
+    .num{color:#fb923c;}
     table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
     th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
     th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
     .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
     .counter{font-weight:800;color:var(--azul-medio);}
     .cover .counter{color:#e5edf8;}
+    /* touch-nav ahora dentro de .stage */
     .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
     .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
     #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
@@ -75,11 +79,22 @@
     .step:nth-child(2){animation-delay:.55s;}
     .step:nth-child(3){animation-delay:.95s;}
     .step:nth-child(4){animation-delay:1.35s;}
+    .step:nth-child(5){animation-delay:1.75s;}
+    .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:clamp(11px,1vw,13px);font-weight:700;letter-spacing:.04em;}
+    .badge-red{background:#fee2e2;color:#b91c1c;}
+    .badge-green{background:#dcfce7;color:#15803d;}
+    .badge-blue{background:#dbeafe;color:#1d4ed8;}
   </style>
 </head>
 <body>
 <div class="deck">
   <div class="stage" id="stage">
+
+    <!-- TOUCH NAV — dentro del stage para posicionarse correctamente -->
+    <div class="touch-nav" id="touchNav">
+      <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+      <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+    </div>
 
     <!-- 1 · PORTADA -->
     <section class="slide cover active">
@@ -90,7 +105,7 @@
           <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 · Reconocer deuda tecnica y construir codigo que evolucione sin romperse</p>
           <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; · Home / End · F pantalla completa · Tactil: desliza</p>
         </div>
-        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 18</span></div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 21</span></div>
       </div>
     </section>
 
@@ -104,10 +119,11 @@
             <li>Identificar deuda tecnica en codigo funcional: nombres confusos, funciones con multiples responsabilidades, logica duplicada.</li>
             <li>Aplicar convenciones de calidad que hacen el codigo comprensible para quien lo modifique despues.</li>
             <li>Relacionar cada decision tecnica con su costo de mantenimiento futuro.</li>
+            <li>Conocer los principios DRY y SRP como guias de diseño practico.</li>
             <li>Construir un plan de mejora modular basado en evidencia del codigo existente.</li>
           </ul>
         </div>
-        <div class="footer"><span>Sesion 23 · Proposito</span><span class="counter">2 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Proposito</span><span class="counter">2 / 21</span></div>
       </div>
     </section>
 
@@ -140,7 +156,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Deuda tecnica</span><span class="counter">3 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Deuda tecnica</span><span class="counter">3 / 21</span></div>
       </div>
     </section>
 
@@ -179,7 +195,7 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Analisis</span><span class="counter">4 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Analisis</span><span class="counter">4 / 21</span></div>
       </div>
     </section>
 
@@ -202,11 +218,89 @@
             <p><strong>Regla practica:</strong> si necesitas un comentario para explicar el nombre de una variable, el nombre esta mal.</p>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Nombres</span><span class="counter">5 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Nombres</span><span class="counter">5 / 21</span></div>
       </div>
     </section>
 
-    <!-- 6 · COHESION DE FUNCIONES -->
+    <!-- 6 · DRY -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Principios de diseño</div>
+        <div class="content">
+          <h2>DRY — Don't Repeat Yourself</h2>
+          <div class="callout">
+            <p><strong>Principio:</strong> cada pieza de conocimiento o logica debe tener una unica representacion en el sistema. Si dos fragmentos de codigo hacen lo mismo, ese conocimiento vive en dos lugares y se puede desincronizar.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="card">
+              <p><span class="badge badge-red">Viola DRY</span></p>
+              <div class="code" style="margin-top:8px;"><span class="cm">// En Nomina.cs</span>
+<span class="kw">double</span> neto = horas * tarifa;
+<span class="kw">if</span> (horas &gt; 40)
+  neto += (horas-40)*tarifa*0.5;
+
+<span class="cm">// En Reporte.cs — copia exacta</span>
+<span class="kw">double</span> neto = horas * tarifa;
+<span class="kw">if</span> (horas &gt; 40)
+  neto += (horas-40)*tarifa*0.5;</div>
+              <p class="note" style="margin-top:6px;">Si cambia el porcentaje de horas extra, hay que recordar actualizar ambos lugares.</p>
+            </div>
+            <div class="card">
+              <p><span class="badge badge-green">Cumple DRY</span></p>
+              <div class="code" style="margin-top:8px;"><span class="cm">// Un solo lugar de verdad:</span>
+<span class="kw">static double</span> CalcularNeto(
+    <span class="kw">double</span> horas, <span class="kw">double</span> tarifa)
+{
+  <span class="kw">double</span> neto = horas * tarifa;
+  <span class="kw">if</span> (horas &gt; 40)
+    neto += (horas-40)*tarifa*0.5;
+  <span class="kw">return</span> neto;
+}
+<span class="cm">// Nomina y Reporte la invocan.</span></div>
+              <p class="note" style="margin-top:6px;">Un cambio en la regla de negocio se aplica en un solo lugar.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · DRY</span><span class="counter">6 / 21</span></div>
+      </div>
+    </section>
+
+    <!-- 7 · SRP -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Principios de diseño</div>
+        <div class="content">
+          <h2>SRP — Single Responsibility Principle</h2>
+          <div class="callout">
+            <p><strong>Principio:</strong> una funcion (o modulo) debe tener una sola razon para cambiar. Si una funcion cambia cuando cambia la UI Y cuando cambia la regla de negocio, tiene dos responsabilidades.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="card">
+              <p><span class="badge badge-red">Viola SRP</span> — multiples razones para cambiar</p>
+              <ul style="margin-top:8px;">
+                <li>Lee datos del teclado.</li>
+                <li>Calcula el descuento segun el tipo de cliente.</li>
+                <li>Formatea e imprime el resultado.</li>
+                <li>Acumula el total del lote.</li>
+              </ul>
+              <p class="note" style="margin-top:6px;">Cambiar el formato de impresion obliga a tocar la funcion de calculo.</p>
+            </div>
+            <div class="card">
+              <p><span class="badge badge-green">Cumple SRP</span> — una razon por funcion</p>
+              <ul style="margin-top:8px;">
+                <li><span class="kbd">LeerCliente()</span> — solo interaccion con el usuario.</li>
+                <li><span class="kbd">CalcularDescuento(tipo, visitas)</span> — solo regla de negocio.</li>
+                <li><span class="kbd">MostrarResumen(nombre, precio)</span> — solo presentacion.</li>
+                <li><span class="kbd">ProcesarLote(n, precio)</span> — solo coordina el flujo.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 23 · SRP</span><span class="counter">7 / 21</span></div>
+      </div>
+    </section>
+
+    <!-- 8 · COHESION DE FUNCIONES -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Convenciones de calidad</div>
@@ -235,11 +329,11 @@
           </div>
           <p class="note" style="margin-top:8px;">Pregunta de diagnostico: "¿Puedo describir lo que hace esta funcion en una sola frase sin usar 'y'?"</p>
         </div>
-        <div class="footer"><span>Sesion 23 · Cohesion</span><span class="counter">6 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Cohesion</span><span class="counter">8 / 21</span></div>
       </div>
     </section>
 
-    <!-- 7 · ACOPLAMIENTO -->
+    <!-- 9 · ACOPLAMIENTO -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Convenciones de calidad</div>
@@ -254,7 +348,7 @@
 {
   <span class="warn">valorGlobal = 100;</span> <span class="cm">// modifica global</span>
   <span class="kw">return</span> valorGlobal * 2;
-}</span></div>
+}</div>
               <p class="note" style="margin-top:8px;">Si <span class="kbd">Calcular</span> modifica una variable global, cualquier otra funcion que la lea puede recibir un valor inesperado.</p>
             </div>
             <div class="card">
@@ -268,11 +362,11 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Acoplamiento</span><span class="counter">7 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Acoplamiento</span><span class="counter">9 / 21</span></div>
       </div>
     </section>
 
-    <!-- 8 · CICLO DE VIDA Y MANTENIMIENTO -->
+    <!-- 10 · CICLO DE VIDA Y MANTENIMIENTO -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Ciclo de vida</div>
@@ -286,16 +380,16 @@
             <tbody>
               <tr><td>Nombres descriptivos en variables y funciones</td><td>Tiempo de comprension del codigo: minutos en lugar de horas</td></tr>
               <tr><td>Separar UI de logica de negocio</td><td>Cambiar la presentacion no rompe el calculo</td></tr>
-              <tr><td>Funciones con una sola responsabilidad</td><td>Localizar el lugar del cambio es inmediato</td></tr>
-              <tr><td>Evitar logica duplicada</td><td>Corregir un error implica cambiar un solo lugar</td></tr>
+              <tr><td>Funciones con una sola responsabilidad (SRP)</td><td>Localizar el lugar del cambio es inmediato</td></tr>
+              <tr><td>Evitar logica duplicada (DRY)</td><td>Corregir un error implica cambiar un solo lugar</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="footer"><span>Sesion 23 · Costo de mantenimiento</span><span class="counter">8 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Costo de mantenimiento</span><span class="counter">10 / 21</span></div>
       </div>
     </section>
 
-    <!-- 9 · PLAN DE MEJORA MODULAR -->
+    <!-- 11 · PLAN DE MEJORA MODULAR -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Plan de mejora</div>
@@ -306,11 +400,11 @@
           <div class="step callout"><strong>Paso 3 — Priorizar:</strong> atacar primero la deuda que mas impacta en el siguiente cambio previsto.</div>
           <div class="step callout"><strong>Paso 4 — Mejorar con pruebas:</strong> antes de refactorizar, construir al menos un caso de prueba que confirme que la funcion ya funciona. Refactorizar sin romper ese caso.</div>
         </div>
-        <div class="footer"><span>Sesion 23 · Plan de mejora</span><span class="counter">9 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Plan de mejora</span><span class="counter">11 / 21</span></div>
       </div>
     </section>
 
-    <!-- 10 · REFACTORIZAR SIN ROMPER: EJEMPLO -->
+    <!-- 12 · REFACTORIZAR SIN ROMPER: EJEMPLO -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Refactorizacion segura</div>
@@ -347,11 +441,27 @@
           </div>
           <p class="note" style="margin-top:4px;">El caso de prueba de la funcion original debe seguir pasando despues de la refactorizacion.</p>
         </div>
-        <div class="footer"><span>Sesion 23 · Refactorizacion</span><span class="counter">10 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Refactorizacion</span><span class="counter">12 / 21</span></div>
       </div>
     </section>
 
-    <!-- 11 · REVISANDO EL PROYECTO COMPLETO -->
+    <!-- 13 · REFACTORIZACION PASO A PASO (nueva) -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Refactorizacion segura</div>
+        <div class="content">
+          <h2>Proceso paso a paso: una mejora, un commit</h2>
+          <div class="step callout-warn"><strong>Nunca:</strong> refactorizar todo de una sola vez. El riesgo de introducir un error sin poder rastrearlo es muy alto.</div>
+          <div class="step callout-ok"><strong>Paso A:</strong> Anotar la salida esperada con un conjunto de entradas conocido antes de tocar una sola linea.</div>
+          <div class="step callout-ok"><strong>Paso B:</strong> Hacer <em>un solo</em> tipo de cambio: solo renombrar, o solo extraer, o solo separar UI de logica.</div>
+          <div class="step callout-ok"><strong>Paso C:</strong> Compilar y verificar que la salida coincide con la anotada en el Paso A.</div>
+          <div class="step callout-ok"><strong>Paso D:</strong> Commit con tipo <span class="kbd">refactor:</span> y descripcion precisa del cambio. Repetir desde el Paso B con la siguiente mejora.</div>
+        </div>
+        <div class="footer"><span>Sesion 23 · Pasos de refactorizacion</span><span class="counter">13 / 21</span></div>
+      </div>
+    </section>
+
+    <!-- 14 · REVISANDO EL PROYECTO COMPLETO -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Revision de proyecto</div>
@@ -364,15 +474,16 @@
               <tr><td>Main solo coordina, no calcula ni presenta</td><td>Contar cuantas responsabilidades tiene Main</td></tr>
               <tr><td>No hay logica de negocio en funciones de presentacion</td><td>Buscar calculos dentro de Console.WriteLine</td></tr>
               <tr><td>No hay variables globales innecesarias</td><td>Contar variables declaradas fuera de todas las funciones</td></tr>
-              <tr><td>No hay bloques de codigo repetidos</td><td>Buscar segmentos identicos o casi identicos</td></tr>
+              <tr><td>No hay bloques de codigo repetidos (DRY)</td><td>Buscar segmentos identicos o casi identicos</td></tr>
+              <tr><td>Cada funcion hace una sola cosa (SRP)</td><td>Describir la funcion en una frase sin usar "y"</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="footer"><span>Sesion 23 · Lista de verificacion</span><span class="counter">11 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Lista de verificacion</span><span class="counter">14 / 21</span></div>
       </div>
     </section>
 
-    <!-- 12 · DOCUMENTACION MINIMA -->
+    <!-- 15 · DOCUMENTACION MINIMA -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Convenciones de calidad</div>
@@ -398,11 +509,11 @@
             <p><strong>Regla:</strong> comentar decisiones no evidentes, restricciones del negocio y contratos que la firma no puede expresar.</p>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Comentarios</span><span class="counter">12 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Comentarios</span><span class="counter">15 / 21</span></div>
       </div>
     </section>
 
-    <!-- 13 · MENSAJES DE COMMIT -->
+    <!-- 16 · MENSAJES DE COMMIT -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Control de versiones</div>
@@ -431,26 +542,26 @@
           </div>
           <p class="note" style="margin-top:8px;">Formato sugerido: <span class="kbd">tipo: descripcion breve del cambio</span> (tipos: feat, fix, refactor, docs, test).</p>
         </div>
-        <div class="footer"><span>Sesion 23 · Commits</span><span class="counter">13 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Commits</span><span class="counter">16 / 21</span></div>
       </div>
     </section>
 
-    <!-- 14 · PRACTICA: DIAGNOSTICAR UN PROYECTO -->
+    <!-- 17 · PRACTICA: DIAGNOSTICAR UN PROYECTO -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Practica guiada</div>
         <div class="content">
           <h2>Diagnosticar el proyecto de la sesion 22</h2>
           <div class="step callout"><strong>Paso 1:</strong> Abrir el proyecto del gimnasio (S22). Listar todas las funciones con una frase de descripcion.</div>
-          <div class="step callout"><strong>Paso 2:</strong> Aplicar la lista de verificacion de la diapositiva 11. Marcar que criterios se cumplen y cuales no.</div>
+          <div class="step callout"><strong>Paso 2:</strong> Aplicar la lista de verificacion de la diapositiva 14. Marcar que criterios se cumplen y cuales no.</div>
           <div class="step callout"><strong>Paso 3:</strong> Identificar al menos un punto de deuda tecnica con evidencia: nombre poco claro, funcion con dos responsabilidades o logica duplicada.</div>
           <div class="step callout"><strong>Paso 4:</strong> Proponer una mejora concreta (no implementarla todavia): ¿que cambiaria? ¿que nombre pondria? ¿que funcion extraeria?</div>
         </div>
-        <div class="footer"><span>Sesion 23 · Diagnostico</span><span class="counter">14 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Diagnostico</span><span class="counter">17 / 21</span></div>
       </div>
     </section>
 
-    <!-- 15 · PRACTICA: APLICAR UNA MEJORA -->
+    <!-- 18 · PRACTICA: APLICAR UNA MEJORA -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Practica guiada</div>
@@ -476,11 +587,11 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Aplicar mejora</span><span class="counter">15 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Aplicar mejora</span><span class="counter">18 / 21</span></div>
       </div>
     </section>
 
-    <!-- 16 · ERRORES DE MANTENIMIENTO COMUNES -->
+    <!-- 19 · ERRORES DE MANTENIMIENTO COMUNES -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Analisis de errores</div>
@@ -489,17 +600,17 @@
           <table>
             <thead><tr><th>Situacion</th><th>Consecuencia</th><th>Prevencion</th></tr></thead>
             <tbody>
-              <tr><td>Cambiar una regla de negocio en un lugar y olvidar el duplicado</td><td>El programa tiene dos comportamientos distintos segun la ruta de ejecucion</td><td>Eliminar duplicados antes de hacer el cambio</td></tr>
-              <tr><td>Renombrar una variable localmente sin actualizar todos sus usos</td><td>Error de compilacion o peor: referencia al valor antiguo</td><td>Usar "Rename Symbol" del editor en vez de Find & Replace</td></tr>
-              <tr><td>Agregar logica de negocio a una funcion de presentacion</td><td>Cambiar la interfaz rompe el calculo</td><td>Verificar que la funcion solo tenga llamadas a Console</td></tr>
+              <tr><td>Cambiar una regla de negocio en un lugar y olvidar el duplicado</td><td>El programa tiene dos comportamientos distintos segun la ruta de ejecucion</td><td>Eliminar duplicados antes de hacer el cambio (DRY)</td></tr>
+              <tr><td>Renombrar una variable localmente sin actualizar todos sus usos</td><td>Error de compilacion o peor: referencia al valor antiguo</td><td>Usar "Rename Symbol" del editor en vez de Find &amp; Replace</td></tr>
+              <tr><td>Agregar logica de negocio a una funcion de presentacion</td><td>Cambiar la interfaz rompe el calculo</td><td>Verificar que la funcion solo tenga llamadas a Console (SRP)</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="footer"><span>Sesion 23 · Errores de mantenimiento</span><span class="counter">16 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Errores de mantenimiento</span><span class="counter">19 / 21</span></div>
       </div>
     </section>
 
-    <!-- 17 · TALLER -->
+    <!-- 20 · TALLER -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Desarrollo guiado</div>
@@ -535,18 +646,18 @@
             <h2>Tu tarea</h2>
             <ol>
               <li>Ejecutar y anotar la salida con N=2, precio=100000, un cliente premium y uno basico con 18 visitas.</li>
-              <li>Diagnosticar con la lista de la diapositiva 11: ¿cuantos criterios fallan?</li>
+              <li>Diagnosticar con la lista de la diapositiva 14: ¿cuantos criterios fallan?</li>
               <li>Aplicar al menos dos mejoras en orden (una por commit): renombrar variables, extraer <span class="kbd">CalcularDescuento</span>, separar lectura de calculo.</li>
               <li>Verificar que la salida de referencia se mantiene tras cada cambio.</li>
             </ol>
             <p class="note" style="margin-top:8px;">Tipos de commit esperados: <span class="kbd">refactor:</span> y <span class="kbd">fix:</span></p>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Taller</span><span class="counter">17 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Taller</span><span class="counter">20 / 21</span></div>
       </div>
     </section>
 
-    <!-- 18 · CIERRE -->
+    <!-- 21 · CIERRE -->
     <section class="slide content-slide">
       <div class="inner">
         <div class="header">Cierre de sesion</div>
@@ -557,6 +668,7 @@
               <h2>Lo que construimos hoy</h2>
               <ul>
                 <li>Identificamos deuda tecnica con criterios concretos.</li>
+                <li>Aplicamos los principios DRY y SRP como guias de diseño.</li>
                 <li>Aplicamos convenciones de calidad: nombres, cohesion, acoplamiento, documentacion.</li>
                 <li>Relacionamos decisiones tecnicas con su costo de mantenimiento.</li>
                 <li>Refactorizamos sin romper comportamiento verificado.</li>
@@ -572,16 +684,12 @@
             </div>
           </div>
         </div>
-        <div class="footer"><span>Sesion 23 · Cierre</span><span class="counter">18 / 18</span></div>
+        <div class="footer"><span>Sesion 23 · Cierre</span><span class="counter">21 / 21</span></div>
       </div>
     </section>
 
   </div><!-- /stage -->
 
-  <div class="touch-nav" id="touchNav">
-    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
-    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
-  </div>
 </div><!-- /deck -->
 
 <script>
