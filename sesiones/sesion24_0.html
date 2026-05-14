@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Logica de Programacion - Sesion 24</title>
+  <style>
+    :root{
+      --texto:#201F4B;
+      --azul-medio:#015583;
+      --turquesa:#05ADBC;
+      --muted:#6b7280;
+      --white:#ffffff;
+      --h1:clamp(30px,3.4vw,48px);
+      --h2:clamp(22px,2.3vw,34px);
+      --p:clamp(15px,1.3vw,19px);
+      --li:clamp(15px,1.3vw,19px);
+      --safe-top-cover:clamp(208px,9vh,128px);
+      --safe-left-cover:clamp(585px,5.5vw,110px);
+      --safe-right-cover:clamp(28px,3vw,72px);
+      --safe-bottom-cover:clamp(54px,6vh,92px);
+      --safe-top:clamp(100px,9vh,132px);
+      --safe-side:clamp(66px,5.5vw,108px);
+      --safe-bottom:clamp(52px,6vh,90px);
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#ffffff;}
+    .deck{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px);box-sizing:border-box;background:#ffffff;}
+    .stage{width:min(96vw,calc(92vh*(16/9)));aspect-ratio:16/9;position:relative;}
+    .slide{position:absolute;inset:0;display:none;box-shadow:0 14px 40px rgba(0,0,0,.35);overflow:hidden;}
+    .slide.active{display:block;}
+    .slide.cover{background:url("./Portada.png") center/cover no-repeat;color:#ffffff;}
+    .slide.content-slide{background:url("./Contenido.png") top left/contain no-repeat,#ffffff;color:var(--texto);}
+    .inner{height:100%;box-sizing:border-box;padding:var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);display:flex;flex-direction:column;gap:clamp(10px,1.1vw,18px);}
+    .cover .inner{padding:var(--safe-top-cover) var(--safe-right-cover) var(--safe-bottom-cover) var(--safe-left-cover);}
+    .content{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.1vw,16px);min-height:0;}
+    .header{color:var(--azul-medio);font-size:clamp(18px,1.6vw,22px);font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+    h1{margin:0;font-size:var(--h1);line-height:1.08;color:var(--texto);}
+    h2{margin:0;font-size:var(--h2);line-height:1.15;color:var(--azul-medio);}
+    p{margin:0;font-size:var(--p);line-height:1.4;color:var(--texto);}
+    li{font-size:var(--li);line-height:1.4;color:var(--texto);}
+    ul,ol{margin:0;padding-left:1.2em;}
+    .subtitle{color:var(--turquesa);font-weight:800;font-size:clamp(18px,1.8vw,24px);margin-top:clamp(6px,1vw,10px);}
+    .cover h1{color:#ffffff;}
+    .cover p{color:#e5edf8;}
+    .cover .subtitle{color:#f7df00;}
+    .note{color:var(--muted);font-size:clamp(12px,1.05vw,14px);line-height:1.35;}
+    .callout{background:rgba(255,255,255,.94);border-left:6px solid var(--turquesa);padding:clamp(10px,1.1vw,14px);border-radius:6px;}
+    .two-col{display:grid;grid-template-columns:1.15fr .9fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    .equal-col{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,22px);align-items:flex-start;min-height:0;}
+    @media (max-width:980px){.two-col,.equal-col{grid-template-columns:1fr;}}
+    .card{background:rgba(255,255,255,.96);border:1px solid #dde2f1;border-radius:10px;padding:clamp(10px,1.1vw,14px);}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#111827;color:#e5e7eb;padding:2px 8px;border-radius:7px;font-size:clamp(11px,1vw,13px);border:1px solid rgba(255,255,255,.08);}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:clamp(12px,1.05vw,14px);line-height:1.35;background:#0b1020;color:#e5e7eb;border-radius:10px;padding:clamp(10px,1.1vw,14px);overflow:auto;max-height:44vh;border:1px solid rgba(17,24,39,.25);white-space:pre-wrap;}
+    .kw{color:#7dd3fc;}
+    .ty{color:#86efac;}
+    .fn{color:#fde68a;}
+    .cm{color:#94a3b8;font-style:italic;}
+    .st{color:#f9a8d4;}
+    .warn{color:#fbbf24;}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.96);}
+    th,td{border:1px solid #dde2f1;padding:clamp(8px,1vw,12px);font-size:clamp(13px,1.2vw,16px);color:var(--texto);vertical-align:top;}
+    th{background:#f3f6fb;text-transform:uppercase;font-size:clamp(11px,1.1vw,13px);letter-spacing:.06em;color:var(--azul-medio);}
+    .footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:clamp(12px,1.05vw,14px);gap:14px;}
+    .counter{font-weight:800;color:var(--azul-medio);}
+    .cover .counter{color:#e5edf8;}
+    .touch-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 12px;pointer-events:none;z-index:10;}
+    .touch-nav button{pointer-events:auto;width:44px;height:44px;border-radius:999px;padding:0;border:1px solid rgba(221,226,241,.95);background:rgba(255,255,255,.92);color:var(--texto);font-weight:900;box-shadow:0 10px 22px rgba(0,0,0,.12);cursor:pointer;}
+    #touchNav{opacity:0;transform:translateY(-50%) translateY(6px);transition:.15s ease;}
+    .stage:hover #touchNav{opacity:1;transform:translateY(-50%) translateY(0);}
+    @media (hover:none){#touchNav{opacity:1;transform:translateY(-50%);}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+    .step{opacity:0;animation:fadeIn .45s ease forwards;}
+    .step:nth-child(1){animation-delay:.15s;}
+    .step:nth-child(2){animation-delay:.55s;}
+    .step:nth-child(3){animation-delay:.95s;}
+    .step:nth-child(4){animation-delay:1.35s;}
+  </style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · PORTADA -->
+    <section class="slide cover active">
+      <div class="inner">
+        <div class="content" style="justify-content:center;">
+          <h1>Sesion 24</h1>
+          <div class="subtitle">Programacion Orientada a Objetos I</div>
+          <p style="margin-top:clamp(10px,1.4vw,18px);color:#e5edf8;">Unidad 3 · Clases, objetos, campos, propiedades y encapsulamiento en C#</p>
+          <p class="note" style="margin-top:clamp(12px,1.6vw,20px);">Navegacion: &#8592; &#8594; · Home / End · F pantalla completa · Tactil: desliza</p>
+        </div>
+        <div class="footer"><span style="color:#e5edf8;">Logica de Programacion · Grupos 810 / 811</span><span class="counter">1 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 2 · PROPOSITO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Proposito de la sesion</div>
+        <div class="content">
+          <h2>De funciones sueltas a objetos que saben hacer cosas</h2>
+          <ul>
+            <li>Entender que es una clase y como actua como molde para crear objetos.</li>
+            <li>Declarar campos, propiedades y metodos dentro de una clase en C#.</li>
+            <li>Aplicar encapsulamiento para proteger los valores internos del objeto.</li>
+            <li>Crear multiples instancias de una clase y operar con ellas como unidades coherentes.</li>
+            <li>Distinguir entre miembros de instancia y miembros estaticos.</li>
+          </ul>
+        </div>
+        <div class="footer"><span>Sesion 24 · Proposito</span><span class="counter">2 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 3 · ANALOGIA: CLASE VS OBJETO -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Concepto fundamental</div>
+        <div class="content">
+          <h2>La clase es el molde; el objeto es el pastel</h2>
+          <div class="callout">
+            <p><strong>Analogia:</strong> Imagina un molde de silicona con forma de estrella. El molde no tiene sabor, no tiene color, no puedes comerlo. Pero cada vez que viertes masa de diferente sabor y color obtienes un pastel distinto: uno de chocolate amargo con glaseado rojo, otro de vainilla con chispas doradas. Todos tienen la misma forma de estrella porque salieron del mismo molde, pero cada uno es unico e independiente.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="card">
+              <h2>La clase (el molde de silicona)</h2>
+              <ul>
+                <li>Existe una sola vez en el codigo.</li>
+                <li>Define que caracteristicas y acciones tendra cada objeto.</li>
+                <li>No ocupa espacio util hasta que se hornea un pastel.</li>
+                <li>Puedes hacer infinitos objetos con el mismo molde.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>El objeto (el pastel horneado)</h2>
+              <ul>
+                <li>Nace con <span class="kbd">new</span> — es el momento de "hornear".</li>
+                <li>Cada pastel tiene su propio sabor y color independiente.</li>
+                <li>Cambiar el relleno de un pastel no afecta a los demas.</li>
+                <li>Vive en la memoria mientras el programa lo necesita.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Clase vs Objeto</span><span class="counter">3 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 4 · PRIMERA CLASE EN C# -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Sintaxis basica</div>
+        <div class="content">
+          <h2>Declarar una clase y crear objetos en C#</h2>
+          <div class="two-col">
+            <div class="code"><span class="cm">// La clase es el molde — se define una sola vez</span>
+<span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="cm">// Campos: las caracteristicas de cada pastel</span>
+    <span class="kw">public</span> <span class="ty">string</span> Nombre;
+    <span class="kw">public</span> <span class="ty">double</span> SalarioBase;
+    <span class="kw">public</span> <span class="ty">int</span>    Horas;
+
+    <span class="cm">// Metodo: lo que el empleado sabe hacer</span>
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>()
+    {
+        <span class="kw">return</span> SalarioBase * Horas;
+    }
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="cm">// Dos pasteles distintos del mismo molde</span>
+        <span class="ty">Empleado</span> e1 = <span class="kw">new</span> <span class="ty">Empleado</span>(); <span class="cm">// primer horneado</span>
+        e1.Nombre      = <span class="st">"Ana"</span>;
+        e1.SalarioBase = 12000;
+        e1.Horas       = 160;
+
+        <span class="ty">Empleado</span> e2 = <span class="kw">new</span> <span class="ty">Empleado</span>(); <span class="cm">// segundo horneado</span>
+        e2.Nombre      = <span class="st">"Luis"</span>;
+        e2.SalarioBase = 15000;
+        e2.Horas       = 140;
+
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e1.<span class="fn">CalcularPago</span>()); <span class="cm">// 1920000</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e2.<span class="fn">CalcularPago</span>()); <span class="cm">// 2100000</span>
+    }
+}</div>
+            <div class="card">
+              <h2>Cada objeto es independiente</h2>
+              <p>Cambiar <span class="kbd">e1.Horas = 80</span> no afecta a <span class="kbd">e2.Horas</span> en lo absoluto. Son dos pasteles horneados por separado: aunque salieron del mismo molde, modificar la decoracion de uno no altera al otro.</p>
+              <p class="note" style="margin-top:8px;">La clase <span class="kbd">Empleado</span> es el plano de arquitectura. <span class="kbd">e1</span> y <span class="kbd">e2</span> son las dos casas construidas con ese plano: misma distribucion, distintos propietarios.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Primera clase</span><span class="counter">4 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 5 · ENCAPSULAMIENTO: POR QUE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Encapsulamiento</div>
+        <div class="content">
+          <h2>Por que no dejar todos los valores expuestos: la vitrina vs la caja fuerte</h2>
+          <div class="callout">
+            <p><strong>Analogia:</strong> Imagina una joyeria. Los anillos exhibidos en la vitrina los puede ver cualquiera — eso es <span class="kbd">public</span>. Pero el cofre donde la joyera guarda los diamantes sin tallar esta bajo llave — eso es <span class="kbd">private</span>. La joyera decide exactamente que se muestra, a que precio y bajo que condiciones. Sin ese control, cualquiera podria tomar un diamante y ponerle el precio que quiera.</p>
+          </div>
+          <div class="equal-col" style="margin-top:8px;">
+            <div class="card">
+              <h2>Sin encapsulamiento (la vitrina sin cristal)</h2>
+              <div class="code"><span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>();
+e.SalarioBase = <span class="warn">-5000</span>; <span class="cm">// invalido!</span>
+e.Horas       = <span class="warn">-10</span>;   <span class="cm">// invalido!</span>
+<span class="cm">// Cualquiera pone el precio que quiere</span>
+<span class="cm">// y el objeto queda en estado corrupto</span></div>
+            </div>
+            <div class="card">
+              <h2>Con encapsulamiento (vitrina con cristal y cerradura)</h2>
+              <div class="code"><span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>();
+<span class="cm">// La propiedad valida antes de aceptar</span>
+e.SalarioBase = <span class="warn">-5000</span>;
+<span class="cm">// Lanza ArgumentException automaticamente</span>
+<span class="cm">// El diamante nunca sale de la caja fuerte</span>
+<span class="cm">// con un precio incorrecto</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Encapsulamiento</span><span class="counter">5 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 6 · PROPIEDADES CON GET/SET -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Propiedades</div>
+        <div class="content">
+          <h2>Propiedades: la ventanilla del banco que controla cada transaccion</h2>
+          <div class="two-col">
+            <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="cm">// Campo privado: el cofre bajo llave</span>
+    <span class="kw">private</span> <span class="ty">double</span> _salarioBase;
+    <span class="kw">private</span> <span class="ty">int</span>    _horas;
+
+    <span class="cm">// Propiedad: la ventanilla con su guardia</span>
+    <span class="kw">public</span> <span class="ty">double</span> SalarioBase
+    {
+        <span class="kw">get</span> { <span class="kw">return</span> _salarioBase; }
+        <span class="kw">set</span>
+        {
+            <span class="kw">if</span> (value &lt;= 0)
+                <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(
+                    <span class="st">"Salario debe ser positivo"</span>);
+            _salarioBase = value;
+        }
+    }
+
+    <span class="kw">public</span> <span class="ty">int</span> Horas
+    {
+        <span class="kw">get</span> { <span class="kw">return</span> _horas; }
+        <span class="kw">set</span>
+        {
+            <span class="kw">if</span> (value &lt; 0 || value &gt; 744)
+                <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(
+                    <span class="st">"Horas fuera de rango"</span>);
+            _horas = value;
+        }
+    }
+
+    <span class="cm">// Propiedad auto-implementada: el compilador</span>
+    <span class="cm">// genera el campo privado automaticamente</span>
+    <span class="kw">public</span> <span class="ty">string</span> Nombre { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>()
+        =&gt; _salarioBase * _horas;
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>();
+        e.Nombre      = <span class="st">"Ana"</span>;
+        e.SalarioBase = 12000; <span class="cm">// pasa la validacion</span>
+        e.Horas       = 160;
+
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e.<span class="fn">CalcularPago</span>()); <span class="cm">// 1920000</span>
+
+        <span class="cm">// Esto lanza ArgumentException: "Salario debe ser positivo"</span>
+        <span class="cm">// e.SalarioBase = -5000;</span>
+    }
+}</div>
+            <div class="card">
+              <h2>Como funciona la ventanilla</h2>
+              <ul>
+                <li><span class="kbd">get</span>: alguien pide ver el valor — la ventanilla lo entrega.</li>
+                <li><span class="kbd">set</span>: alguien quiere cambiar el valor — el guardia (<span class="kbd">value</span>) lo revisa primero.</li>
+                <li>Si el valor es invalido, el guardia rechaza la transaccion antes de que llegue al cofre.</li>
+                <li>El cofre interno (<span class="kbd">_salarioBase</span>) jamas queda en estado corrupto.</li>
+              </ul>
+              <p class="note" style="margin-top:8px;"><span class="kbd">value</span> es la palabra reservada que contiene lo que alguien intenta asignar.</p>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Propiedades</span><span class="counter">6 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 7 · CONSTRUCTORES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Constructor</div>
+        <div class="content">
+          <h2>El constructor: el ritual de inauguracion que le da vida al objeto</h2>
+          <div class="callout">
+            <p><strong>Analogia:</strong> Cuando un restaurante abre por primera vez, antes de recibir clientes el dueno hace un ritual de inauguracion: enciende las luces, coloca el menu en cada mesa, verifica que la caja registradora tenga cambio y pone el letrero de "Abierto". Si algo falla en ese ritual — por ejemplo no hay caja — el restaurante simplemente no abre. El <strong>constructor</strong> es ese ritual: garantiza que el objeto abre sus puertas en condiciones perfectas o no abre en absoluto.</p>
+          </div>
+          <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="kw">private</span> <span class="ty">double</span> _salarioBase;
+    <span class="kw">private</span> <span class="ty">int</span>    _horas;
+
+    <span class="kw">public</span> <span class="ty">string</span> Nombre { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+
+    <span class="cm">// Constructor: mismo nombre que la clase, sin tipo de retorno</span>
+    <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> nombre, <span class="ty">double</span> salarioBase, <span class="ty">int</span> horas)
+    {
+        <span class="cm">// Si algo falla, el objeto NO se crea (no abre el restaurante)</span>
+        <span class="kw">if</span> (salarioBase &lt;= 0) <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Salario invalido"</span>);
+        <span class="kw">if</span> (horas &lt; 0)        <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Horas invalidas"</span>);
+        Nombre       = nombre;
+        _salarioBase = salarioBase;
+        _horas       = horas;
+    }
+
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>() =&gt; _salarioBase * _horas;
+    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>() =&gt; <span class="st">$"{Nombre} | pago: {_salarioBase * _horas:C}"</span>;
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="cm">// El restaurante abre solo si todo esta correcto</span>
+        <span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>, 12000, 160);
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e); <span class="cm">// Ana | pago: $1,920,000.00</span>
+
+        <span class="cm">// Este intento lanza excepcion: el restaurante no abre</span>
+        <span class="cm">// Empleado mal = new Empleado("X", -1, 160); // ArgumentException</span>
+    }
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Constructor</span><span class="counter">7 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 8 · MIEMBROS ESTATICOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Miembros estaticos</div>
+        <div class="content">
+          <h2>Instancia vs estatico: el apodo propio vs el apellido familiar</h2>
+          <div class="callout">
+            <p><strong>Analogia:</strong> En la familia Garcia cada hijo tiene su apodo propio — Juan es "Juancho", Maria es "Mafe" — ese apodo es de <em>instancia</em>: es personal, nadie mas lo tiene. Pero el apellido "Garcia" es de toda la familia: es <em>estatico</em>, compartido por todos, y lo accedes por el apellido directamente, no por cada persona individualmente.</p>
+          </div>
+          <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="cm">// Estatico: el "apellido" compartido por todos los objetos</span>
+    <span class="kw">public static</span> <span class="ty">int</span> TotalEmpleados = 0;
+
+    <span class="kw">public</span> <span class="ty">string</span> Nombre { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> nombre)
+    {
+        Nombre = nombre;
+        TotalEmpleados++; <span class="cm">// cada nuevo objeto actualiza el contador familiar</span>
+    }
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="ty">Empleado</span> a = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>);
+        <span class="ty">Empleado</span> b = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Luis"</span>);
+        <span class="ty">Empleado</span> c = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Mia"</span>);
+
+        <span class="cm">// Se accede por el nombre de la clase, no por el objeto</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(<span class="ty">Empleado</span>.TotalEmpleados); <span class="cm">// 3</span>
+        <span class="cm">// a.Nombre es "Ana"  — apodo personal (instancia)</span>
+        <span class="cm">// Empleado.TotalEmpleados es 3 — apellido familiar (estatico)</span>
+    }
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Estaticos</span><span class="counter">8 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 9 · METODO ToString -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Buenas practicas</div>
+        <div class="content">
+          <h2>Sobreescribir ToString: la etiqueta en la mermelada</h2>
+          <div class="callout">
+            <p><strong>Analogia:</strong> Tienes tres frascos de mermelada en la despensa. Si ninguno tiene etiqueta, al abrirlos no sabes si son de fresa, de mango o de ciruela. Si cada frasco tiene su etiqueta, de un vistazo sabes exactamente que hay adentro. <span class="kbd">ToString()</span> es la etiqueta que pones en el objeto para que al mostrarlo en pantalla diga algo util — no el nombre tecnico del frasco.</p>
+          </div>
+          <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="kw">public</span> <span class="ty">string</span> Nombre      { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">double</span> SalarioBase  { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">int</span>    Horas         { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> nombre, <span class="ty">double</span> salarioBase, <span class="ty">int</span> horas)
+    {
+        Nombre = nombre; SalarioBase = salarioBase; Horas = horas;
+    }
+
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>() =&gt; SalarioBase * Horas;
+
+    <span class="cm">// Sin override: Console.WriteLine(e) imprime "Empleado" — frasco sin etiqueta</span>
+    <span class="cm">// Con override: imprime la etiqueta util que nosotros definimos</span>
+    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>()
+        =&gt; <span class="st">$"[{Nombre}] pago mensual: {CalcularPago():C}"</span>;
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="ty">Empleado</span> e1 = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>,  12000, 160);
+        <span class="ty">Empleado</span> e2 = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Luis"</span>, 15000, 140);
+
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e1); <span class="cm">// [Ana]  pago mensual: $1,920,000.00</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e2); <span class="cm">// [Luis] pago mensual: $2,100,000.00</span>
+    }
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 24 · ToString</span><span class="counter">9 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 10 · ARREGLO DE OBJETOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Colecciones de objetos</div>
+        <div class="content">
+          <h2>Arreglo de objetos: el cajón con varios frascos etiquetados</h2>
+          <div class="code"><span class="kw">using</span> System;
+
+<span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="kw">public</span> <span class="ty">string</span> Nombre     { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">double</span> SalarioBase { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">int</span>    Horas        { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> nombre, <span class="ty">double</span> salarioBase, <span class="ty">int</span> horas)
+    {
+        Nombre = nombre; SalarioBase = salarioBase; Horas = horas;
+    }
+
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>() =&gt; SalarioBase * Horas;
+    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>() =&gt; <span class="st">$"{Nombre,-12} | {CalcularPago(),14:C}"</span>;
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="cm">// El cajon: tres frascos distintos, todos del mismo molde</span>
+        <span class="ty">Empleado</span>[] equipo = {
+            <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>,   12000, 160),
+            <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Luis"</span>,  15000, 140),
+            <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Mia"</span>,   11000, 168),
+        };
+
+        <span class="ty">double</span> totalNomina = 0;
+        <span class="kw">foreach</span> (<span class="ty">Empleado</span> e <span class="kw">in</span> equipo)
+        {
+            <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e);          <span class="cm">// usa ToString()</span>
+            totalNomina += e.<span class="fn">CalcularPago</span>();
+        }
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(<span class="st">$"\nTotal nomina: {totalNomina:C}"</span>);
+    }
+}
+<span class="cm">// Ana          |  $1,920,000.00</span>
+<span class="cm">// Luis         |  $2,100,000.00</span>
+<span class="cm">// Mia          |  $1,848,000.00</span>
+<span class="cm">// Total nomina: $5,868,000.00</span></div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Arreglos de objetos</span><span class="counter">10 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 11 · SEPARACION EN ARCHIVOS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Organizacion del codigo</div>
+        <div class="content">
+          <h2>Cada clase en su propio archivo: un cuarto para cada cosa</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Estructura recomendada</h2>
+              <div class="code"><span class="cm">// ── Empleado.cs ──────────────────────</span>
+<span class="kw">class</span> <span class="ty">Empleado</span>
+{
+    <span class="kw">public</span> <span class="ty">string</span> Nombre     { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">double</span> SalarioBase { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">int</span>    Horas        { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> n, <span class="ty">double</span> s, <span class="ty">int</span> h)
+    { Nombre = n; SalarioBase = s; Horas = h; }
+
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>() =&gt; SalarioBase * Horas;
+    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>()
+        =&gt; <span class="st">$"{Nombre,-12} | {CalcularPago():C}"</span>;
+}
+
+<span class="cm">// ── Program.cs ───────────────────────</span>
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="cm">// Solo orquestacion y entrada/salida</span>
+        <span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>, 12000, 160);
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e);
+    }
+}</div>
+            </div>
+            <div class="card">
+              <h2>Por que separar — la analogia de la cocina</h2>
+              <p>En un restaurante, la receta del chef (como se prepara cada plato) vive en la cocina. El menu que ve el cliente (como se presenta) vive en el salon. Si cambia la receta, solo va al chef. Si cambia el menu, solo se imprime de nuevo. Nadie confunde los dos mundos.</p>
+              <ul style="margin-top:8px;">
+                <li>Cambias la regla de pago → solo editas <span class="kbd">Empleado.cs</span>.</li>
+                <li>Cambias como se muestra → solo editas <span class="kbd">Program.cs</span>.</li>
+                <li><span class="kbd">Empleado.cs</span> puede reutilizarse en otro proyecto sin tocar nada mas.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Separacion de archivos</span><span class="counter">11 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 12 · EJEMPLO COMPLETO: CUENTA BANCARIA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Ejemplo integrador</div>
+        <div class="content">
+          <h2>Clase CuentaBancaria: encapsulamiento en accion</h2>
+          <div class="code"><span class="kw">class</span> <span class="ty">CuentaBancaria</span>
+{
+    <span class="kw">private</span> <span class="ty">double</span> _saldo;
+
+    <span class="kw">public</span> <span class="ty">string</span> Titular { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">double</span> Saldo    =&gt; _saldo; <span class="cm">// ventanilla de solo lectura</span>
+
+    <span class="kw">public</span> <span class="fn">CuentaBancaria</span>(<span class="ty">string</span> titular, <span class="ty">double</span> saldoInicial)
+    {
+        <span class="kw">if</span> (saldoInicial &lt; 0)
+            <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Saldo inicial no puede ser negativo"</span>);
+        Titular = titular;
+        _saldo  = saldoInicial;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Depositar</span>(<span class="ty">double</span> monto)
+    {
+        <span class="kw">if</span> (monto &lt;= 0) <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Monto invalido"</span>);
+        _saldo += monto;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Retirar</span>(<span class="ty">double</span> monto)
+    {
+        <span class="kw">if</span> (monto &lt;= 0 || monto &gt; _saldo)
+            <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Retiro no valido"</span>);
+        _saldo -= monto;
+    }
+
+    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>()
+        =&gt; <span class="st">$"[{Titular}] saldo actual: {_saldo:C}"</span>;
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="ty">CuentaBancaria</span> c = <span class="kw">new</span> <span class="ty">CuentaBancaria</span>(<span class="st">"Ana"</span>, 500000);
+        c.<span class="fn">Depositar</span>(200000);  <span class="cm">// _saldo = 700 000</span>
+        c.<span class="fn">Retirar</span>(100000);    <span class="cm">// _saldo = 600 000</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(c); <span class="cm">// [Ana] saldo actual: $600,000.00</span>
+        <span class="cm">// c._saldo = 9999;   // ERROR: campo privado, no accesible</span>
+    }
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 24 · CuentaBancaria</span><span class="counter">12 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 13 · TABLA DE MIEMBROS -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Resumen de miembros</div>
+        <div class="content">
+          <h2>Tipos de miembros de una clase en C#</h2>
+          <table>
+            <thead><tr><th>Miembro</th><th>Que es</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td>Campo</td><td>Variable interna que guarda el estado del objeto. Normalmente privado.</td><td><span class="kbd">private double _saldo;</span></td></tr>
+              <tr><td>Propiedad</td><td>Ventanilla controlada de acceso a un campo. Puede validar en <span class="kbd">set</span>.</td><td><span class="kbd">public double Saldo =&gt; _saldo;</span></td></tr>
+              <tr><td>Constructor</td><td>Ritual de apertura que inicializa el objeto al crearlo con <span class="kbd">new</span>.</td><td><span class="kbd">public CuentaBancaria(string t, double s)</span></td></tr>
+              <tr><td>Metodo</td><td>Accion que el objeto sabe realizar usando sus propios valores internos.</td><td><span class="kbd">public void Depositar(double m)</span></td></tr>
+              <tr><td>Miembro estatico</td><td>Pertenece a la clase entera, no a ningun objeto individual.</td><td><span class="kbd">public static int TotalEmpleados;</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 24 · Tipos de miembros</span><span class="counter">13 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 14 · VISIBILIDAD -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Modificadores de acceso</div>
+        <div class="content">
+          <h2>public, private, protected: el plano de la casa y sus habitaciones</h2>
+          <div class="callout">
+            <p><strong>Analogia:</strong> <span class="kbd">public</span> es la sala de estar — cualquier visita entra. <span class="kbd">private</span> es el cuarto del dueno bajo llave — solo el vive ahi, nadie mas entra. <span class="kbd">protected</span> es el cuarto de juegos familiar — los hijos (subclases) pueden entrar, pero los vecinos no. Lo veremos en herencia, sesion 25.</p>
+          </div>
+          <table style="margin-top:8px;">
+            <thead><tr><th>Modificador</th><th>Quien puede acceder</th><th>Uso tipico</th></tr></thead>
+            <tbody>
+              <tr><td><span class="kbd">public</span></td><td>Cualquier codigo, desde cualquier archivo.</td><td>Propiedades y metodos que forman la interfaz visible del objeto.</td></tr>
+              <tr><td><span class="kbd">private</span></td><td>Unicamente el codigo dentro de la misma clase.</td><td>Campos internos y metodos auxiliares que no deben exponerse.</td></tr>
+              <tr><td><span class="kbd">protected</span></td><td>La clase y sus clases hijas (subclases).</td><td>Campos que las subclases necesitan pero el mundo exterior no debe tocar.</td></tr>
+            </tbody>
+          </table>
+          <p class="note" style="margin-top:8px;"><strong>Regla de oro:</strong> empieza siempre con <span class="kbd">private</span>. Solo lo abres a <span class="kbd">public</span> cuando hay una razon clara para que codigo externo lo use.</p>
+        </div>
+        <div class="footer"><span>Sesion 24 · Modificadores</span><span class="counter">14 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 15 · ERRORES COMUNES -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Errores frecuentes</div>
+        <div class="content">
+          <h2>Errores tipicos al aprender clases por primera vez</h2>
+          <table>
+            <thead><tr><th>Error</th><th>Codigo con error</th><th>Correccion</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Olvidar <span class="kbd">new</span> — la variable apunta a nada</td>
+                <td><div class="code"><span class="ty">Empleado</span> e;
+e.Nombre = <span class="st">"Ana"</span>;
+<span class="warn">// NullReferenceException en ejecucion</span>
+<span class="cm">// e existe como variable pero no</span>
+<span class="cm">// hay ningun objeto creado en memoria</span></div></td>
+                <td><div class="code"><span class="ty">Empleado</span> e =
+    <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>, 12000, 160);
+<span class="ty">Console</span>.<span class="fn">WriteLine</span>(e.Nombre);</div></td>
+              </tr>
+              <tr>
+                <td>Acceder a campo privado desde fuera</td>
+                <td><div class="code">c._saldo = 999999;
+<span class="warn">// Error de compilacion:</span>
+<span class="warn">// '_saldo' es inaccesible por</span>
+<span class="warn">// su nivel de proteccion</span></div></td>
+                <td>Usar el metodo publico: <span class="kbd">c.Depositar(999999)</span> — que valida antes de cambiar el valor.</td>
+              </tr>
+              <tr>
+                <td>Constructor sin validacion</td>
+                <td><div class="code"><span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">double</span> s)
+{
+    _salarioBase = s; <span class="cm">// acepta -9000</span>
+}</div></td>
+                <td><div class="code"><span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">double</span> s)
+{
+    <span class="kw">if</span> (s &lt;= 0) <span class="kw">throw new</span>
+        <span class="ty">ArgumentException</span>(<span class="st">"invalido"</span>);
+    _salarioBase = s;
+}</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="footer"><span>Sesion 24 · Errores frecuentes</span><span class="counter">15 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 16 · PRACTICA GUIADA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Practica guiada</div>
+        <div class="content">
+          <h2>Construir la clase Producto desde cero</h2>
+          <div class="step callout"><strong>Paso 1:</strong> Crear <span class="kbd">Producto.cs</span> con campos privados <span class="kbd">_nombre</span>, <span class="kbd">_precio</span>, <span class="kbd">_stock</span> y propiedades publicas de solo lectura. Reglas: precio &gt; 0, stock &gt;= 0.</div>
+          <div class="step callout"><strong>Paso 2:</strong> Agregar el constructor que recibe los tres valores, valida las reglas y lanza excepcion si alguna falla. El objeto no se crea en estado invalido.</div>
+          <div class="step callout"><strong>Paso 3:</strong> Agregar metodo <span class="kbd">Vender(int cantidad)</span> que descuenta stock y lanza excepcion si no hay suficiente, y <span class="kbd">Reabastecer(int cantidad)</span> que suma al stock.</div>
+          <div class="step callout"><strong>Paso 4:</strong> Sobreescribir <span class="kbd">ToString()</span>. En <span class="kbd">Program.cs</span>, crear 3 productos, vender algunos y mostrar el estado final de cada uno.</div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Practica guiada</span><span class="counter">16 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 17 · SOLUCION PRACTICA -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Solucion practica</div>
+        <div class="content">
+          <h2>Clase Producto: implementacion y uso completos</h2>
+          <div class="code"><span class="kw">class</span> <span class="ty">Producto</span>
+{
+    <span class="kw">private</span> <span class="ty">string</span> _nombre;
+    <span class="kw">private</span> <span class="ty">double</span> _precio;
+    <span class="kw">private</span> <span class="ty">int</span>    _stock;
+
+    <span class="kw">public</span> <span class="ty">string</span> Nombre =&gt; _nombre;
+    <span class="kw">public</span> <span class="ty">double</span> Precio =&gt; _precio;
+    <span class="kw">public</span> <span class="ty">int</span>    Stock  =&gt; _stock;
+
+    <span class="kw">public</span> <span class="fn">Producto</span>(<span class="ty">string</span> nombre, <span class="ty">double</span> precio, <span class="ty">int</span> stock)
+    {
+        <span class="kw">if</span> (precio &lt;= 0) <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Precio invalido"</span>);
+        <span class="kw">if</span> (stock  &lt;  0) <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Stock invalido"</span>);
+        _nombre = nombre; _precio = precio; _stock = stock;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Vender</span>(<span class="ty">int</span> cantidad)
+    {
+        <span class="kw">if</span> (cantidad &lt;= 0 || cantidad &gt; _stock)
+            <span class="kw">throw new</span> <span class="ty">InvalidOperationException</span>(<span class="st">"Stock insuficiente"</span>);
+        _stock -= cantidad;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Reabastecer</span>(<span class="ty">int</span> cantidad)
+    {
+        <span class="kw">if</span> (cantidad &lt;= 0) <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Cantidad invalida"</span>);
+        _stock += cantidad;
+    }
+
+    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>()
+        =&gt; <span class="st">$"{_nombre,-15} | precio: {_precio,10:C} | stock: {_stock,4}"</span>;
+}
+
+<span class="kw">class</span> <span class="ty">Program</span>
+{
+    <span class="kw">static void</span> <span class="fn">Main</span>()
+    {
+        <span class="ty">Producto</span> p1 = <span class="kw">new</span> <span class="ty">Producto</span>(<span class="st">"Laptop"</span>,  3500000, 10);
+        <span class="ty">Producto</span> p2 = <span class="kw">new</span> <span class="ty">Producto</span>(<span class="st">"Teclado"</span>,   85000, 50);
+        <span class="ty">Producto</span> p3 = <span class="kw">new</span> <span class="ty">Producto</span>(<span class="st">"Mouse"</span>,      45000, 30);
+
+        p1.<span class="fn">Vender</span>(3);
+        p2.<span class="fn">Vender</span>(12);
+        p3.<span class="fn">Reabastecer</span>(20);
+
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(p1); <span class="cm">// Laptop          | precio: $3,500,000 | stock:    7</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(p2); <span class="cm">// Teclado         | precio:    $85,000 | stock:   38</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(p3); <span class="cm">// Mouse           | precio:    $45,000 | stock:   50</span>
+    }
+}</div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Solucion Producto</span><span class="counter">17 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 18 · TALLER -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Taller</div>
+        <div class="content">
+          <h2>Taller: sistema de reservas de asientos de cine</h2>
+          <div class="callout">
+            <p><strong>Enunciado:</strong> Modelar una clase <span class="kbd">Asiento</span> que represente un asiento de sala de cine. Cada asiento tiene numero (1 a 200), fila (char A-J) y estado (libre u ocupado). Debe permitir reservar y liberar. Un asiento ocupado no puede reservarse de nuevo. Crear 5 asientos y simular el proceso completo.</p>
+          </div>
+          <ul>
+            <li>Campos privados; propiedades de solo lectura para numero y fila.</li>
+            <li>Propiedad <span class="kbd">EstaOcupado</span> (bool, de solo lectura desde fuera).</li>
+            <li>Metodos <span class="kbd">Reservar()</span> y <span class="kbd">Liberar()</span> con validacion que lanzan excepcion descriptiva.</li>
+            <li><span class="kbd">ToString()</span> que muestre: <span class="kbd">A-12 [OCUPADO]</span> o <span class="kbd">B-05 [libre]</span>.</li>
+            <li>En <span class="kbd">Main</span>: crear 5 asientos, reservar algunos, intentar reservar uno ya ocupado dentro de un <span class="kbd">try/catch</span> y mostrar el mensaje de error, luego imprimir el estado final de todos.</li>
+          </ul>
+        </div>
+        <div class="footer"><span>Sesion 24 · Taller</span><span class="counter">18 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 19 · PREGUNTAS DE REFLEXION -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Reflexion</div>
+        <div class="content">
+          <h2>Preguntas para consolidar el aprendizaje</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Preguntas conceptuales</h2>
+              <ul>
+                <li>Explica con tu propia analogia (distinta al molde de pastel) la diferencia entre clase y objeto.</li>
+                <li>¿Por que es peligroso tener todos los campos <span class="kbd">public</span>? Da un ejemplo concreto de que podria salir mal.</li>
+                <li>¿Que hace exactamente <span class="kbd">new</span>? ¿Que ocurre en la memoria del computador?</li>
+                <li>¿Cuando tiene sentido usar un miembro <span class="kbd">static</span>?</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Preguntas de codigo</h2>
+              <ul>
+                <li>Si tienes <span class="kbd">Producto p1</span> y <span class="kbd">Producto p2</span>, ¿afecta <span class="kbd">p1.Vender(3)</span> al stock de <span class="kbd">p2</span>? Explica por que.</li>
+                <li>¿Que diferencia hay entre <span class="kbd">public double Precio =&gt; _precio;</span> y <span class="kbd">public double Precio { get; set; }</span>?</li>
+                <li>¿Por que el constructor lanza excepcion en lugar de simplemente ignorar el valor invalido?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Reflexion</span><span class="counter">19 / 20</span></div>
+      </div>
+    </section>
+
+    <!-- 20 · CIERRE -->
+    <section class="slide content-slide">
+      <div class="inner">
+        <div class="header">Cierre de sesion</div>
+        <div class="content">
+          <h2>Lo que construiste hoy</h2>
+          <div class="equal-col">
+            <div class="card">
+              <h2>Conceptos nuevos</h2>
+              <ul>
+                <li><strong>Clase:</strong> el molde — define la forma de todos los objetos de ese tipo.</li>
+                <li><strong>Objeto:</strong> el pastel horneado — instancia real creada con <span class="kbd">new</span>.</li>
+                <li><strong>Encapsulamiento:</strong> campos privados + propiedades que validan antes de guardar.</li>
+                <li><strong>Constructor:</strong> garantiza que el objeto abre sus puertas en estado valido.</li>
+                <li><strong>Estatico:</strong> el apellido familiar — compartido por todos los objetos.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h2>Que viene en sesion 25</h2>
+              <ul>
+                <li><strong>Herencia:</strong> el hijo recibe todo del padre y agrega lo suyo.</li>
+                <li><strong>Polimorfismo:</strong> el mismo mensaje, respuestas distintas segun el tipo.</li>
+                <li><strong>Clases abstractas:</strong> planos que no pueden construirse directamente.</li>
+                <li><strong>Interfaces:</strong> contratos de comportamiento que cualquier clase puede firmar.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>Sesion 24 · Cierre</span><span class="counter">20 / 20</span></div>
+      </div>
+    </section>
+
+  </div><!-- /stage -->
+
+  <div class="touch-nav" id="touchNav">
+    <button id="btnPrev" aria-label="Anterior">&#9664;</button>
+    <button id="btnNext" aria-label="Siguiente">&#9654;</button>
+  </div>
+</div><!-- /deck -->
+
+<script>
+  (function(){
+    const slides=Array.from(document.querySelectorAll('.slide'));
+    const counters=Array.from(document.querySelectorAll('.counter'));
+    const stage=document.getElementById('stage');
+    const btnPrev=document.getElementById('btnPrev');
+    const btnNext=document.getElementById('btnNext');
+    let idx=0;
+    function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+    function show(i){
+      idx=clamp(i,0,slides.length-1);
+      slides.forEach((s,k)=>s.classList.toggle('active',k===idx));
+      const label=(idx+1)+" / "+slides.length;
+      counters.forEach(el=>el.textContent=label);
+      history.replaceState(null,"","#"+(idx+1));
+    }
+    function next(){show(idx+1);}
+    function prev(){show(idx-1);}
+    const m=(location.hash||"").match(/^#(\d+)$/);
+    if(m){const s=parseInt(m[1],10);if(!isNaN(s))idx=clamp(s-1,0,slides.length-1);}
+    show(idx);
+    btnPrev.addEventListener('click',prev);
+    btnNext.addEventListener('click',next);
+    document.addEventListener('keydown',(e)=>{
+      const k=e.key;
+      if(k==='f'||k==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();return;}
+      if(k==='ArrowRight'||k==='PageDown'||k===' '){e.preventDefault();next();}
+      else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();prev();}
+      else if(k==='Home'){e.preventDefault();show(0);}
+      else if(k==='End'){e.preventDefault();show(slides.length-1);}
+    });
+    const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    if(isTouch){
+      let x0=null,y0=null,t0=0;
+      const SWIPE_MIN_X=50,SWIPE_MAX_Y=80,SWIPE_MAX_MS=800;
+      stage.addEventListener('touchstart',(e)=>{const t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();},{passive:true});
+      stage.addEventListener('touchend',(e)=>{
+        if(x0===null||y0===null)return;
+        const t=e.changedTouches[0];const dx=t.clientX-x0,dy=t.clientY-y0,dt=Date.now()-t0;
+        x0=null;y0=null;
+        if(dt>SWIPE_MAX_MS||Math.abs(dy)>SWIPE_MAX_Y)return;
+        if(dx<=-SWIPE_MIN_X)next();else if(dx>=SWIPE_MIN_X)prev();
+      },{passive:true});
+    }
+  })();
+</script>
+</body>
+</html>
