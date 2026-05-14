@@ -100,7 +100,7 @@
         <div class="content">
           <h2>De funciones sueltas a objetos que saben hacer cosas</h2>
           <ul>
-            <li>Entender que es una clase y como actua como molde para crear objetos.</li>
+            <li>Entender que es una clase y como actua como formulario para crear objetos.</li>
             <li>Declarar campos, propiedades y metodos dentro de una clase en C#.</li>
             <li>Aplicar encapsulamiento para proteger los valores internos del objeto.</li>
             <li>Crear multiples instancias de una clase y operar con ellas como unidades coherentes.</li>
@@ -116,26 +116,26 @@
       <div class="inner">
         <div class="header">Concepto fundamental</div>
         <div class="content">
-          <h2>La clase es el molde; el objeto es el pastel</h2>
+          <h2>La clase es el formulario de contratacion; el objeto es la ficha del empleado</h2>
           <div class="callout">
-            <p><strong>Analogia:</strong> Imagina un molde de silicona con forma de estrella. El molde no tiene sabor, no tiene color, no puedes comerlo. Pero cada vez que viertes masa de diferente sabor y color obtienes un pastel distinto: uno de chocolate amargo con glaseado rojo, otro de vainilla con chispas doradas. Todos tienen la misma forma de estrella porque salieron del mismo molde, pero cada uno es unico e independiente.</p>
+            <p><strong>Analogia:</strong> El departamento de Recursos Humanos tiene un formulario de contratacion estandar: nombre, puesto, salario, fecha de ingreso. El formulario no es ningun empleado — es solo la estructura en papel. Cuando contratan a Ana lo llenan con sus datos, cuando contratan a Luis lo llenan con los suyos. Cada ficha resultante es una persona real e independiente, aunque ambas vienen del mismo formulario.</p>
           </div>
           <div class="equal-col" style="margin-top:8px;">
             <div class="card">
-              <h2>La clase (el molde de silicona)</h2>
+              <h2>La clase (el formulario de contratacion)</h2>
               <ul>
                 <li>Existe una sola vez en el codigo.</li>
-                <li>Define que caracteristicas y acciones tendra cada objeto.</li>
-                <li>No ocupa espacio util hasta que se hornea un pastel.</li>
-                <li>Puedes hacer infinitos objetos con el mismo molde.</li>
+                <li>Define que datos y acciones tendra cada empleado.</li>
+                <li>No es ningun empleado real hasta que alguien lo llena.</li>
+                <li>Puedes contratar infinitos empleados con el mismo formulario.</li>
               </ul>
             </div>
             <div class="card">
-              <h2>El objeto (el pastel horneado)</h2>
+              <h2>El objeto (la ficha del empleado)</h2>
               <ul>
-                <li>Nace con <span class="kbd">new</span> — es el momento de "hornear".</li>
-                <li>Cada pastel tiene su propio sabor y color independiente.</li>
-                <li>Cambiar el relleno de un pastel no afecta a los demas.</li>
+                <li>Nace con <span class="kbd">new</span> — es el momento de "contratar".</li>
+                <li>Cada ficha tiene sus propios datos independientes.</li>
+                <li>Cambiar el salario de Ana no afecta el salario de Luis.</li>
                 <li>Vive en la memoria mientras el programa lo necesita.</li>
               </ul>
             </div>
@@ -152,10 +152,10 @@
         <div class="content">
           <h2>Declarar una clase y crear objetos en C#</h2>
           <div class="two-col">
-            <div class="code"><span class="cm">// La clase es el molde — se define una sola vez</span>
+            <div class="code"><span class="cm">// La clase es el formulario de contratacion — se define una sola vez</span>
 <span class="kw">class</span> <span class="ty">Empleado</span>
 {
-    <span class="cm">// Campos: las caracteristicas de cada pastel</span>
+    <span class="cm">// Campos: los datos de cada empleado contratado</span>
     <span class="kw">public</span> <span class="ty">string</span> Nombre;
     <span class="kw">public</span> <span class="ty">double</span> SalarioBase;
     <span class="kw">public</span> <span class="ty">int</span>    Horas;
@@ -171,13 +171,13 @@
 {
     <span class="kw">static void</span> <span class="fn">Main</span>()
     {
-        <span class="cm">// Dos pasteles distintos del mismo molde</span>
-        <span class="ty">Empleado</span> e1 = <span class="kw">new</span> <span class="ty">Empleado</span>(); <span class="cm">// primer horneado</span>
+        <span class="cm">// Dos fichas distintas del mismo formulario de contratacion</span>
+        <span class="ty">Empleado</span> e1 = <span class="kw">new</span> <span class="ty">Empleado</span>(); <span class="cm">// primera contratacion</span>
         e1.Nombre      = <span class="st">"Ana"</span>;
         e1.SalarioBase = 12000;
         e1.Horas       = 160;
 
-        <span class="ty">Empleado</span> e2 = <span class="kw">new</span> <span class="ty">Empleado</span>(); <span class="cm">// segundo horneado</span>
+        <span class="ty">Empleado</span> e2 = <span class="kw">new</span> <span class="ty">Empleado</span>(); <span class="cm">// segunda contratacion</span>
         e2.Nombre      = <span class="st">"Luis"</span>;
         e2.SalarioBase = 15000;
         e2.Horas       = 140;
@@ -188,8 +188,8 @@
 }</div>
             <div class="card">
               <h2>Cada objeto es independiente</h2>
-              <p>Cambiar <span class="kbd">e1.Horas = 80</span> no afecta a <span class="kbd">e2.Horas</span> en lo absoluto. Son dos pasteles horneados por separado: aunque salieron del mismo molde, modificar la decoracion de uno no altera al otro.</p>
-              <p class="note" style="margin-top:8px;">La clase <span class="kbd">Empleado</span> es el plano de arquitectura. <span class="kbd">e1</span> y <span class="kbd">e2</span> son las dos casas construidas con ese plano: misma distribucion, distintos propietarios.</p>
+              <p>Cambiar <span class="kbd">e1.Horas = 80</span> no afecta a <span class="kbd">e2.Horas</span> en lo absoluto. Son dos fichas de empleado completadas por separado: aunque nacieron del mismo formulario, los datos de una no modifican los de la otra.</p>
+              <p class="note" style="margin-top:8px;">La clase <span class="kbd">Empleado</span> es el formulario en blanco de RRHH. <span class="kbd">e1</span> y <span class="kbd">e2</span> son las dos fichas completadas: mismo formato, datos distintos. Cambiar <span class="kbd">e1.Horas = 80</span> no afecta a <span class="kbd">e2.Horas</span> en lo absoluto.</p>
             </div>
           </div>
         </div>
@@ -202,27 +202,35 @@
       <div class="inner">
         <div class="header">Encapsulamiento</div>
         <div class="content">
-          <h2>Por que no dejar todos los valores expuestos: la vitrina vs la caja fuerte</h2>
+          <h2>El problema: cuando los datos quedan expuestos sin control</h2>
           <div class="callout">
-            <p><strong>Analogia:</strong> Imagina una joyeria. Los anillos exhibidos en la vitrina los puede ver cualquiera — eso es <span class="kbd">public</span>. Pero el cofre donde la joyera guarda los diamantes sin tallar esta bajo llave — eso es <span class="kbd">private</span>. La joyera decide exactamente que se muestra, a que precio y bajo que condiciones. Sin ese control, cualquiera podria tomar un diamante y ponerle el precio que quiera.</p>
+            <p><strong>Conexion con lo que ya sabes:</strong> Hasta ahora hemos usado variables sueltas. Con clases, esas variables viven <em>dentro</em> del objeto. Si las dejamos <span class="kbd">public</span>, cualquier parte del programa puede cambiarlas con cualquier valor — incluso valores que no tienen sentido. El <strong>encapsulamiento</strong> es la tecnica para evitarlo: guardas los datos <em>adentro</em> y solo permites cambiarlos de forma controlada.</p>
           </div>
           <div class="equal-col" style="margin-top:8px;">
             <div class="card">
-              <h2>Sin encapsulamiento (la vitrina sin cristal)</h2>
+              <h2>Sin control — cualquiera escribe lo que quiere</h2>
               <div class="code"><span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>();
-e.SalarioBase = <span class="warn">-5000</span>; <span class="cm">// invalido!</span>
-e.Horas       = <span class="warn">-10</span>;   <span class="cm">// invalido!</span>
-<span class="cm">// Cualquiera pone el precio que quiere</span>
-<span class="cm">// y el objeto queda en estado corrupto</span></div>
+e.Nombre      = <span class="st">"Ana"</span>;
+e.SalarioBase = <span class="warn">-5000</span>; <span class="cm">// no tiene sentido</span>
+e.Horas       = <span class="warn">-10</span>;   <span class="cm">// tampoco</span>
+
+<span class="cm">// El programa sigue sin quejarse...</span>
+<span class="cm">// pero el calculo dara un resultado</span>
+<span class="cm">// completamente incorrecto.</span>
+<span class="ty">Console</span>.<span class="fn">WriteLine</span>(e.<span class="fn">CalcularPago</span>()); <span class="cm">// 50000 ???</span></div>
             </div>
             <div class="card">
-              <h2>Con encapsulamiento (vitrina con cristal y cerradura)</h2>
+              <h2>Con control — la clase cuida sus datos</h2>
               <div class="code"><span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>();
-<span class="cm">// La propiedad valida antes de aceptar</span>
-e.SalarioBase = <span class="warn">-5000</span>;
-<span class="cm">// Lanza ArgumentException automaticamente</span>
-<span class="cm">// El diamante nunca sale de la caja fuerte</span>
-<span class="cm">// con un precio incorrecto</span></div>
+e.Nombre      = <span class="st">"Ana"</span>;
+
+<span class="cm">// SalarioBase y Horas ahora son</span>
+<span class="cm">// propiedades con logica de validacion.</span>
+<span class="cm">// Veremos como escribirlas en el</span>
+<span class="cm">// siguiente slide.</span>
+e.SalarioBase = 12000; <span class="cm">// acepta: es valido</span>
+e.Horas       = 160;   <span class="cm">// acepta: es valido</span></div>
+              <p class="note" style="margin-top:8px;">La clase <em>decide</em> que valores acepta. El codigo externo no puede saltarse esa decision.</p>
             </div>
           </div>
         </div>
@@ -235,45 +243,31 @@ e.SalarioBase = <span class="warn">-5000</span>;
       <div class="inner">
         <div class="header">Propiedades</div>
         <div class="content">
-          <h2>Propiedades: la ventanilla del banco que controla cada transaccion</h2>
+          <h2>Campos privados y propiedades: como la clase protege sus datos</h2>
           <div class="two-col">
             <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
 {
-    <span class="cm">// Campo privado: el cofre bajo llave</span>
+    <span class="cm">// Campo privado: solo la clase puede tocarlo</span>
     <span class="kw">private</span> <span class="ty">double</span> _salarioBase;
-    <span class="kw">private</span> <span class="ty">int</span>    _horas;
 
-    <span class="cm">// Propiedad: la ventanilla con su guardia</span>
+    <span class="cm">// Propiedad: la "ventanilla" para entrar y salir</span>
     <span class="kw">public</span> <span class="ty">double</span> SalarioBase
     {
         <span class="kw">get</span> { <span class="kw">return</span> _salarioBase; }
         <span class="kw">set</span>
         {
-            <span class="kw">if</span> (value &lt;= 0)
-                <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(
-                    <span class="st">"Salario debe ser positivo"</span>);
-            _salarioBase = value;
+            <span class="kw">if</span> (value &gt; 0)         <span class="cm">// solo acepta si es valido</span>
+                _salarioBase = value;
+            <span class="cm">// si no, simplemente no cambia nada</span>
         }
     }
 
-    <span class="kw">public</span> <span class="ty">int</span> Horas
-    {
-        <span class="kw">get</span> { <span class="kw">return</span> _horas; }
-        <span class="kw">set</span>
-        {
-            <span class="kw">if</span> (value &lt; 0 || value &gt; 744)
-                <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(
-                    <span class="st">"Horas fuera de rango"</span>);
-            _horas = value;
-        }
-    }
-
-    <span class="cm">// Propiedad auto-implementada: el compilador</span>
-    <span class="cm">// genera el campo privado automaticamente</span>
-    <span class="kw">public</span> <span class="ty">string</span> Nombre { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">string</span> Nombre; <span class="cm">// este lo dejamos publico por ahora</span>
 
     <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>()
-        =&gt; _salarioBase * _horas;
+    {
+        <span class="kw">return</span> _salarioBase * 160;
+    }
 }
 
 <span class="kw">class</span> <span class="ty">Program</span>
@@ -282,24 +276,21 @@ e.SalarioBase = <span class="warn">-5000</span>;
     {
         <span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>();
         e.Nombre      = <span class="st">"Ana"</span>;
-        e.SalarioBase = 12000; <span class="cm">// pasa la validacion</span>
-        e.Horas       = 160;
-
+        e.SalarioBase = 12000;       <span class="cm">// acepta: 12000 > 0</span>
+        e.SalarioBase = <span class="warn">-5000</span>;      <span class="cm">// ignora: -5000 no pasa el if</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e.SalarioBase); <span class="cm">// 12000  (no cambio)</span>
         <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e.<span class="fn">CalcularPago</span>()); <span class="cm">// 1920000</span>
-
-        <span class="cm">// Esto lanza ArgumentException: "Salario debe ser positivo"</span>
-        <span class="cm">// e.SalarioBase = -5000;</span>
     }
 }</div>
             <div class="card">
-              <h2>Como funciona la ventanilla</h2>
+              <h2>Como funciona paso a paso</h2>
               <ul>
-                <li><span class="kbd">get</span>: alguien pide ver el valor — la ventanilla lo entrega.</li>
-                <li><span class="kbd">set</span>: alguien quiere cambiar el valor — el guardia (<span class="kbd">value</span>) lo revisa primero.</li>
-                <li>Si el valor es invalido, el guardia rechaza la transaccion antes de que llegue al cofre.</li>
-                <li>El cofre interno (<span class="kbd">_salarioBase</span>) jamas queda en estado corrupto.</li>
+                <li><span class="kbd">private double _salarioBase</span> — el campo vive <em>adentro</em> de la clase, nadie externo puede tocarlo directamente.</li>
+                <li><span class="kbd">get</span> — cuando alguien <em>lee</em> <span class="kbd">SalarioBase</span>, este bloque devuelve el valor.</li>
+                <li><span class="kbd">set</span> — cuando alguien <em>escribe</em> <span class="kbd">SalarioBase = algo</span>, este bloque recibe ese "algo" en la palabra reservada <span class="kbd">value</span> y decide si lo acepta.</li>
+                <li>Si <span class="kbd">value</span> no pasa la condicion, el campo interno no cambia — el objeto queda intacto.</li>
               </ul>
-              <p class="note" style="margin-top:8px;"><span class="kbd">value</span> es la palabra reservada que contiene lo que alguien intenta asignar.</p>
+              <p class="note" style="margin-top:8px;">Convencion: los campos privados llevan guion bajo al inicio (<span class="kbd">_salarioBase</span>) para distinguirlos visualmente de las propiedades.</p>
             </div>
           </div>
         </div>
@@ -312,42 +303,40 @@ e.SalarioBase = <span class="warn">-5000</span>;
       <div class="inner">
         <div class="header">Constructor</div>
         <div class="content">
-          <h2>El constructor: el ritual de inauguracion que le da vida al objeto</h2>
+          <h2>El constructor: inicializar el objeto en el momento de crearlo</h2>
           <div class="callout">
-            <p><strong>Analogia:</strong> Cuando un restaurante abre por primera vez, antes de recibir clientes el dueno hace un ritual de inauguracion: enciende las luces, coloca el menu en cada mesa, verifica que la caja registradora tenga cambio y pone el letrero de "Abierto". Si algo falla en ese ritual — por ejemplo no hay caja — el restaurante simplemente no abre. El <strong>constructor</strong> es ese ritual: garantiza que el objeto abre sus puertas en condiciones perfectas o no abre en absoluto.</p>
+            <p><strong>Analogia:</strong> Cuando RRHH da de alta a un nuevo empleado, completa el formulario en ese mismo momento: nombre, puesto y salario. No existe una ficha de empleado "vacia que se llena despues". El <strong>constructor</strong> hace lo mismo: recibe los datos en el momento del <span class="kbd">new</span> y los asigna de una vez, garantizando que el objeto nace completo.</p>
           </div>
           <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
 {
     <span class="kw">private</span> <span class="ty">double</span> _salarioBase;
     <span class="kw">private</span> <span class="ty">int</span>    _horas;
-
-    <span class="kw">public</span> <span class="ty">string</span> Nombre { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">public</span>  <span class="ty">string</span> Nombre;
 
     <span class="cm">// Constructor: mismo nombre que la clase, sin tipo de retorno</span>
     <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> nombre, <span class="ty">double</span> salarioBase, <span class="ty">int</span> horas)
     {
-        <span class="cm">// Si algo falla, el objeto NO se crea (no abre el restaurante)</span>
-        <span class="kw">if</span> (salarioBase &lt;= 0) <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Salario invalido"</span>);
-        <span class="kw">if</span> (horas &lt; 0)        <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="st">"Horas invalidas"</span>);
         Nombre       = nombre;
         _salarioBase = salarioBase;
         _horas       = horas;
     }
 
-    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>() =&gt; _salarioBase * _horas;
-    <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>() =&gt; <span class="st">$"{Nombre} | pago: {_salarioBase * _horas:C}"</span>;
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>()
+    {
+        <span class="kw">return</span> _salarioBase * _horas;
+    }
 }
 
 <span class="kw">class</span> <span class="ty">Program</span>
 {
     <span class="kw">static void</span> <span class="fn">Main</span>()
     {
-        <span class="cm">// El restaurante abre solo si todo esta correcto</span>
-        <span class="ty">Empleado</span> e = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>, 12000, 160);
-        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e); <span class="cm">// Ana | pago: $1,920,000.00</span>
+        <span class="cm">// Los datos van directo en el new — el objeto nace completo</span>
+        <span class="ty">Empleado</span> e1 = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>,  12000, 160);
+        <span class="ty">Empleado</span> e2 = <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Luis"</span>, 15000, 140);
 
-        <span class="cm">// Este intento lanza excepcion: el restaurante no abre</span>
-        <span class="cm">// Empleado mal = new Empleado("X", -1, 160); // ArgumentException</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e1.<span class="fn">CalcularPago</span>()); <span class="cm">// 1920000</span>
+        <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e2.<span class="fn">CalcularPago</span>()); <span class="cm">// 2100000</span>
     }
 }</div>
         </div>
@@ -362,7 +351,7 @@ e.SalarioBase = <span class="warn">-5000</span>;
         <div class="content">
           <h2>Instancia vs estatico: el apodo propio vs el apellido familiar</h2>
           <div class="callout">
-            <p><strong>Analogia:</strong> En la familia Garcia cada hijo tiene su apodo propio — Juan es "Juancho", Maria es "Mafe" — ese apodo es de <em>instancia</em>: es personal, nadie mas lo tiene. Pero el apellido "Garcia" es de toda la familia: es <em>estatico</em>, compartido por todos, y lo accedes por el apellido directamente, no por cada persona individualmente.</p>
+            <p><strong>Analogia:</strong> Cada empleado de la empresa tiene su propio numero de gafete — ese numero es de <em>instancia</em>: es personal, nadie mas lo tiene. Pero el nombre de la empresa impreso en todos los gafetes es de toda la organizacion: es <em>estatico</em>, compartido por cada empleado contratado, y lo accedes por el nombre de la empresa directamente, no por cada persona.</p>
           </div>
           <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
 {
@@ -402,27 +391,38 @@ e.SalarioBase = <span class="warn">-5000</span>;
       <div class="inner">
         <div class="header">Buenas practicas</div>
         <div class="content">
-          <h2>Sobreescribir ToString: la etiqueta en la mermelada</h2>
+          <h2>Sobreescribir ToString: la etiqueta en la carpeta del expediente</h2>
           <div class="callout">
-            <p><strong>Analogia:</strong> Tienes tres frascos de mermelada en la despensa. Si ninguno tiene etiqueta, al abrirlos no sabes si son de fresa, de mango o de ciruela. Si cada frasco tiene su etiqueta, de un vistazo sabes exactamente que hay adentro. <span class="kbd">ToString()</span> es la etiqueta que pones en el objeto para que al mostrarlo en pantalla diga algo util — no el nombre tecnico del frasco.</p>
+            <p><strong>Analogia:</strong> En la oficina tienes tres carpetas apiladas sin rotulo. Al abrirlas no sabes si es el contrato de Ana, el expediente de Luis o la auditoria de nomina. Si cada carpeta tiene una etiqueta con el nombre y el departamento, de un vistazo sabes exactamente que hay adentro. <span class="kbd">ToString()</span> es la etiqueta que le pones al objeto para que al mostrarlo en pantalla diga algo util — no el nombre tecnico de la carpeta.</p>
           </div>
           <div class="code"><span class="kw">class</span> <span class="ty">Empleado</span>
 {
-    <span class="kw">public</span> <span class="ty">string</span> Nombre      { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
-    <span class="kw">public</span> <span class="ty">double</span> SalarioBase  { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
-    <span class="kw">public</span> <span class="ty">int</span>    Horas         { <span class="kw">get</span>; <span class="kw">private</span> <span class="kw">set</span>; }
+    <span class="kw">private</span> <span class="ty">string</span> _nombre;
+    <span class="kw">private</span> <span class="ty">double</span> _salarioBase;
+    <span class="kw">private</span> <span class="ty">int</span>    _horas;
+
+    <span class="kw">public</span> <span class="ty">string</span> Nombre     { <span class="kw">get</span> { <span class="kw">return</span> _nombre;      } }
+    <span class="kw">public</span> <span class="ty">double</span> SalarioBase { <span class="kw">get</span> { <span class="kw">return</span> _salarioBase; } }
+    <span class="kw">public</span> <span class="ty">int</span>    Horas        { <span class="kw">get</span> { <span class="kw">return</span> _horas;       } }
 
     <span class="kw">public</span> <span class="fn">Empleado</span>(<span class="ty">string</span> nombre, <span class="ty">double</span> salarioBase, <span class="ty">int</span> horas)
     {
-        Nombre = nombre; SalarioBase = salarioBase; Horas = horas;
+        _nombre      = nombre;
+        _salarioBase = salarioBase;
+        _horas       = horas;
     }
 
-    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>() =&gt; SalarioBase * Horas;
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">CalcularPago</span>()
+    {
+        <span class="kw">return</span> _salarioBase * _horas;
+    }
 
-    <span class="cm">// Sin override: Console.WriteLine(e) imprime "Empleado" — frasco sin etiqueta</span>
+    <span class="cm">// Sin override: Console.WriteLine(e) imprime "Empleado" — carpeta sin rotulo</span>
     <span class="cm">// Con override: imprime la etiqueta util que nosotros definimos</span>
     <span class="kw">public override</span> <span class="ty">string</span> <span class="fn">ToString</span>()
-        =&gt; <span class="st">$"[{Nombre}] pago mensual: {CalcularPago():C}"</span>;
+    {
+        <span class="kw">return</span> <span class="st">$"[{_nombre}] pago mensual: {CalcularPago():C}"</span>;
+    }
 }
 
 <span class="kw">class</span> <span class="ty">Program</span>
@@ -436,6 +436,7 @@ e.SalarioBase = <span class="warn">-5000</span>;
         <span class="ty">Console</span>.<span class="fn">WriteLine</span>(e2); <span class="cm">// [Luis] pago mensual: $2,100,000.00</span>
     }
 }</div>
+          <p class="note" style="margin-top:8px;">Una propiedad con solo <span class="kbd">get</span> es de <strong>solo lectura</strong> desde fuera: cualquiera puede leer el valor, pero nadie puede cambiarlo directamente — solo el constructor o los metodos de la clase pueden escribir en el campo privado.</p>
         </div>
         <div class="footer"><span>Sesion 24 · ToString</span><span class="counter">9 / 20</span></div>
       </div>
@@ -446,7 +447,7 @@ e.SalarioBase = <span class="warn">-5000</span>;
       <div class="inner">
         <div class="header">Colecciones de objetos</div>
         <div class="content">
-          <h2>Arreglo de objetos: el cajón con varios frascos etiquetados</h2>
+          <h2>Arreglo de objetos: la lista de nomina del departamento</h2>
           <div class="code"><span class="kw">using</span> System;
 
 <span class="kw">class</span> <span class="ty">Empleado</span>
@@ -468,7 +469,7 @@ e.SalarioBase = <span class="warn">-5000</span>;
 {
     <span class="kw">static void</span> <span class="fn">Main</span>()
     {
-        <span class="cm">// El cajon: tres frascos distintos, todos del mismo molde</span>
+        <span class="cm">// La nomina: tres empleados distintos, todos del mismo formulario</span>
         <span class="ty">Empleado</span>[] equipo = {
             <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Ana"</span>,   12000, 160),
             <span class="kw">new</span> <span class="ty">Empleado</span>(<span class="st">"Luis"</span>,  15000, 140),
@@ -529,8 +530,8 @@ e.SalarioBase = <span class="warn">-5000</span>;
 }</div>
             </div>
             <div class="card">
-              <h2>Por que separar — la analogia de la cocina</h2>
-              <p>En un restaurante, la receta del chef (como se prepara cada plato) vive en la cocina. El menu que ve el cliente (como se presenta) vive en el salon. Si cambia la receta, solo va al chef. Si cambia el menu, solo se imprime de nuevo. Nadie confunde los dos mundos.</p>
+              <h2>Por que separar — la analogia del departamento</h2>
+              <p>En la empresa, las reglas de negocio (como se calcula el pago) viven en el departamento de nomina. La pantalla que ve el usuario (como se presenta) es responsabilidad de sistemas. Si cambia la formula de pago, solo se modifica nomina. Si cambia la presentacion, solo se toca la interfaz. Nadie confunde los dos mundos.</p>
               <ul style="margin-top:8px;">
                 <li>Cambias la regla de pago → solo editas <span class="kbd">Empleado.cs</span>.</li>
                 <li>Cambias como se muestra → solo editas <span class="kbd">Program.cs</span>.</li>
@@ -623,9 +624,9 @@ e.SalarioBase = <span class="warn">-5000</span>;
       <div class="inner">
         <div class="header">Modificadores de acceso</div>
         <div class="content">
-          <h2>public, private, protected: el plano de la casa y sus habitaciones</h2>
+          <h2>public, private, protected: las zonas de acceso de la empresa</h2>
           <div class="callout">
-            <p><strong>Analogia:</strong> <span class="kbd">public</span> es la sala de estar — cualquier visita entra. <span class="kbd">private</span> es el cuarto del dueno bajo llave — solo el vive ahi, nadie mas entra. <span class="kbd">protected</span> es el cuarto de juegos familiar — los hijos (subclases) pueden entrar, pero los vecinos no. Lo veremos en herencia, sesion 25.</p>
+            <p><strong>Analogia:</strong> <span class="kbd">public</span> es la recepcion — cualquier visitante entra. <span class="kbd">private</span> es la boveda de RRHH bajo llave — solo el personal autorizado entra, nadie externo. <span class="kbd">protected</span> es la sala de reunion interna — los empleados del departamento (subclases) tienen acceso, pero los visitantes externos no. Lo veremos en herencia, sesion 25.</p>
           </div>
           <table style="margin-top:8px;">
             <thead><tr><th>Modificador</th><th>Quien puede acceder</th><th>Uso tipico</th></tr></thead>
@@ -797,7 +798,7 @@ e.Nombre = <span class="st">"Ana"</span>;
             <div class="card">
               <h2>Preguntas conceptuales</h2>
               <ul>
-                <li>Explica con tu propia analogia (distinta al molde de pastel) la diferencia entre clase y objeto.</li>
+                <li>Explica con tu propia analogia (distinta al formulario de contratacion) la diferencia entre clase y objeto.</li>
                 <li>¿Por que es peligroso tener todos los campos <span class="kbd">public</span>? Da un ejemplo concreto de que podria salir mal.</li>
                 <li>¿Que hace exactamente <span class="kbd">new</span>? ¿Que ocurre en la memoria del computador?</li>
                 <li>¿Cuando tiene sentido usar un miembro <span class="kbd">static</span>?</li>
@@ -827,11 +828,11 @@ e.Nombre = <span class="st">"Ana"</span>;
             <div class="card">
               <h2>Conceptos nuevos</h2>
               <ul>
-                <li><strong>Clase:</strong> el molde — define la forma de todos los objetos de ese tipo.</li>
-                <li><strong>Objeto:</strong> el pastel horneado — instancia real creada con <span class="kbd">new</span>.</li>
+                <li><strong>Clase:</strong> el formulario de contratacion — define la estructura de todos los objetos de ese tipo.</li>
+                <li><strong>Objeto:</strong> la ficha del empleado contratado — instancia real creada con <span class="kbd">new</span>.</li>
                 <li><strong>Encapsulamiento:</strong> campos privados + propiedades que validan antes de guardar.</li>
-                <li><strong>Constructor:</strong> garantiza que el objeto abre sus puertas en estado valido.</li>
-                <li><strong>Estatico:</strong> el apellido familiar — compartido por todos los objetos.</li>
+                <li><strong>Constructor:</strong> checklist de alta que garantiza que el objeto entra al sistema en estado valido.</li>
+                <li><strong>Estatico:</strong> el nombre de la empresa en el gafete — compartido por todos los objetos.</li>
               </ul>
             </div>
             <div class="card">
@@ -839,7 +840,7 @@ e.Nombre = <span class="st">"Ana"</span>;
               <ul>
                 <li><strong>Herencia:</strong> el hijo recibe todo del padre y agrega lo suyo.</li>
                 <li><strong>Polimorfismo:</strong> el mismo mensaje, respuestas distintas segun el tipo.</li>
-                <li><strong>Clases abstractas:</strong> planos que no pueden construirse directamente.</li>
+                <li><strong>Clases abstractas:</strong> formularios que obligan a completar ciertos campos — no generan empleados directamente.</li>
                 <li><strong>Interfaces:</strong> contratos de comportamiento que cualquier clase puede firmar.</li>
               </ul>
             </div>
